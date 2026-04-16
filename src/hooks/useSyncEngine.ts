@@ -4,12 +4,14 @@ import { useIvStore } from "../store/useIvStore";
 import { pullSync, pushSync } from "../lib/sync";
 import { useSyncStatus } from "./useSyncStatus";
 
-const DEBOUNCE_MS  = 2_000;  // wait 2 s after the last change before pushing
-const RETRY_MS     = 10_000; // retry a failed push after 10 s
+const DEBOUNCE_MS      = 2_000;  // wait 2 s after the last change before pushing
+const RETRY_MS         = 10_000; // retry a failed push after 10 s
+const POLL_INTERVAL_MS = 30_000; // poll for remote changes every 30 s
 
 /**
  * Mounts sync behaviour into the app:
  *  - Pulls from server once on mount (after Zustand localStorage rehydration)
+ *  - Polls every 30 s for remote changes; only applies data when server is newer
  *  - Pushes to server on every caught/pending/session change, debounced 2 s
  *
  * Does nothing if SYNC_TOKEN is not configured (sync silently disabled).
@@ -40,6 +42,38 @@ export function useSyncEngine() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // intentional — one pull on mount only
 
+  // ── Poll every 30 s for remote changes ─────────────────────────────────────
+  // Skips when a pull or debounced push is already in flight so we never
+  // overwrite pending local changes with stale server data.
+  // Uses skipIfNotNewerThan so setState is only called when the server has
+  // data the client hasn't seen yet — no spurious echo pushes.
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      // Don't poll while a pull is in progress or the user has unsaved local changes
+      if (isPulling.current || debounceRef.current) return;
+
+      const { lastSynced } = useSyncStatus.getState();
+      isPulling.current = true;
+      try {
+        const result = await pullSync({ skipIfNotNewerThan: lastSynced ?? undefined });
+        if (result.ok && result.savedAt) {
+          const remoteDate = new Date(result.savedAt);
+          // Only update the "Synced X ago" indicator when remote data was applied
+          if (!lastSynced || remoteDate > lastSynced) {
+            setLastSynced(remoteDate);
+          }
+        }
+        // Silently ignore 204, auth errors, and network failures during polling
+      } catch { /* silent — don't spam the UI with polling errors */ }
+      finally {
+        setTimeout(() => { isPulling.current = false; }, 0);
+      }
+    }, POLL_INTERVAL_MS);
+
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // intentional — one interval for the app lifetime
+
   // ── Push on state changes (debounced) ──────────────────────────────────────
   const caughtByGen   = useDexStore((s) => s.caughtByGen);
   const pendingByGen  = useDexStore((s) => s.pendingByGen);
@@ -60,16 +94,18 @@ export function useSyncEngine() {
     setSyncing(true);
 
     debounceRef.current = setTimeout(async () => {
+      debounceRef.current = null; // clear so the poller can see there's no pending push
       const result = await pushSync();
 
       if (result.ok) {
-        setLastSynced(new Date());
+        // Use the server's savedAt so the poller can compare timestamps accurately
+        setLastSynced(result.savedAt ? new Date(result.savedAt) : new Date());
       } else if (result.error !== "Sync not configured") {
         setError(result.error);
         // Schedule one automatic retry
         retryRef.current = setTimeout(async () => {
           const retry = await pushSync();
-          if (retry.ok) setLastSynced(new Date());
+          if (retry.ok) setLastSynced(retry.savedAt ? new Date(retry.savedAt) : new Date());
           else setError(retry.error);
         }, RETRY_MS);
       } else {

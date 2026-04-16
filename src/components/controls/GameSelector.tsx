@@ -17,7 +17,7 @@ export default function GameSelector({ meta }: Props) {
   const noneSelected = activeGames.length === 0;
 
   return (
-    <div className="flex items-center gap-1 flex-wrap">
+    <div className="flex items-center gap-1 flex-shrink-0">
       <button
         onClick={clearActiveGames}
         className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${

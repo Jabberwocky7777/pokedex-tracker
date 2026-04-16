@@ -55,8 +55,12 @@ export type SyncResult =
   | { ok: true;  savedAt?: string }
   | { ok: false; error: string };
 
-/** Pull the latest snapshot from the server and overwrite local stores. */
-export async function pullSync(): Promise<SyncResult> {
+/** Pull the latest snapshot from the server and overwrite local stores.
+ *  If `skipIfNotNewerThan` is provided, skips applying state when the remote
+ *  savedAt is not newer — used by the polling interval to avoid overwriting
+ *  local data with an unchanged server snapshot.
+ */
+export async function pullSync(opts?: { skipIfNotNewerThan?: Date }): Promise<SyncResult> {
   if (!isEnabled()) return { ok: false, error: "Sync not configured" };
 
   let res: Response;
@@ -77,6 +81,11 @@ export async function pullSync(): Promise<SyncResult> {
     body = await res.json() as { data: BackupData; savedAt: string };
   } catch {
     return { ok: false, error: "Invalid response from sync server" };
+  }
+
+  // If the caller supplied a reference time, skip applying when remote isn't newer.
+  if (opts?.skipIfNotNewerThan && new Date(body.savedAt) <= opts.skipIfNotNewerThan) {
+    return { ok: true, savedAt: body.savedAt };
   }
 
   const { data } = body;
