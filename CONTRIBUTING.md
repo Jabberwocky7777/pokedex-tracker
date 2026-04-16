@@ -29,7 +29,7 @@ src/
   components/
     box-view/       # PC box grid (BoxView, Box, PokemonCell)
     catch-calculator/ # Standalone catch rate tool
-    controls/       # Small UI controls (GameSelector, DexModeSelector, etc.)
+    controls/       # Small UI controls (GameSelector, DexModeSelector, SyncIndicator, etc.)
     detail-panel/   # Sidebar/overlay Pokémon details (DetailPanel, LocationTable, EvolutionBadge)
     iv-checker/     # IV calculator + PC Box session saves
     layout/         # Top-level Layout + Header
@@ -41,13 +41,16 @@ src/
     usePokemonFilter.ts   # Main filtering pipeline (gen → dex → availability → search)
     useProgress.ts        # Caught/total progress calculation
     useRouteIndex.ts      # Inverted index: location → version → method → Pokémon[]
+    useSyncEngine.ts      # Sync orchestration: pull on mount, debounced push on change
+    useSyncStatus.ts      # Non-persisted Zustand store for sync UI state
   lib/
     backup.ts             # Export/import backup JSON
     catch-rate.ts         # Gen III/IV catch probability formula
     format-location.ts    # Location slug → display name (hardcoded overrides)
     iv-calc.ts            # IV calculation formulas, nature multipliers, stat projection
-    move-fetch.ts         # PokéAPI learnset/move fetcher with session caching
+    move-fetch.ts         # PokéAPI learnset/move fetcher with session caching (Gen III + IV)
     pokemon-display.ts    # Sprite selector, dex number formatter
+    sync.ts               # pullSync() / pushSync() — communicates with /api/sync endpoint
     type-colors.ts        # TYPE_COLORS (hex) and TYPE_BG_COLORS (Tailwind classes)
   store/
     useDexStore.ts        # Caught/pending per generation (Zustand + localStorage)
@@ -57,6 +60,10 @@ src/
     index.css             # Tailwind v4 entry point
   types/
     index.ts              # All shared TypeScript types
+
+sync-server/
+  server.js               # Express sync API (GET/POST /api/sync, GET /health)
+  package.json            # Dependencies: express only
 
 public/data/
   pokemon.json            # ~1.2 MB compiled Pokémon data (served at runtime, NOT bundled)
@@ -84,9 +91,9 @@ npm run generate-data
 ```
 
 **Output files:**
-- `public/data/pokemon.json` — 386+ Pokémon with encounters, evolution chains, regional dex entries, catch rates, and base stats. Compact JSON (no indent).
+- `public/data/pokemon.json` — 493 Pokémon with encounters, evolution chains, regional dex entries, catch rates, and base stats. Compact JSON (no indent).
 - `src/data/meta.json` — Generation definitions and regional dex metadata.
-- `src/data/boxes.json` — PC box layout (13 boxes × 30 slots).
+- `src/data/boxes.json` — PC box layout.
 
 **Rate limiting:** The script batches 10 Pokémon per request with a 250ms delay. A full run takes 3–5 minutes. Do not remove the delay — PokéAPI will throttle or ban the IP.
 
@@ -94,15 +101,17 @@ npm run generate-data
 
 ---
 
-## Scope: Currently Gen III Only
+## Expanding to New Generations
 
-`src/data/meta.json` lists `activeGenerations: [3]`. The type system in `src/types/index.ts` supports Gen 1–9, and `scripts/constants.ts` has Gen 4 version names and IDs already defined.
+`src/data/meta.json` lists `activeGenerations: [3, 4]`. The type system in `src/types/index.ts` supports Gen 1–9, and `scripts/constants.ts` has version names and IDs for later generations.
 
 **To add a new generation:**
 1. Update `scripts/constants.ts` — add version names to `GEN_META` and `REGIONAL_DEXES`
 2. Run `npm run generate-data` — fetches the new Pokémon from PokéAPI
 3. Add display colors/labels to `GAME_COLORS`/`GAME_LABELS` in `src/types/index.ts`
 4. Add location name overrides to `src/lib/format-location.ts` for the new region
+5. Add version group definitions to `src/lib/move-fetch.ts` and a machine map file (e.g. `src/components/pokedex/gen5-machines.ts`)
+6. Update `PokedexTab.tsx` to include the new version groups for the new generation
 
 ---
 
