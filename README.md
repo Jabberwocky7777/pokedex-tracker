@@ -14,7 +14,8 @@ A Gen III–IV Pokémon collection tracker with cross-device sync, a catch rate 
 - **IV checker** — Multi-level stat entry, IV range narrowing, stat projections, nature support, and PC Box session saves
 - **Pokédex tab** — Base stat bars, side-by-side comparisons, and full learnset viewer (level-up, TM/HM, egg moves, tutors) via PokéAPI for both Gen III and Gen IV games
 - **Route info** — Browse encounter tables by location, version, and method
-- **Cross-device sync** — Optional self-hosted sync server (included in the Docker image) keeps progress in sync between PC and phone
+- **Cross-device sync** — Optional self-hosted sync server (included in the Docker image) keeps progress in sync between PC and phone; polls every 30 s so changes appear automatically without a page reload
+- **Mobile & tablet ready** — Hamburger drawer navigation, horizontally-scrollable filter controls, and touch-friendly tap targets for iPhone and iPad
 - **Dark mode** — Enabled by default, no flash on load
 
 ---
@@ -119,13 +120,23 @@ Your browser will show a login prompt — enter the `NGINX_USER` and `NGINX_PASS
 ### Sync across devices
 
 Once the app is running with a `SYNC_TOKEN` set, cross-device sync is automatic:
-- On every page load the app pulls the latest snapshot from the server
-- After any catch/release, the app pushes an update (debounced 2 s)
-- A sync indicator appears in the header showing sync status
+- **On page load** — pulls the latest snapshot from the server
+- **On every change** — pushes an update 2 seconds after the last catch/release
+- **Every 30 seconds** — polls for remote changes so if you catch something on your phone, your PC tab updates automatically without a reload
+- A sync indicator in the header shows live status (syncing / synced / error)
 
-To use sync on your phone, just open the same URL on your phone's browser.
+To use sync on your phone, open the same URL in your phone's browser and log in with the same `NGINX_USER` / `NGINX_PASSWORD`.
 
 > **No token set?** Sync is silently disabled — the app works exactly as before, with data in browser localStorage only.
+
+### Exposing to the internet (optional)
+
+To access the app from outside your home network, put it behind HTTPS. Two easy options:
+
+- **Cloudflare Tunnel** (recommended) — free, hides your home IP, no port forwarding needed. Install the Cloudflare Tunnel app on TrueNAS and point it at `http://localhost:7777`.
+- **Cloudflare DNS proxy** — point your domain's A record at your home IP with the orange-cloud proxy enabled. Forward port 443 → 7777 on your router. Cloudflare handles TLS.
+
+The nginx Basic Auth login prompt (`NGINX_USER` / `NGINX_PASSWORD`) protects the site from random visitors — they can't reach the sync API or see any data without your credentials.
 
 ### Updating to a new version
 
