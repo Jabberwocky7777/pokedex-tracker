@@ -3,7 +3,6 @@
 const express = require("express");
 const fs      = require("fs");
 const path    = require("path");
-const os      = require("os");
 
 const TOKEN    = process.env.SYNC_TOKEN || "";
 const PORT     = parseInt(process.env.PORT || "3001", 10);
@@ -27,7 +26,10 @@ function readData() {
 }
 
 function writeData(payload) {
-  const tmp = path.join(os.tmpdir(), `sync-${Date.now()}.json.tmp`);
+  // Temp file must live in the same directory (same filesystem) as the target
+  // so that renameSync is atomic. Writing to os.tmpdir() fails with EXDEV when
+  // /data is a mounted host-path volume on a different filesystem.
+  const tmp = path.join(DATA_DIR, `sync-${Date.now()}.json.tmp`);
   fs.writeFileSync(tmp, JSON.stringify(payload), "utf8");
   fs.renameSync(tmp, DATA_FILE);
 }
