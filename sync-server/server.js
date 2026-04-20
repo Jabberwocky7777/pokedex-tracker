@@ -4,11 +4,12 @@ const express = require("express");
 const fs      = require("fs");
 const path    = require("path");
 
-const TOKEN    = process.env.SYNC_TOKEN   || "";
-const APP_USER = process.env.APP_USER     || "";
-const APP_PASS = process.env.APP_PASSWORD || "";
-const PORT     = parseInt(process.env.PORT || "3001", 10);
-const DATA_DIR = process.env.DATA_DIR || "/data";
+const TOKEN         = process.env.SYNC_TOKEN   || "";
+const APP_USER      = process.env.APP_USER     || "";
+const APP_PASS      = process.env.APP_PASSWORD || "";
+const PORT          = parseInt(process.env.PORT || "3001", 10);
+const DATA_DIR      = process.env.DATA_DIR || "/data";
+const CORS_ORIGIN   = process.env.CORS_ORIGIN || "";
 const DATA_FILE = path.join(DATA_DIR, "sync.json");
 
 if (!TOKEN)             console.warn("[sync] WARNING: SYNC_TOKEN not set — sync is disabled.");
@@ -47,7 +48,8 @@ const app = express();
 app.use(express.json({ limit: "4mb" }));
 
 app.use((_req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  // If CORS_ORIGIN is set, restrict to that origin; otherwise allow all (dev / unconfigured).
+  res.header("Access-Control-Allow-Origin", CORS_ORIGIN || "*");
   res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   next();

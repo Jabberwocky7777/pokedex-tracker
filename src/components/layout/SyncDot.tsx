@@ -21,7 +21,7 @@ interface Props {
 export default function SyncDot({ className = "" }: Props) {
   const { syncing, lastSynced, error, forcePush } = useSyncStatus();
   const [tooltipVisible, setTooltipVisible] = useState(false);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState<number>(() => Date.now());
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Refresh the relative timestamp every 30s so it stays accurate
@@ -29,7 +29,6 @@ export default function SyncDot({ className = "" }: Props) {
     timerRef.current = setInterval(() => setNow(Date.now()), 30_000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, []);
-  void now; // used only to trigger re-render
 
   // Determine dot state
   let state: DotState = "idle";
@@ -38,7 +37,7 @@ export default function SyncDot({ className = "" }: Props) {
   } else if (error) {
     state = "error";
   } else if (lastSynced) {
-    const ageMs = Date.now() - lastSynced.getTime();
+    const ageMs = now - lastSynced.getTime();
     state = ageMs > 60 * 60 * 1000 ? "stale" : "synced";
   }
 

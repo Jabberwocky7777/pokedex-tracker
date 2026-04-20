@@ -39,9 +39,9 @@ export default function DesignerPcBox({ allPokemon, activeGeneration, onPickPoke
   const numBoxes = Math.ceil(slots.length / BOX_SIZE);
 
   // ── Slot grid (shared between full-screen and accordion-expanded modes) ────────
-  function renderBoxes(slotSizeClass: string) {
+  function renderBoxes(slotSizeClass: string, centered = false) {
     return (
-      <div className="flex flex-wrap gap-4">
+      <div className={`flex flex-wrap gap-4 ${centered ? "justify-center" : ""}`}>
         {Array.from({ length: numBoxes }, (_, boxIdx) => {
           const start = boxIdx * BOX_SIZE;
           const boxSlots = slots.slice(start, start + BOX_SIZE);
@@ -143,8 +143,8 @@ export default function DesignerPcBox({ allPokemon, activeGeneration, onPickPoke
   // ── Full-screen mode (no slot active) ─────────────────────────────────────────
   if (fullScreen) {
     return (
-      <div className="p-4">
-        {renderBoxes("w-12 h-12")}
+      <div className="max-w-5xl mx-auto w-full px-6 py-6">
+        {renderBoxes("w-14 h-14", true)}
       </div>
     );
   }
@@ -165,8 +165,8 @@ export default function DesignerPcBox({ allPokemon, activeGeneration, onPickPoke
       </button>
 
       {accordionOpen && (
-        <div className="px-3 pb-3 overflow-x-auto">
-          {renderBoxes("w-10 h-10")}
+        <div className="max-w-5xl mx-auto w-full px-4 pb-4 overflow-x-auto">
+          {renderBoxes("w-12 h-12", true)}
         </div>
       )}
     </div>

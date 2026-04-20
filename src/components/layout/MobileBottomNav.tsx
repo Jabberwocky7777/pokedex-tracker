@@ -25,7 +25,7 @@ export default function MobileBottomNav() {
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className={`flex flex-col items-center justify-center flex-1 py-2 gap-0.5 text-[10px] font-medium transition-colors
+            className={`flex flex-col items-center justify-center flex-1 py-2 gap-0.5 text-xs font-medium transition-colors
               ${isActive
                 ? "text-white border-t-2 border-indigo-500 -mt-[2px]"
                 : "text-gray-500 hover:text-gray-300 border-t-2 border-transparent -mt-[2px]"

@@ -35,7 +35,7 @@ export function useSyncEngine() {
   const isFirstRender = useRef(true);
   const debounceRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // ── Pull on mount + every 30s ─────────────────────────────────────────────
+  // ── Pull on mount + every 30s (pauses when tab is hidden) ───────────────
   useEffect(() => {
     if (!hasToken()) return;
 
@@ -58,8 +58,25 @@ export function useSyncEngine() {
       }
     }
 
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    function startPolling() {
+      if (timer !== null) return;
+      timer = setInterval(doPull, POLL_INTERVAL_MS);
+    }
+
+    function stopPolling() {
+      if (timer !== null) { clearInterval(timer); timer = null; }
+    }
+
+    function handleVisibilityChange() {
+      if (document.hidden) stopPolling();
+      else startPolling();
+    }
+
     doPull();
-    const timer = setInterval(doPull, POLL_INTERVAL_MS);
+    if (!document.hidden) startPolling();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     setForcePush(async () => {
       setSyncing(true);
@@ -79,7 +96,8 @@ export function useSyncEngine() {
     });
 
     return () => {
-      clearInterval(timer);
+      stopPolling();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       setForcePush(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

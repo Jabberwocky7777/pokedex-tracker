@@ -68,7 +68,7 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
       result[stat] = ivRange(intersection);
     }
     return result;
-  }, [draftPoints, pokemon.baseStats, slot.evAllocation, nature]);
+  }, [draftPoints, pokemon, slot.evAllocation, nature]);
 
   const allConfirmed = STAT_KEYS.every((k) => slot.confirmedIVs[k] != null);
   const hiddenPower = allConfirmed

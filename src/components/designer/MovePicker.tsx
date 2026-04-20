@@ -32,7 +32,6 @@ export default function MovePicker({ pokemonId, versionGroup, slotIndex, onSelec
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
     fetchLearnset(pokemonId).then(async (ls) => {
       if (cancelled) return;
       setLearnset(ls);

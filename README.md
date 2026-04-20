@@ -11,7 +11,7 @@ A Gen III–IV Pokémon collection tracker with cross-device sync, a catch rate 
 - **Availability modes** — Show all, obtainable only, or directly catchable only
 - **Regional dex** — Switch between National, Hoenn, and Kanto dex numbering
 - **Catch rate calculator** — Gen III/IV formula with all Poké Balls, status conditions, and HP modifiers
-- **IV checker** — Multi-level stat entry, IV range narrowing, stat projections, nature support, and PC Box session saves
+- **Designer** — IV range narrowing, stat projections, nature support, EV planning, PC Box slot management, and move picker via PokéAPI
 - **Pokédex tab** — Base stat bars, side-by-side comparisons, and full learnset viewer (level-up, TM/HM, egg moves, tutors) via PokéAPI for both Gen III and Gen IV games
 - **Route info** — Browse encounter tables by location, version, and method
 - **Cross-device sync** — Optional self-hosted sync server (included in the Docker image) keeps progress in sync between PC and phone; polls every 30 s so changes appear automatically without a page reload

@@ -15,7 +15,7 @@ export default function PcBoxLayout({ allPokemon, meta }: Props) {
   const { activeGeneration, selectedPokemonId, setSelectedPokemonId } = useSettingsStore();
 
   const genMeta = meta.generations.find((g) => g.id === activeGeneration);
-  const games = (genMeta?.versions ?? []) as GameVersion[];
+  const games = useMemo(() => (genMeta?.versions ?? []) as GameVersion[], [genMeta]);
   const [selectedGame, setSelectedGame] = useState<GameVersion>(games[0]);
 
   const { slotsByGen, assignSlot, clearSlot, moveSlot } = useBoxSlotStore();

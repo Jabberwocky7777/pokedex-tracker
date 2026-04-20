@@ -31,6 +31,7 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
   const [koQuery, setKoQuery] = useState("");
   const [showKoSearch, setShowKoSearch] = useState(false);
   const [presetName, setPresetName] = useState("");
+  const [evDrafts, setEvDrafts] = useState<Partial<Record<StatKey, string>>>({});
 
   const totalEVs = STAT_KEYS.reduce((sum, k) => sum + (slot.evAllocation[k] ?? 0), 0);
   const multiplier = (slot.machobraceActive ? 2 : 1) * (slot.pokerusActive ? 2 : 1);
@@ -45,6 +46,24 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
       vitaminEVs: { ...slot.vitaminEVs, [stat]: current + add },
       evAllocation: { ...slot.evAllocation, [stat]: (slot.evAllocation[stat] ?? 0) + add },
     });
+  }
+
+  function removeVitamin(stat: StatKey) {
+    const current = slot.vitaminEVs[stat] ?? 0;
+    if (current <= 0) return;
+    const remove = Math.min(10, current);
+    onUpdate({
+      vitaminEVs: { ...slot.vitaminEVs, [stat]: current - remove },
+      evAllocation: { ...slot.evAllocation, [stat]: Math.max(0, (slot.evAllocation[stat] ?? 0) - remove) },
+    });
+  }
+
+  function setEVDirectly(stat: StatKey, raw: number) {
+    const clamped = Math.max(0, Math.min(EV_STAT_CAP, isNaN(raw) ? 0 : raw));
+    const otherTotal = STAT_KEYS.reduce((sum, k) => sum + (k === stat ? 0 : (slot.evAllocation[k] ?? 0)), 0);
+    const value = Math.min(clamped, Math.max(0, EV_TOTAL_CAP - otherTotal));
+    onUpdate({ evAllocation: { ...slot.evAllocation, [stat]: value } });
+    setEvDrafts((d) => { const n = { ...d }; delete n[stat]; return n; });
   }
 
   function incrementKO(speciesId: number) {
@@ -135,8 +154,9 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
           {STAT_KEYS.map((stat) => {
             const val = slot.evAllocation[stat] ?? 0;
             const pct = Math.min(100, (val / EV_STAT_CAP) * 100);
+            const draft = evDrafts[stat];
             return (
-              <div key={stat} className="flex flex-col gap-0.5">
+              <div key={stat} className="flex flex-col gap-1">
                 <span className="text-xs text-gray-500">{STAT_LABELS[stat]}</span>
                 <div className="h-1.5 bg-gray-700 rounded-full">
                   <div
@@ -146,7 +166,16 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="text-xs text-center font-mono text-gray-300">{val}</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={EV_STAT_CAP}
+                  value={draft ?? val}
+                  onChange={(e) => setEvDrafts((d) => ({ ...d, [stat]: e.target.value }))}
+                  onBlur={(e) => setEVDirectly(stat, parseInt(e.target.value))}
+                  onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+                  className="w-full px-1 py-0.5 rounded bg-gray-800 border border-gray-700 text-xs text-center font-mono text-gray-200 focus:outline-none focus:border-indigo-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
               </div>
             );
           })}
@@ -185,20 +214,28 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
           {STAT_KEYS.map((stat) => {
             const vitaminUsed = slot.vitaminEVs[stat] ?? 0;
             const maxed = vitaminUsed >= MAX_VITAMIN_EVS;
+            const empty = vitaminUsed <= 0;
             return (
-              <button
-                key={stat}
-                onClick={() => applyVitamin(stat)}
-                disabled={maxed}
-                className={`flex flex-col items-center gap-0.5 p-2 rounded border text-xs transition-colors ${
-                  maxed
-                    ? "border-gray-700 text-gray-600 cursor-not-allowed"
-                    : "border-gray-700 hover:border-indigo-500 hover:bg-gray-800 text-gray-300"
-                }`}
-              >
+              <div key={stat} className="flex flex-col items-center gap-1 p-2 rounded border border-gray-700 text-xs text-gray-300">
                 <span className="font-medium">{VITAMIN_LABELS[stat]}</span>
-                <span className="text-gray-500">{vitaminUsed}/100</span>
-              </button>
+                <span className="text-gray-500 text-[10px]">{vitaminUsed}/100</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => removeVitamin(stat)}
+                    disabled={empty}
+                    className="w-6 h-6 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed text-gray-300 text-sm flex items-center justify-center transition-colors"
+                  >
+                    −
+                  </button>
+                  <button
+                    onClick={() => applyVitamin(stat)}
+                    disabled={maxed}
+                    className="w-6 h-6 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-30 disabled:cursor-not-allowed text-gray-300 text-sm flex items-center justify-center transition-colors"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
             );
           })}
         </div>

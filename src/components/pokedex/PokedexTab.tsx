@@ -283,7 +283,7 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                             onClick={() => setMoveTab("a")}
                             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                               moveTab === "a"
-                                ? "bg-indigo-600 text-white"
+                                ? "bg-indigo-500 text-white"
                                 : "bg-gray-800 text-gray-400 hover:text-gray-200"
                             }`}
                           >
@@ -293,7 +293,7 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                             onClick={() => setMoveTab("b")}
                             className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
                               moveTab === "b"
-                                ? "bg-pink-600 text-white"
+                                ? "bg-pink-500 text-white"
                                 : "bg-gray-800 text-gray-400 hover:text-gray-200"
                             }`}
                           >
