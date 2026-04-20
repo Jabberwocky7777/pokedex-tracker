@@ -210,7 +210,7 @@ export default function IvChecker({ allPokemon, meta }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      <Header meta={meta} caught={0} total={0} percentage={0} />
+      <Header meta={meta} />
 
       <main className="flex-1 overflow-y-auto">
         <div className={`${compareMode ? "max-w-5xl" : "max-w-3xl"} mx-auto w-full px-4 py-8 flex flex-col gap-6 transition-all`}>

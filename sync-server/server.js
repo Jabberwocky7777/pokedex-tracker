@@ -1,8 +1,10 @@
 "use strict";
 
 const express = require("express");
+const http    = require("http");
 const fs      = require("fs");
 const path    = require("path");
+const { WebSocketServer } = require("ws");
 
 const TOKEN    = process.env.SYNC_TOKEN || "";
 const APP_USER = process.env.APP_USER || "";
@@ -12,22 +14,19 @@ const DATA_DIR = process.env.DATA_DIR || "/data";
 const DATA_FILE = path.join(DATA_DIR, "sync.json");
 
 if (!TOKEN) {
-  console.warn("[sync] WARNING: SYNC_TOKEN is not set — sync is disabled, all /api/sync requests will be rejected.");
+  console.warn("[sync] WARNING: SYNC_TOKEN is not set — sync is disabled.");
 }
 if (!APP_USER || !APP_PASS) {
   console.warn("[sync] WARNING: APP_USER / APP_PASSWORD not set — login endpoint is disabled.");
 }
 
 // ── Persistence helpers ───────────────────────────────────────────────────────
-// Writes are atomic: write to a temp file in the same directory, then rename.
-// Temp file must be on the same filesystem as the target so renameSync is
-// atomic (cross-device rename fails with EXDEV on mounted host-path volumes).
 
 function readData() {
   try {
     return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
   } catch {
-    return null; // file doesn't exist yet, or is unreadable — that's fine
+    return null;
   }
 }
 
@@ -37,20 +36,17 @@ function writeData(payload) {
     fs.writeFileSync(tmp, JSON.stringify(payload), "utf8");
     fs.renameSync(tmp, DATA_FILE);
   } catch (err) {
-    // Clean up orphaned temp file so it doesn't accumulate on disk
-    try { fs.unlinkSync(tmp); } catch { /* ignore — may not exist if writeFileSync failed */ }
-    throw err; // re-throw so the route handler returns 500
+    try { fs.unlinkSync(tmp); } catch { /* ignore */ }
+    throw err;
   }
 }
 
 // ── Express app ───────────────────────────────────────────────────────────────
 
 const app = express();
+app.use(express.json({ limit: "4mb" }));
 
-// CORS — the frontend calls /api/* via nginx proxy (same-origin), so these
-// headers are never needed for browser requests. They're kept here solely in
-// case someone runs the sync server standalone (e.g. during local development
-// without the nginx proxy). Security is enforced by the Bearer token, not origin.
+// CORS for standalone development only (nginx proxies in production)
 app.use((_req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
@@ -59,42 +55,7 @@ app.use((_req, res, next) => {
 });
 app.options("*", (_req, res) => res.status(204).end());
 
-app.use(express.json({ limit: "4mb" })); // real payloads are ~50 KB; generous limit
-
-// Auth middleware
-function requireToken(req, res, next) {
-  const auth = req.headers["authorization"] || "";
-  if (auth !== `Bearer ${TOKEN}`) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-  next();
-}
-
-// GET /api/sync → return current snapshot (204 if nothing saved yet)
-app.get("/api/sync", requireToken, (_req, res) => {
-  const saved = readData();
-  if (!saved) return res.status(204).end();
-  res.json(saved);
-});
-
-// POST /api/sync → replace snapshot (last-write-wins)
-app.post("/api/sync", requireToken, (req, res) => {
-  const { data } = req.body ?? {};
-  if (!data || typeof data !== "object") {
-    return res.status(400).json({ error: "Missing or invalid data payload" });
-  }
-  const savedAt = new Date().toISOString();
-  try {
-    writeData({ data, savedAt });
-  } catch (err) {
-    console.error("[sync] Failed to write data:", err);
-    return res.status(500).json({ error: "Failed to save data" });
-  }
-  res.json({ ok: true, savedAt });
-});
-
-// POST /api/login → validate username + password, return SYNC_TOKEN on success
-// The token is never exposed in env.js or the UI — only returned after auth.
+// POST /api/login → validate credentials, return SYNC_TOKEN on success
 app.post("/api/login", (req, res) => {
   if (!APP_USER || !APP_PASS || !TOKEN) {
     return res.status(503).json({ error: "Login not configured on this server" });
@@ -112,18 +73,99 @@ app.post("/api/login", (req, res) => {
 // GET /health → no auth, for health checks and login screen state detection
 app.get("/health", (_req, res) => res.json({
   ok: true,
-  // loginEnabled: server has credentials configured → show username/password form
-  // syncEnabled: server has a token → sync will work after login
   loginEnabled: Boolean(APP_USER && APP_PASS && TOKEN),
   syncEnabled: Boolean(TOKEN),
 }));
 
-// Ensure data directory exists before we try to write to it
+// ── HTTP server (shared with WebSocket) ──────────────────────────────────────
+
+const httpServer = http.createServer(app);
+
+// ── WebSocket server ──────────────────────────────────────────────────────────
+
+const wss = new WebSocketServer({ server: httpServer });
+
+function validateToken(req) {
+  const auth = (req.headers["authorization"] || "").trim();
+  if (auth === `Bearer ${TOKEN}` && TOKEN !== "") return true;
+  // Browser WebSocket API can't set headers — accept token via query param fallback
+  const urlParams = new URL(req.url || "", `http://localhost`).searchParams;
+  const queryToken = urlParams.get("token") || "";
+  return queryToken === TOKEN && TOKEN !== "";
+}
+
+function send(ws, msg) {
+  if (ws.readyState === ws.OPEN) {
+    ws.send(JSON.stringify(msg));
+  }
+}
+
+wss.on("connection", (ws, req) => {
+  if (!validateToken(req)) {
+    send(ws, { type: "error", message: "Unauthorized" });
+    ws.close(4401, "Unauthorized");
+    return;
+  }
+
+  // Send current snapshot immediately on connect
+  const saved = readData();
+  if (saved) {
+    send(ws, { type: "snapshot", data: saved.data, savedAt: saved.savedAt });
+  } else {
+    send(ws, { type: "no-data" });
+  }
+
+  ws.on("message", (raw) => {
+    let msg;
+    try {
+      msg = JSON.parse(raw.toString());
+    } catch {
+      send(ws, { type: "error", message: "Invalid JSON" });
+      return;
+    }
+
+    if (msg.type === "pull") {
+      const current = readData();
+      if (current) {
+        send(ws, { type: "snapshot", data: current.data, savedAt: current.savedAt });
+      } else {
+        send(ws, { type: "no-data" });
+      }
+    } else if (msg.type === "push") {
+      if (!msg.data || typeof msg.data !== "object") {
+        send(ws, { type: "error", message: "Missing data payload" });
+        return;
+      }
+      const savedAt = new Date().toISOString();
+      try {
+        writeData({ data: msg.data, savedAt });
+      } catch (err) {
+        console.error("[sync] Failed to write data:", err);
+        send(ws, { type: "error", message: "Failed to save data" });
+        return;
+      }
+      // Broadcast to all other connected clients
+      wss.clients.forEach((client) => {
+        if (client !== ws && client.readyState === client.OPEN) {
+          send(client, { type: "snapshot", data: msg.data, savedAt });
+        }
+      });
+      send(ws, { type: "snapshot", data: msg.data, savedAt });
+    } else {
+      send(ws, { type: "error", message: `Unknown message type: ${msg.type}` });
+    }
+  });
+
+  ws.on("error", (err) => console.error("[sync] WS client error:", err.message));
+});
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`[sync] listening on :${PORT}`);
   console.log(`[sync] data file: ${DATA_FILE}`);
   console.log(`[sync] auth: ${TOKEN ? "enabled" : "disabled (no token set)"}`);
-  console.log(`[sync] login: ${APP_USER && APP_PASS ? `enabled (user: ${APP_USER})` : "disabled (no credentials set)"}`);
+  console.log(`[sync] login: ${APP_USER && APP_PASS ? `enabled (user: ${APP_USER})` : "disabled"}`);
 });

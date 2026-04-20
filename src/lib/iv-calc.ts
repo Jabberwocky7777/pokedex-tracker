@@ -160,3 +160,29 @@ export function projectStats(
   return result;
 }
 
+/**
+ * Calculate Hidden Power type and base power from confirmed IVs (Gen III/IV formula).
+ * Returns null if any IV is missing.
+ */
+export function calculateHiddenPower(
+  ivs: Record<StatKey, number>
+): { type: string; power: number } | null {
+  const order: StatKey[] = ["hp", "atk", "def", "spe", "spAtk", "spDef"];
+  const TYPES = [
+    "fighting", "flying", "poison", "ground", "rock", "bug",
+    "ghost", "steel", "fire", "water", "grass", "electric",
+    "psychic", "ice", "dragon", "dark",
+  ];
+
+  for (const k of order) {
+    if (ivs[k] == null) return null;
+  }
+
+  const typeBits = order.map((k, i) => ((ivs[k] & 1) << i));
+  const powerBits = order.map((k, i) => (((ivs[k] >> 1) & 1) << i));
+
+  const typeIndex = Math.floor((typeBits.reduce((a, b) => a + b, 0) * 15) / 63);
+  const power = Math.floor((powerBits.reduce((a, b) => a + b, 0) * 40) / 63) + 30;
+
+  return { type: TYPES[typeIndex], power };
+}

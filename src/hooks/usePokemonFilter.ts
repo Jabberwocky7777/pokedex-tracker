@@ -25,7 +25,8 @@ export function usePokemonFilter(
   dexMode: DexMode,
   activeGames: GameVersion[],   // empty = all games in generation
   availabilityMode: AvailabilityMode,
-  searchQuery: string
+  searchQuery: string,
+  caughtIds: number[] = []
 ): FilteredPokemon[] {
   return useMemo(() => {
     if (!meta) return [];
@@ -133,16 +134,55 @@ export function usePokemonFilter(
     // Step 4: apply search filter
     const query = searchQuery.trim().toLowerCase();
 
+    // Step 4b: "needs-attention" set — Pokémon that warrant action
+    let needsAttentionIds: Set<number> | null = null;
+    if (availabilityMode === "needs-attention") {
+      const caughtSet = new Set(caughtIds);
+      needsAttentionIds = new Set<number>();
+      for (const p of filtered) {
+        // Caught but unevolved
+        if (caughtSet.has(p.id) && p.evolvesTo.length > 0) {
+          needsAttentionIds.add(p.id);
+          continue;
+        }
+        // Uncaught — requires trade to evolve from already-caught base
+        if (!caughtSet.has(p.id) && p.evolvesFrom != null && caughtSet.has(p.evolvesFrom)) {
+          const base = allPokemon.find((x) => x.id === p.evolvesFrom);
+          if (base?.evolvesTo.some((e) => e.speciesId === p.id && e.trigger === "trade")) {
+            needsAttentionIds.add(p.id);
+            continue;
+          }
+        }
+        // Baby Pokémon not yet caught (breeding required)
+        if (p.isBaby && !caughtSet.has(p.id)) {
+          needsAttentionIds.add(p.id);
+          continue;
+        }
+        // Uncaught version exclusive
+        if (!caughtSet.has(p.id)) {
+          const gamesWithEncounters =
+            activeGames.length > 1
+              ? activeGames.filter((g) =>
+                  p.encounters.some((e) => e.version === g && e.locations.length > 0)
+                )
+              : [];
+          if (gamesWithEncounters.length === 1 && activeGames.length > 1) {
+            needsAttentionIds.add(p.id);
+          }
+        }
+      }
+    }
+
     // Step 5: compute per-pokemon display state
     return filtered
       .filter((p) => {
+        if (needsAttentionIds !== null && !needsAttentionIds.has(p.id)) return false;
         if (!query) return true;
         return p.displayName.toLowerCase().includes(query);
       })
       .map((p) => {
         let isHighlighted: boolean;
-        if (availabilityMode === "all") {
-          // "All" availability mode: every Pokémon is bright regardless of game selection
+        if (availabilityMode === "all" || availabilityMode === "needs-attention") {
           isHighlighted = true;
         } else if (availabilityMode === "obtainable") {
           isHighlighted = obtainableIds.has(p.id);
@@ -185,7 +225,7 @@ export function usePokemonFilter(
 
         return { ...p, displayNumber, isHighlighted, isVersionExclusive, exclusiveGames, genSprite };
       });
-  }, [allPokemon, meta, activeGeneration, dexMode, activeGames, availabilityMode, searchQuery]);
+  }, [allPokemon, meta, activeGeneration, dexMode, activeGames, availabilityMode, searchQuery, caughtIds]);
 }
 
 export type { FilteredPokemon };

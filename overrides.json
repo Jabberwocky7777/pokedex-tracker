@@ -1,0 +1,1892 @@
+{
+  "_meta": {
+    "title": "PokéAPI Gen 3 & Gen 4 Override Patch",
+    "description": "Manually verified corrections and additions for data categories PokéAPI gets wrong or omits entirely. Source of truth: Serebii.net. Merge this file at build time in generate-data.ts — it must survive re-runs of generate-data without being overwritten.",
+    "source": "Serebii.net (primary), Bulbapedia (secondary)",
+    "applies_to": ["firered", "leafgreen", "ruby", "sapphire", "emerald", "diamond", "pearl", "platinum", "heartgold", "soulsilver"],
+    "categories": [
+      "static_legendaries",
+      "roaming_legendaries",
+      "gift_pokemon",
+      "game_corner_pokemon",
+      "in_game_trades",
+      "secondary_encounter_methods",
+      "version_exclusive_splits",
+      "learnset_notes"
+    ]
+  },
+
+  "static_legendaries": {
+    "_note": "PokéAPI returns empty or wrong encounter data for all of these. These must be added manually. Method is always 'static' (one-time encounter). All respawn after defeating Elite Four unless noted.",
+
+    "firered": [
+      {
+        "id": 144,
+        "name": "Articuno",
+        "location": "Seafoam Islands",
+        "level": 50,
+        "method": "static",
+        "requirement": "Requires Strength and Surf to navigate. Available after obtaining HM04 Surf.",
+        "moves": ["Mist", "Agility", "Mind Reader", "Ice Beam"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 145,
+        "name": "Zapdos",
+        "location": "Power Plant (Route 10)",
+        "level": 50,
+        "method": "static",
+        "requirement": "Requires Surf to access Route 10 power plant entrance.",
+        "moves": ["Thunder Wave", "Agility", "Detect", "Drill Peck"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 146,
+        "name": "Moltres",
+        "location": "Mt. Ember (One Island)",
+        "level": 50,
+        "method": "static",
+        "requirement": "One Island accessible after defeating Blaine. Requires Strength boulder puzzle.",
+        "_pokeapi_error": "PokéAPI often lists Moltres at Victory Road (Gen 1 location). In FRLG, Moltres was moved to Mt. Ember on One Island. This is a critical location error.",
+        "moves": ["Fire Spin", "Agility", "Endure", "Flamethrower"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 150,
+        "name": "Mewtwo",
+        "location": "Cerulean Cave",
+        "level": 70,
+        "method": "static",
+        "requirement": "Requires National Pokédex, Surf, Rock Smash, and Strength. Only accessible post-game.",
+        "moves": ["Swift", "Recover", "Safeguard", "Psychic"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 249,
+        "name": "Lugia",
+        "location": "Navel Rock (Sevii Islands)",
+        "level": 70,
+        "method": "static_event",
+        "requirement": "MysticTicket required (Nintendo event item). Take the right path on Navel Rock down to the island's depths.",
+        "moves": ["Recover", "Hydro Pump", "Rain Dance", "Swift"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": false,
+        "event_item": "MysticTicket"
+      },
+      {
+        "id": 250,
+        "name": "Ho-Oh",
+        "location": "Navel Rock (Sevii Islands)",
+        "level": 70,
+        "method": "static_event",
+        "requirement": "MysticTicket required (Nintendo event item). Take the left path on Navel Rock up to the summit.",
+        "moves": ["Recover", "Fire Blast", "Sunny Day", "Swift"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": false,
+        "event_item": "MysticTicket"
+      },
+      {
+        "id": 386,
+        "name": "Deoxys",
+        "location": "Birth Island (Sevii Islands)",
+        "level": 30,
+        "method": "static_event",
+        "requirement": "AuroraTicket required (Nintendo event item). Solve triangle puzzle to trigger battle. FireRed: Attack Forme.",
+        "forme": "attack",
+        "moves": ["Taunt", "Pursuit", "Psychic", "Superpower"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": false,
+        "event_item": "AuroraTicket",
+        "_note": "Deoxys reverts to Attack Forme when on a FireRed cartridge, regardless of forme when traded."
+      }
+    ],
+
+    "leafgreen": [
+      {
+        "id": 144,
+        "name": "Articuno",
+        "location": "Seafoam Islands",
+        "level": 50,
+        "method": "static",
+        "requirement": "Requires Strength and Surf.",
+        "moves": ["Mist", "Agility", "Mind Reader", "Ice Beam"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 145,
+        "name": "Zapdos",
+        "location": "Power Plant (Route 10)",
+        "level": 50,
+        "method": "static",
+        "requirement": "Requires Surf.",
+        "moves": ["Thunder Wave", "Agility", "Detect", "Drill Peck"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 146,
+        "name": "Moltres",
+        "location": "Mt. Ember (One Island)",
+        "level": 50,
+        "method": "static",
+        "requirement": "Requires Strength boulder puzzle on Mt. Ember.",
+        "_pokeapi_error": "Same as FireRed — PokéAPI often shows Victory Road (Gen 1 location). Moltres is at Mt. Ember in both FRLG.",
+        "moves": ["Fire Spin", "Agility", "Endure", "Flamethrower"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 150,
+        "name": "Mewtwo",
+        "location": "Cerulean Cave",
+        "level": 70,
+        "method": "static",
+        "requirement": "National Pokédex required. Surf, Rock Smash, Strength needed.",
+        "moves": ["Swift", "Recover", "Safeguard", "Psychic"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 249,
+        "name": "Lugia",
+        "location": "Navel Rock (Sevii Islands)",
+        "level": 70,
+        "method": "static_event",
+        "requirement": "MysticTicket required.",
+        "moves": ["Recover", "Hydro Pump", "Rain Dance", "Swift"],
+        "ability": "Pressure",
+        "event_item": "MysticTicket"
+      },
+      {
+        "id": 250,
+        "name": "Ho-Oh",
+        "location": "Navel Rock (Sevii Islands)",
+        "level": 70,
+        "method": "static_event",
+        "requirement": "MysticTicket required.",
+        "moves": ["Recover", "Fire Blast", "Sunny Day", "Swift"],
+        "ability": "Pressure",
+        "event_item": "MysticTicket"
+      },
+      {
+        "id": 386,
+        "name": "Deoxys",
+        "location": "Birth Island (Sevii Islands)",
+        "level": 30,
+        "method": "static_event",
+        "requirement": "AuroraTicket required. LeafGreen: Defense Forme.",
+        "forme": "defense",
+        "moves": ["Knock Off", "Spikes", "Psychic", "Snatch"],
+        "ability": "Pressure",
+        "event_item": "AuroraTicket",
+        "_note": "Deoxys reverts to Defense Forme when on a LeafGreen cartridge."
+      }
+    ],
+
+    "ruby": [
+      {
+        "id": 383,
+        "name": "Groudon",
+        "location": "Cave of Origin (Sootopolis City)",
+        "level": 45,
+        "method": "static",
+        "requirement": "Ruby version only. Story-required encounter.",
+        "moves": ["Slash", "Bulk Up", "Rest", "Earthquake"],
+        "ability": "Drought",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI may show Groudon in Sapphire. Groudon is Ruby-exclusive, Kyogre is Sapphire-exclusive."
+      },
+      {
+        "id": 384,
+        "name": "Rayquaza",
+        "location": "Sky Pillar (Route 131)",
+        "level": 70,
+        "method": "static",
+        "requirement": "Available post-game. Requires Mach Bike to navigate crumbling floors.",
+        "moves": ["Rest", "AncientPower", "Extremespeed", "Outrage"],
+        "ability": "Air Lock",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 377,
+        "name": "Regirock",
+        "location": "Desert Ruins (Route 111)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Requires completing the Sealed Chamber puzzle first (Wailord first in party, Relicanth last, use Dig in Sealed Chamber).",
+        "moves": ["Superpower", "AncientPower", "Curse", "Rock Throw"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 378,
+        "name": "Regice",
+        "location": "Island Cave (Route 105)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Requires Sealed Chamber puzzle. Walk around the cave twice (clockwise against the wall).",
+        "moves": ["Superpower", "AncientPower", "Curse", "Icy Wind"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 379,
+        "name": "Registeel",
+        "location": "Ancient Tomb (Route 120)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Requires Sealed Chamber puzzle. Use Flash in the center of the room.",
+        "moves": ["Superpower", "AncientPower", "Curse", "Metal Claw"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 382,
+        "name": "Kyogre",
+        "location": "N/A",
+        "method": "unobtainable_in_this_version",
+        "_note": "Kyogre is Sapphire-exclusive. Cannot be caught in Ruby. Must trade from Sapphire or Emerald."
+      }
+    ],
+
+    "sapphire": [
+      {
+        "id": 382,
+        "name": "Kyogre",
+        "location": "Cave of Origin (Sootopolis City)",
+        "level": 45,
+        "method": "static",
+        "requirement": "Sapphire version only. Story-required encounter.",
+        "moves": ["Water Pulse", "Calm Mind", "AncientPower", "Ice Beam"],
+        "ability": "Drizzle",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI may show Kyogre in Ruby. Kyogre is Sapphire-exclusive, Groudon is Ruby-exclusive."
+      },
+      {
+        "id": 384,
+        "name": "Rayquaza",
+        "location": "Sky Pillar (Route 131)",
+        "level": 70,
+        "method": "static",
+        "requirement": "Available post-game. Requires Mach Bike.",
+        "moves": ["Rest", "AncientPower", "Extremespeed", "Outrage"],
+        "ability": "Air Lock",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 377,
+        "name": "Regirock",
+        "location": "Desert Ruins (Route 111)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Requires Sealed Chamber puzzle.",
+        "moves": ["Superpower", "AncientPower", "Curse", "Rock Throw"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 378,
+        "name": "Regice",
+        "location": "Island Cave (Route 105)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Requires Sealed Chamber puzzle.",
+        "moves": ["Superpower", "AncientPower", "Curse", "Icy Wind"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 379,
+        "name": "Registeel",
+        "location": "Ancient Tomb (Route 120)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Requires Sealed Chamber puzzle.",
+        "moves": ["Superpower", "AncientPower", "Curse", "Metal Claw"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 383,
+        "name": "Groudon",
+        "location": "N/A",
+        "method": "unobtainable_in_this_version",
+        "_note": "Groudon is Ruby-exclusive. Cannot be caught in Sapphire. Must trade from Ruby or Emerald."
+      }
+    ],
+
+    "emerald": [
+      {
+        "id": 382,
+        "name": "Kyogre",
+        "location": "Marine Cave (Routes 105, 125, 127, or 129 — random weather event)",
+        "level": 70,
+        "method": "static_weather_event",
+        "requirement": "Post-Elite Four. A weather report on TV triggers either Marine Cave (heavy rain) or Terra Cave (harsh sun). Marine Cave location rotates between those four routes each time.",
+        "moves": ["Hydro Pump", "Rest", "Sheer Cold", "Double-Edge"],
+        "ability": "Drizzle",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI may not model the weather-cave system. Kyogre does NOT have a fixed location in Emerald."
+      },
+      {
+        "id": 383,
+        "name": "Groudon",
+        "location": "Terra Cave (Routes 114, 115, 116, or 118 — random weather event)",
+        "level": 70,
+        "method": "static_weather_event",
+        "requirement": "Post-Elite Four. Terra Cave (harsh sun) location rotates between those four routes.",
+        "moves": ["Rest", "Fissure", "SolarBeam", "Eruption"],
+        "ability": "Drought",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 384,
+        "name": "Rayquaza",
+        "location": "Sky Pillar (Route 131)",
+        "level": 70,
+        "method": "static",
+        "requirement": "Story-required during delta episode. Also catchable post-game if not caught during story.",
+        "moves": ["Fly", "Rest", "Outrage", "Extremespeed"],
+        "ability": "Air Lock",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 377,
+        "name": "Regirock",
+        "location": "Desert Tomb (Route 111)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Sealed Chamber puzzle required. Go left 2, down 2, use Rock Smash.",
+        "moves": ["Superpower", "AncientPower", "Curse", "Rock Throw"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 378,
+        "name": "Regice",
+        "location": "Island Cave (Route 105)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Sealed Chamber puzzle. Walk clockwise around the cave twice.",
+        "moves": ["Superpower", "AncientPower", "Curse", "Icy Wind"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 379,
+        "name": "Registeel",
+        "location": "Ancient Tomb (Route 120)",
+        "level": 40,
+        "method": "static",
+        "requirement": "Sealed Chamber puzzle. Use Flash in the center of the room.",
+        "moves": ["Superpower", "AncientPower", "Curse", "Metal Claw"],
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 380,
+        "name": "Latias",
+        "location": "Southern Island",
+        "level": 50,
+        "method": "static_event",
+        "requirement": "Eon Ticket required (Nintendo event via e-Reader or Record Mixing). Holds Soul Dew. The OTHER Lati (whichever one does NOT roam) is found here.",
+        "held_item": "Soul Dew",
+        "moves": ["Mist Ball", "Psychic", "Recover", "Charm"],
+        "ability": "Levitate",
+        "event_item": "Eon Ticket",
+        "_note": "In Emerald: player chooses which Lati roams (Latias or Latios) after watching TV. The OTHER one can be found on Southern Island with the Eon Ticket."
+      },
+      {
+        "id": 381,
+        "name": "Latios",
+        "location": "Southern Island",
+        "level": 50,
+        "method": "static_event",
+        "requirement": "Eon Ticket required. The non-roaming Lati.",
+        "held_item": "Soul Dew",
+        "moves": ["Luster Purge", "Psychic", "Recover", "Dragon Dance"],
+        "ability": "Levitate",
+        "event_item": "Eon Ticket"
+      },
+      {
+        "id": 151,
+        "name": "Mew",
+        "location": "Faraway Island",
+        "level": 30,
+        "method": "static_event",
+        "requirement": "Old Sea Map required (Nintendo event item). Emerald-exclusive event Pokémon.",
+        "moves": ["Pound", "Transform", "Mega Punch", "Metronome"],
+        "ability": "Synchronize",
+        "event_item": "Old Sea Map",
+        "_pokeapi_error": "PokéAPI likely has no encounter data for Mew in Emerald."
+      },
+      {
+        "id": 249,
+        "name": "Lugia",
+        "location": "Navel Rock",
+        "level": 70,
+        "method": "static_event",
+        "requirement": "MysticTicket required.",
+        "moves": ["Recover", "Hydro Pump", "Rain Dance", "Swift"],
+        "ability": "Pressure",
+        "event_item": "MysticTicket"
+      },
+      {
+        "id": 250,
+        "name": "Ho-Oh",
+        "location": "Navel Rock",
+        "level": 70,
+        "method": "static_event",
+        "requirement": "MysticTicket required.",
+        "moves": ["Recover", "Fire Blast", "Sunny Day", "Swift"],
+        "ability": "Pressure",
+        "event_item": "MysticTicket"
+      },
+      {
+        "id": 386,
+        "name": "Deoxys",
+        "location": "Birth Island",
+        "level": 30,
+        "method": "static_event",
+        "requirement": "AuroraTicket required. Emerald: Speed Forme.",
+        "forme": "speed",
+        "moves": ["Knock Off", "Pursuit", "Psychic", "Swift"],
+        "ability": "Pressure",
+        "event_item": "AuroraTicket"
+      }
+    ],
+
+    "diamond": [
+      {
+        "id": 483,
+        "name": "Dialga",
+        "location": "Spear Pillar (Mt. Coronet)",
+        "level": 47,
+        "method": "static",
+        "requirement": "Diamond-exclusive. Story-required encounter.",
+        "moves": ["Dragon Breath", "Metal Claw", "AncientPower", "Roar of Time"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI missing this encounter data."
+      },
+      {
+        "id": 480,
+        "name": "Uxie",
+        "location": "Lake Acuity",
+        "level": 50,
+        "method": "static",
+        "requirement": "Available after story event at Spear Pillar.",
+        "moves": ["Future Sight", "Amnesia", "Yawn", "Extrasensory"],
+        "ability": "Levitate",
+        "respawns_after_elite_four": false,
+        "_note": "Uxie does NOT respawn in Diamond/Pearl if fainted. Cannot re-battle until Platinum."
+      },
+      {
+        "id": 482,
+        "name": "Azelf",
+        "location": "Lake Valor",
+        "level": 50,
+        "method": "static",
+        "requirement": "Available after story event at Spear Pillar.",
+        "moves": ["Future Sight", "Nasty Plot", "Last Resort", "Extrasensory"],
+        "ability": "Levitate",
+        "respawns_after_elite_four": false,
+        "_note": "Azelf does NOT respawn in Diamond/Pearl if fainted."
+      },
+      {
+        "id": 487,
+        "name": "Giratina",
+        "location": "Turnback Cave (Route 214)",
+        "level": 70,
+        "method": "static",
+        "requirement": "Post-National Dex. Navigate Turnback Cave. Diamond/Pearl: Giratina appears only here, not in Distortion World.",
+        "forme": "altered",
+        "moves": ["Ominous Wind", "AncientPower", "Shadow Force", "Dragon Claw"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 485,
+        "name": "Heatran",
+        "location": "Stark Mountain",
+        "level": 70,
+        "method": "static",
+        "requirement": "Post-game. Buck and player explore Stark Mountain. Heatran appears after Buck takes the Magma Stone.",
+        "moves": ["AncientPower", "Leer", "Fire Spin", "Metal Sound"],
+        "ability": "Flash Fire",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 486,
+        "name": "Regigigas",
+        "location": "Snowpoint Temple (B5F)",
+        "level": 70,
+        "method": "static",
+        "requirement": "Must have Regirock, Regice, and Registeel in party simultaneously. These must be transferred from Gen 3 games via Pal Park in Diamond/Pearl.",
+        "moves": ["Confuse Ray", "Icy Wind", "Crush Grip", "Stomp"],
+        "ability": "Slow Start",
+        "respawns_after_elite_four": true,
+        "_note": "In Diamond/Pearl, the three Regis MUST come from Gen 3 via Pal Park (or transfer). In Platinum they can be caught in-game."
+      },
+      {
+        "id": 479,
+        "name": "Rotom",
+        "location": "Old Chateau (Eterna Forest)",
+        "level": 15,
+        "method": "static_timed",
+        "requirement": "Must interact with the TV on the upper floor at NIGHT only (10pm–4am game time). Diamond/Pearl: only base Rotom form, no appliance forms.",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI likely missing or incorrect timing and version data for Rotom."
+      },
+      {
+        "id": 484,
+        "name": "Palkia",
+        "location": "N/A",
+        "method": "unobtainable_in_this_version",
+        "_note": "Palkia is Pearl-exclusive. Trade from Pearl or obtain via event."
+      }
+    ],
+
+    "pearl": [
+      {
+        "id": 484,
+        "name": "Palkia",
+        "location": "Spear Pillar (Mt. Coronet)",
+        "level": 47,
+        "method": "static",
+        "requirement": "Pearl-exclusive. Story-required encounter.",
+        "moves": ["Dragon Breath", "Water Pulse", "AncientPower", "Spacial Rend"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI missing this encounter data."
+      },
+      {
+        "id": 480,
+        "name": "Uxie",
+        "location": "Lake Acuity",
+        "level": 50,
+        "method": "static",
+        "moves": ["Future Sight", "Amnesia", "Yawn", "Extrasensory"],
+        "ability": "Levitate",
+        "respawns_after_elite_four": false
+      },
+      {
+        "id": 482,
+        "name": "Azelf",
+        "location": "Lake Valor",
+        "level": 50,
+        "method": "static",
+        "moves": ["Future Sight", "Nasty Plot", "Last Resort", "Extrasensory"],
+        "ability": "Levitate",
+        "respawns_after_elite_four": false
+      },
+      {
+        "id": 487,
+        "name": "Giratina",
+        "location": "Turnback Cave (Route 214)",
+        "level": 70,
+        "method": "static",
+        "requirement": "Post-National Dex.",
+        "forme": "altered",
+        "moves": ["Ominous Wind", "AncientPower", "Shadow Force", "Dragon Claw"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 485,
+        "name": "Heatran",
+        "location": "Stark Mountain",
+        "level": 70,
+        "method": "static",
+        "ability": "Flash Fire",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 486,
+        "name": "Regigigas",
+        "location": "Snowpoint Temple (B5F)",
+        "level": 70,
+        "method": "static",
+        "requirement": "Regirock, Regice, Registeel in party. Must come from Gen 3 via Pal Park.",
+        "ability": "Slow Start",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 479,
+        "name": "Rotom",
+        "location": "Old Chateau (Eterna Forest)",
+        "level": 15,
+        "method": "static_timed",
+        "requirement": "Night only (10pm–4am). Interact with TV on upper floor.",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 483,
+        "name": "Dialga",
+        "location": "N/A",
+        "method": "unobtainable_in_this_version",
+        "_note": "Dialga is Diamond-exclusive. Trade from Diamond."
+      }
+    ],
+
+    "platinum": [
+      {
+        "id": 487,
+        "name": "Giratina",
+        "location": "Distortion World",
+        "level": 47,
+        "method": "static",
+        "requirement": "Platinum-exclusive story encounter. If not caught in Distortion World, respawns at Turnback Cave (Lv. 47) after defeating Elite Four.",
+        "forme": "origin",
+        "moves": ["DragonBreath", "Ominous Wind", "AncientPower", "Shadow Force"],
+        "ability": "Levitate",
+        "respawns_after_elite_four": true,
+        "_note": "Giratina is Origin Forme in Distortion World. Returns to Altered Forme in Turnback Cave unless holding Griseous Orb."
+      },
+      {
+        "id": 483,
+        "name": "Dialga",
+        "location": "Spear Pillar",
+        "level": 70,
+        "method": "static",
+        "requirement": "Post-National Dex. Return to Spear Pillar after initial story events.",
+        "moves": ["Dragon Breath", "Metal Claw", "AncientPower", "Roar of Time"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 484,
+        "name": "Palkia",
+        "location": "Spear Pillar",
+        "level": 70,
+        "method": "static",
+        "requirement": "Post-National Dex. Return to Spear Pillar.",
+        "moves": ["Dragon Breath", "Water Pulse", "AncientPower", "Spacial Rend"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 480,
+        "name": "Uxie",
+        "location": "Lake Acuity",
+        "level": 50,
+        "method": "static",
+        "ability": "Levitate",
+        "respawns_after_elite_four": true,
+        "_note": "Unlike Diamond/Pearl, ALL legendaries in Platinum respawn after defeating Elite Four."
+      },
+      {
+        "id": 482,
+        "name": "Azelf",
+        "location": "Lake Valor",
+        "level": 50,
+        "method": "static",
+        "ability": "Levitate",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 485,
+        "name": "Heatran",
+        "location": "Stark Mountain",
+        "level": 50,
+        "method": "static",
+        "ability": "Flash Fire",
+        "respawns_after_elite_four": true,
+        "_note": "Heatran is Lv. 50 in Platinum (not 70 like Diamond/Pearl)."
+      },
+      {
+        "id": 486,
+        "name": "Regigigas",
+        "location": "Snowpoint Temple (B5F)",
+        "level": 1,
+        "method": "static",
+        "requirement": "In Platinum, Regirock/Regice/Registeel can be caught in-game (Iron Ruins, Iceberg Ruins, Steel Ruins). All three must be in party.",
+        "ability": "Slow Start",
+        "respawns_after_elite_four": true,
+        "_note": "Regigigas is Lv. 1 in Platinum (not Lv. 70 like Diamond/Pearl)."
+      },
+      {
+        "id": 377,
+        "name": "Regirock",
+        "location": "Rock Peak Ruins (Route 228)",
+        "level": 30,
+        "method": "static",
+        "requirement": "Platinum-exclusive in-game location. Event required in Diamond/Pearl (must import from Gen 3).",
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI likely missing Platinum-specific Regi locations."
+      },
+      {
+        "id": 378,
+        "name": "Regice",
+        "location": "Iceberg Ruins (Route 216)",
+        "level": 30,
+        "method": "static",
+        "requirement": "Platinum-exclusive in-game location.",
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 379,
+        "name": "Registeel",
+        "location": "Iron Ruins (Route 228)",
+        "level": 30,
+        "method": "static",
+        "requirement": "Platinum-exclusive in-game location.",
+        "ability": "Clear Body",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 479,
+        "name": "Rotom",
+        "location": "Old Chateau (Eterna Forest)",
+        "level": 20,
+        "method": "static_timed",
+        "requirement": "Interact with TV at night OR on Monday nights. Platinum adds appliance form changes.",
+        "respawns_after_elite_four": true,
+        "_note": "Rotom is Lv. 20 in Platinum (not 15 like Diamond/Pearl). Appliance forms unlock after National Dex from the TV in the Old Chateau."
+      }
+    ],
+
+    "heartgold": [
+      {
+        "id": 250,
+        "name": "Ho-Oh",
+        "location": "Bell Tower (Ecruteak City)",
+        "level": 45,
+        "method": "static",
+        "requirement": "Obtain Rainbow Wing by defeating the Radio Tower Director after clearing Team Rocket. Defeat the Kimono Girls in Ecruteak Dance Theater first. HeartGold-primary (HG players get Rainbow Wing naturally).",
+        "moves": ["AncientPower", "Safeguard", "Gust", "Sacred Fire"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI often missing this encounter or shows wrong version."
+      },
+      {
+        "id": 249,
+        "name": "Lugia",
+        "location": "Whirl Islands (B2F)",
+        "level": 45,
+        "method": "static",
+        "requirement": "HeartGold: Obtain Silver Wing from the man in Pewter City (post-game). SoulSilver players get Silver Wing naturally and can encounter Lugia before Ho-Oh.",
+        "moves": ["AncientPower", "Safeguard", "Gust", "Aeroblast"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 150,
+        "name": "Mewtwo",
+        "location": "Cerulean Cave",
+        "level": 70,
+        "method": "static",
+        "requirement": "Post-game, Kanto region. Requires Surf and Strength.",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 144,
+        "name": "Articuno",
+        "location": "Seafoam Islands (Route 20)",
+        "level": 50,
+        "method": "static",
+        "requirement": "Post-game, Kanto region.",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 145,
+        "name": "Zapdos",
+        "location": "Power Plant (Route 10)",
+        "level": 50,
+        "method": "static",
+        "requirement": "Post-game, Kanto region.",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 146,
+        "name": "Moltres",
+        "location": "Mt. Silver",
+        "level": 50,
+        "method": "static",
+        "requirement": "Post-game, Mt. Silver region. Different from FRLG location.",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI may show wrong location for Moltres in HGSS. It is NOT at Mt. Ember or Victory Road — it is on Mt. Silver."
+      },
+      {
+        "id": 382,
+        "name": "Kyogre",
+        "location": "Embedded Tower (Route 47)",
+        "level": 50,
+        "method": "static",
+        "requirement": "HeartGold: Obtain Blue Orb from the man in Pewter City (post-game). Requires Surf.",
+        "ability": "Drizzle",
+        "respawns_after_elite_four": true,
+        "_note": "Groudon is SoulSilver exclusive at Embedded Tower. Kyogre is HeartGold exclusive there. Rayquaza is available in both after catching both Kyogre and Groudon."
+      },
+      {
+        "id": 384,
+        "name": "Rayquaza",
+        "location": "Embedded Tower (Route 47)",
+        "level": 50,
+        "method": "static",
+        "requirement": "Must have caught both Kyogre (from HG) and Groudon (from SS) first. Requires trading.",
+        "ability": "Air Lock",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 245,
+        "name": "Suicune",
+        "location": "Route 25 (Cape Brink)",
+        "level": 40,
+        "method": "static",
+        "requirement": "After encountering Suicune multiple times as it roams, it settles for a final battle at Route 25. HeartGold-only static encounter (in SoulSilver, Suicune roams differently and has a different encounter pattern).",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 130,
+        "name": "Gyarados (Red)",
+        "location": "Lake of Rage",
+        "level": 30,
+        "method": "static",
+        "requirement": "Story-required shiny Gyarados. Always shiny. Uses standard Gyarados data but has shiny coloring.",
+        "shiny": true,
+        "ability": "Intimidate",
+        "respawns_after_elite_four": false,
+        "_note": "This is NOT in PokéAPI encounter data. It is a unique one-time static shiny encounter."
+      },
+      {
+        "id": 143,
+        "name": "Snorlax",
+        "location": "Vermilion City (harbor, Route 11 area)",
+        "level": 50,
+        "method": "static",
+        "requirement": "Use Pokeflute channel on Pokégear radio. Stand in front of sleeping Snorlax and use radio.",
+        "ability": "Immunity",
+        "respawns_after_elite_four": false
+      }
+    ],
+
+    "soulsilver": [
+      {
+        "id": 249,
+        "name": "Lugia",
+        "location": "Whirl Islands (B2F)",
+        "level": 45,
+        "method": "static",
+        "requirement": "SoulSilver-primary. Obtain Silver Wing from Radio Tower Director after defeating Team Rocket. Defeat Kimono Girls first.",
+        "moves": ["AncientPower", "Safeguard", "Gust", "Aeroblast"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "PokéAPI likely missing or wrong version attribution."
+      },
+      {
+        "id": 250,
+        "name": "Ho-Oh",
+        "location": "Bell Tower (Ecruteak City)",
+        "level": 45,
+        "method": "static",
+        "requirement": "SoulSilver: Obtain Rainbow Wing from the man in Pewter City (post-game).",
+        "moves": ["AncientPower", "Safeguard", "Gust", "Sacred Fire"],
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 150,
+        "name": "Mewtwo",
+        "location": "Cerulean Cave",
+        "level": 70,
+        "method": "static",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 144,
+        "name": "Articuno",
+        "location": "Seafoam Islands (Route 20)",
+        "level": 50,
+        "method": "static",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 145,
+        "name": "Zapdos",
+        "location": "Power Plant (Route 10)",
+        "level": 50,
+        "method": "static",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 146,
+        "name": "Moltres",
+        "location": "Mt. Silver",
+        "level": 50,
+        "method": "static",
+        "ability": "Pressure",
+        "respawns_after_elite_four": true,
+        "_pokeapi_error": "Moltres is on Mt. Silver in HGSS, NOT Mt. Ember or Victory Road."
+      },
+      {
+        "id": 383,
+        "name": "Groudon",
+        "location": "Embedded Tower (Route 47)",
+        "level": 50,
+        "method": "static",
+        "requirement": "SoulSilver: Obtain Red Orb from man in Pewter City (post-game).",
+        "ability": "Drought",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 384,
+        "name": "Rayquaza",
+        "location": "Embedded Tower (Route 47)",
+        "level": 50,
+        "method": "static",
+        "requirement": "Must have caught both Kyogre (from HG) and Groudon (from SS) first.",
+        "ability": "Air Lock",
+        "respawns_after_elite_four": true
+      },
+      {
+        "id": 130,
+        "name": "Gyarados (Red)",
+        "location": "Lake of Rage",
+        "level": 30,
+        "method": "static",
+        "shiny": true,
+        "ability": "Intimidate",
+        "respawns_after_elite_four": false
+      },
+      {
+        "id": 143,
+        "name": "Snorlax",
+        "location": "Vermilion City area",
+        "level": 50,
+        "method": "static",
+        "requirement": "Use Pokéflute channel on Pokégear radio.",
+        "ability": "Immunity",
+        "respawns_after_elite_four": false
+      }
+    ]
+  },
+
+  "roaming_legendaries": {
+    "_note": "PokéAPI cannot model roaming Pokémon properly. They have no fixed location. Flag these with method: 'roaming' and list the trigger condition. They appear in any tall grass/water encounter in the specified region.",
+
+    "firered": [
+      {
+        "_note": "Only ONE of Raikou/Entei/Suicune appears per FireRed save, determined by starter choice. All three are listed here — your tracker data must include which one appears for a given save.",
+        "pokemon": [
+          {
+            "id": 243,
+            "name": "Raikou",
+            "method": "roaming",
+            "level": 50,
+            "roam_region": "Kanto (any tall grass)",
+            "trigger": "Clear Team Rocket from Sevii Islands (give Ruby + Sapphire to Celio). Appears if starter was Squirtle.",
+            "starter_required": "Squirtle",
+            "ability": "Pressure",
+            "moves": ["Thundershock", "Roar", "Quick Attack", "Spark"],
+            "known_bug": "Raikou can use Roar if trapped with Block/Mean Look, making it permanently disappear from the save file."
+          },
+          {
+            "id": 244,
+            "name": "Entei",
+            "method": "roaming",
+            "level": 50,
+            "roam_region": "Kanto (any tall grass)",
+            "trigger": "Clear Team Rocket from Sevii Islands. Appears if starter was Bulbasaur.",
+            "starter_required": "Bulbasaur",
+            "ability": "Pressure",
+            "moves": ["Ember", "Roar", "Fire Spin", "Stomp"],
+            "known_bug": "Entei can use Roar if trapped, making it permanently disappear. Use Master Ball."
+          },
+          {
+            "id": 245,
+            "name": "Suicune",
+            "method": "roaming",
+            "level": 50,
+            "roam_region": "Kanto (any tall grass)",
+            "trigger": "Clear Team Rocket from Sevii Islands. Appears if starter was Charmander.",
+            "starter_required": "Charmander",
+            "ability": "Pressure",
+            "moves": ["Bubblebeam", "Rain Dance", "Gust", "Aurora Beam"],
+            "_note": "Suicune does NOT have the Roar bug. Safer to use trapping moves on."
+          }
+        ]
+      }
+    ],
+
+    "leafgreen": [
+      {
+        "_note": "Same one-per-save roaming mechanic as FireRed, same starter-determination logic.",
+        "pokemon": [
+          {
+            "id": 243, "name": "Raikou", "method": "roaming", "level": 50,
+            "trigger": "Clear Sevii Island rockets. Starter was Squirtle.",
+            "starter_required": "Squirtle"
+          },
+          {
+            "id": 244, "name": "Entei", "method": "roaming", "level": 50,
+            "trigger": "Clear Sevii Island rockets. Starter was Bulbasaur.",
+            "starter_required": "Bulbasaur"
+          },
+          {
+            "id": 245, "name": "Suicune", "method": "roaming", "level": 50,
+            "trigger": "Clear Sevii Island rockets. Starter was Charmander.",
+            "starter_required": "Charmander"
+          }
+        ]
+      }
+    ],
+
+    "ruby": [
+      {
+        "id": 381,
+        "name": "Latios",
+        "method": "roaming",
+        "level": 40,
+        "roam_region": "Hoenn (any tall grass or water)",
+        "trigger": "Defeat Elite Four. Watch TV in your house — choose 'blue' Pokémon. Latios roams in Ruby.",
+        "ability": "Levitate",
+        "moves": ["Water Sport", "Psychic", "Refresh", "Luster Purge"],
+        "_note": "Ruby: Latios roams. Sapphire: Latias roams. PokéAPI often conflates these."
+      }
+    ],
+
+    "sapphire": [
+      {
+        "id": 380,
+        "name": "Latias",
+        "method": "roaming",
+        "level": 40,
+        "roam_region": "Hoenn",
+        "trigger": "Defeat Elite Four. Watch TV in your house — choose 'red' Pokémon. Latias roams in Sapphire.",
+        "ability": "Levitate",
+        "moves": ["Water Sport", "Psychic", "Refresh", "Mist Ball"]
+      }
+    ],
+
+    "emerald": [
+      {
+        "_note": "Emerald: player CHOOSES which Lati roams by answering 'red' or 'blue' after watching TV. The other can be obtained at Southern Island with Eon Ticket.",
+        "pokemon": [
+          {
+            "id": 380,
+            "name": "Latias",
+            "method": "roaming",
+            "level": 40,
+            "trigger": "Defeat Elite Four, choose 'red' when asked on TV.",
+            "player_choice": "red",
+            "moves": ["Water Sport", "Psychic", "Refresh", "Mist Ball"]
+          },
+          {
+            "id": 381,
+            "name": "Latios",
+            "method": "roaming",
+            "level": 40,
+            "trigger": "Defeat Elite Four, choose 'blue' when asked on TV.",
+            "player_choice": "blue",
+            "moves": ["Water Sport", "Psychic", "Refresh", "Luster Purge"]
+          }
+        ]
+      }
+    ],
+
+    "diamond": [
+      {
+        "id": 481,
+        "name": "Mesprit",
+        "method": "roaming",
+        "level": 50,
+        "roam_region": "Sinnoh",
+        "trigger": "After visiting Lake Verity during story events at Spear Pillar. First encounter triggers roaming.",
+        "ability": "Levitate",
+        "_note": "Track via Marking Map Pokétch app. Flees immediately on turn 1."
+      },
+      {
+        "id": 488,
+        "name": "Cresselia",
+        "method": "roaming",
+        "level": 50,
+        "roam_region": "Sinnoh",
+        "trigger": "Visit Fullmoon Island after defeating Team Galactic. Cresselia leaves a Lunar Wing and begins roaming.",
+        "ability": "Levitate",
+        "_note": "Track via Marking Map Pokétch app."
+      }
+    ],
+
+    "pearl": [
+      {
+        "id": 481, "name": "Mesprit", "method": "roaming", "level": 50,
+        "roam_region": "Sinnoh",
+        "trigger": "After visiting Lake Verity during story."
+      },
+      {
+        "id": 488, "name": "Cresselia", "method": "roaming", "level": 50,
+        "roam_region": "Sinnoh",
+        "trigger": "Visit Fullmoon Island post-game."
+      }
+    ],
+
+    "platinum": [
+      {
+        "_note": "Platinum has FIVE roaming Pokémon — by far the most of any game. PokéAPI almost certainly missing most of these.",
+        "pokemon": [
+          {
+            "id": 481, "name": "Mesprit", "method": "roaming", "level": 50,
+            "roam_region": "Sinnoh",
+            "trigger": "After visiting Lake Verity during story."
+          },
+          {
+            "id": 488, "name": "Cresselia", "method": "roaming", "level": 50,
+            "roam_region": "Sinnoh",
+            "trigger": "Visit Fullmoon Island post-game."
+          },
+          {
+            "id": 144, "name": "Articuno", "method": "roaming", "level": 60,
+            "roam_region": "Sinnoh",
+            "trigger": "Obtain National Pokédex. Speak to Professor Oak after his call. All three birds are released simultaneously.",
+            "_pokeapi_error": "PokéAPI missing all three bird roamers in Platinum entirely."
+          },
+          {
+            "id": 145, "name": "Zapdos", "method": "roaming", "level": 60,
+            "roam_region": "Sinnoh",
+            "trigger": "National Dex + Professor Oak call."
+          },
+          {
+            "id": 146, "name": "Moltres", "method": "roaming", "level": 60,
+            "roam_region": "Sinnoh",
+            "trigger": "National Dex + Professor Oak call."
+          }
+        ]
+      }
+    ],
+
+    "heartgold": [
+      {
+        "_note": "HGSS roamers are particularly complex. Suicune does NOT fully roam in HGSS — it has a fixed final encounter after being spotted multiple times.",
+        "pokemon": [
+          {
+            "id": 243, "name": "Raikou", "method": "roaming", "level": 40,
+            "roam_region": "Johto",
+            "trigger": "After releasing the three beasts from Burned Tower (story). Roams from the start of post-Ecruteak game."
+          },
+          {
+            "id": 244, "name": "Entei", "method": "roaming", "level": 40,
+            "roam_region": "Johto",
+            "trigger": "Same as Raikou — released from Burned Tower."
+          },
+          {
+            "id": 380,
+            "name": "Latias",
+            "method": "roaming",
+            "level": 35,
+            "roam_region": "Kanto",
+            "trigger": "Defeat the Kanto Elite Four. Hear Steven's radio broadcast. HeartGold gets Latias; SoulSilver gets Latios.",
+            "version_exclusive": "heartgold",
+            "_pokeapi_error": "PokéAPI likely missing HGSS Lati roamers entirely."
+          }
+        ]
+      }
+    ],
+
+    "soulsilver": [
+      {
+        "pokemon": [
+          {
+            "id": 243, "name": "Raikou", "method": "roaming", "level": 40,
+            "roam_region": "Johto",
+            "trigger": "Released from Burned Tower."
+          },
+          {
+            "id": 244, "name": "Entei", "method": "roaming", "level": 40,
+            "roam_region": "Johto",
+            "trigger": "Released from Burned Tower."
+          },
+          {
+            "id": 381,
+            "name": "Latios",
+            "method": "roaming",
+            "level": 35,
+            "roam_region": "Kanto",
+            "trigger": "Defeat Kanto Elite Four. Steven's radio broadcast. SoulSilver gets Latios; HeartGold gets Latias.",
+            "version_exclusive": "soulsilver"
+          }
+        ]
+      }
+    ]
+  },
+
+  "gift_pokemon": {
+    "_note": "These are obtained from NPCs, not wild encounters. PokéAPI has inconsistent data for these. All are one-per-game unless noted.",
+
+    "firered": [
+      { "id": 1, "name": "Bulbasaur", "method": "starter", "location": "Pallet Town (Prof. Oak)", "level": 5 },
+      { "id": 4, "name": "Charmander", "method": "starter", "location": "Pallet Town (Prof. Oak)", "level": 5 },
+      { "id": 7, "name": "Squirtle", "method": "starter", "location": "Pallet Town (Prof. Oak)", "level": 5 },
+      {
+        "id": 133, "name": "Eevee",
+        "method": "gift_npc",
+        "location": "Celadon Mansion (4F)",
+        "level": 25,
+        "giver": "Bill's grandfather",
+        "_pokeapi_error": "Eevee gift from Celadon Mansion is almost never in PokéAPI encounter data."
+      },
+      {
+        "id": 131, "name": "Lapras",
+        "method": "gift_npc",
+        "location": "Silph Co. (7F)",
+        "level": 25,
+        "giver": "Employee after clearing Silph Co. of Rockets"
+      },
+      {
+        "id": 129, "name": "Magikarp",
+        "method": "purchase",
+        "location": "Route 4 Pokémon Center",
+        "level": 5,
+        "cost": "500 Pokedollars",
+        "_note": "One-time purchase from the Magikarp salesman."
+      },
+      {
+        "id": 236, "name": "Tyrogue",
+        "method": "gift_npc",
+        "location": "Mt. Ember (summit area)",
+        "level": 10,
+        "giver": "Karate Master in Fighting Dojo — wait, this is the FRLG Fighting Dojo in Saffron City",
+        "_correction": "The Fighting Dojo is in Saffron City. After defeating the Karate Master, choose Hitmonlee OR Hitmonchan (not both). Tyrogue is NOT available this way in FRLG.",
+        "_remove_this_entry": true
+      },
+      {
+        "id": 106, "name": "Hitmonlee",
+        "method": "gift_choice",
+        "location": "Saffron City (Fighting Dojo)",
+        "level": 25,
+        "giver": "Karate Master. Choose Hitmonlee OR Hitmonchan.",
+        "mutually_exclusive_with": 107
+      },
+      {
+        "id": 107, "name": "Hitmonchan",
+        "method": "gift_choice",
+        "location": "Saffron City (Fighting Dojo)",
+        "level": 25,
+        "giver": "Karate Master. Choose Hitmonchan OR Hitmonlee.",
+        "mutually_exclusive_with": 106
+      },
+      {
+        "id": 138, "name": "Omanyte",
+        "method": "fossil",
+        "location": "Mt. Moon (Helix Fossil). Revive at Cinnabar Island Lab.",
+        "level": 5,
+        "fossil_item": "Helix Fossil",
+        "mutually_exclusive_with": 140
+      },
+      {
+        "id": 140, "name": "Kabuto",
+        "method": "fossil",
+        "location": "Mt. Moon (Dome Fossil). Revive at Cinnabar Island Lab.",
+        "level": 5,
+        "fossil_item": "Dome Fossil",
+        "mutually_exclusive_with": 138
+      },
+      {
+        "id": 142, "name": "Aerodactyl",
+        "method": "fossil",
+        "location": "Cinnabar Island (Old Amber from Mr. Fuji's aide in Pewter Museum). Revive at Cinnabar Island Lab.",
+        "level": 5,
+        "fossil_item": "Old Amber"
+      },
+      {
+        "id": 175, "name": "Togepi (Egg)",
+        "method": "gift_egg",
+        "location": "One Island — man gives egg once Pokédex requirements are met.",
+        "level": 1,
+        "_note": "Egg hatches into Togepi. Hatches fairly quickly. Verify exact trigger — NPC is near the ferry or Pokémon Center."
+      }
+    ],
+
+    "leafgreen": [
+      { "id": 1, "name": "Bulbasaur", "method": "starter", "location": "Pallet Town (Prof. Oak)", "level": 5 },
+      { "id": 4, "name": "Charmander", "method": "starter", "location": "Pallet Town (Prof. Oak)", "level": 5 },
+      { "id": 7, "name": "Squirtle", "method": "starter", "location": "Pallet Town (Prof. Oak)", "level": 5 },
+      { "id": 133, "name": "Eevee", "method": "gift_npc", "location": "Celadon Mansion (4F)", "level": 25 },
+      { "id": 131, "name": "Lapras", "method": "gift_npc", "location": "Silph Co. (7F)", "level": 25 },
+      { "id": 129, "name": "Magikarp", "method": "purchase", "location": "Route 4", "cost": "500 Pokedollars" },
+      { "id": 106, "name": "Hitmonlee", "method": "gift_choice", "location": "Saffron City (Fighting Dojo)", "level": 25, "mutually_exclusive_with": 107 },
+      { "id": 107, "name": "Hitmonchan", "method": "gift_choice", "location": "Saffron City (Fighting Dojo)", "level": 25, "mutually_exclusive_with": 106 },
+      { "id": 138, "name": "Omanyte", "method": "fossil", "fossil_item": "Helix Fossil", "level": 5, "mutually_exclusive_with": 140 },
+      { "id": 140, "name": "Kabuto", "method": "fossil", "fossil_item": "Dome Fossil", "level": 5, "mutually_exclusive_with": 138 },
+      { "id": 142, "name": "Aerodactyl", "method": "fossil", "fossil_item": "Old Amber", "level": 5 },
+      { "id": 175, "name": "Togepi (Egg)", "method": "gift_egg", "location": "One Island", "level": 1 }
+    ],
+
+    "ruby": [
+      { "id": 252, "name": "Treecko", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      { "id": 255, "name": "Torchic", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      { "id": 258, "name": "Mudkip", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      {
+        "id": 349, "name": "Feebas (via trade only)",
+        "_note": "Feebas is wild on Route 119 (6 random tiles that change daily). NOT a gift. Noting here due to PokéAPI often having wrong tile data."
+      },
+      {
+        "id": 374, "name": "Beldum",
+        "method": "gift_npc",
+        "location": "Steven's House (Mossdeep City)",
+        "level": 5,
+        "giver": "Steven Stone's note after becoming Champion",
+        "_pokeapi_error": "Beldum gift is almost always missing from PokéAPI."
+      },
+      {
+        "id": 351, "name": "Castform",
+        "method": "gift_npc",
+        "location": "Weather Institute (Route 119)",
+        "level": 25,
+        "giver": "Weather Institute researcher after defeating Aqua hideout"
+      },
+      {
+        "id": 360, "name": "Wynaut (Egg)",
+        "method": "gift_egg",
+        "location": "Lavaridge Town",
+        "giver": "Old woman gives Wynaut Egg",
+        "level": 1
+      },
+      {
+        "id": 345, "name": "Lileep",
+        "method": "fossil",
+        "fossil_item": "Root Fossil",
+        "location": "Devon Corporation (Rustboro City). Fossil found in Mirage Tower.",
+        "level": 20,
+        "mutually_exclusive_with": 347,
+        "_note": "In Ruby, Root Fossil is in the top-right tile when Mirage Tower collapses. The other fossil sinks."
+      },
+      {
+        "id": 347, "name": "Anorith",
+        "method": "fossil",
+        "fossil_item": "Claw Fossil",
+        "location": "Devon Corporation. Fossil found in Mirage Tower.",
+        "level": 20,
+        "mutually_exclusive_with": 345
+      }
+    ],
+
+    "sapphire": [
+      { "id": 252, "name": "Treecko", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      { "id": 255, "name": "Torchic", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      { "id": 258, "name": "Mudkip", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      { "id": 374, "name": "Beldum", "method": "gift_npc", "location": "Steven's House (Mossdeep City)", "level": 5 },
+      { "id": 351, "name": "Castform", "method": "gift_npc", "location": "Weather Institute (Route 119)", "level": 25 },
+      { "id": 360, "name": "Wynaut (Egg)", "method": "gift_egg", "location": "Lavaridge Town", "level": 1 },
+      { "id": 345, "name": "Lileep", "method": "fossil", "fossil_item": "Root Fossil", "level": 20, "mutually_exclusive_with": 347 },
+      { "id": 347, "name": "Anorith", "method": "fossil", "fossil_item": "Claw Fossil", "level": 20, "mutually_exclusive_with": 345 }
+    ],
+
+    "emerald": [
+      { "id": 252, "name": "Treecko", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      { "id": 255, "name": "Torchic", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      { "id": 258, "name": "Mudkip", "method": "starter", "location": "Route 101 (Prof. Birch)", "level": 5 },
+      { "id": 374, "name": "Beldum", "method": "gift_npc", "location": "Steven's House (Mossdeep City)", "level": 5 },
+      { "id": 351, "name": "Castform", "method": "gift_npc", "location": "Weather Institute (Route 119)", "level": 25 },
+      { "id": 360, "name": "Wynaut (Egg)", "method": "gift_egg", "location": "Lavaridge Town", "level": 1 },
+      { "id": 345, "name": "Lileep", "method": "fossil", "fossil_item": "Root Fossil", "level": 20, "mutually_exclusive_with": 347 },
+      { "id": 347, "name": "Anorith", "method": "fossil", "fossil_item": "Claw Fossil", "level": 20, "mutually_exclusive_with": 345 },
+      {
+        "id_choice": [152, 155, 158],
+        "name": "Johto Starter (one of three)",
+        "method": "gift_choice",
+        "location": "Route 101 (Prof. Birch)",
+        "level": 5,
+        "requirement": "Complete the Hoenn Pokédex (own all 200 Hoenn dex entries). Prof. Birch gives one Johto starter.",
+        "_pokeapi_error": "Johto starters in Emerald are not in PokéAPI encounter data.",
+        "_note": "Choose one of: Chikorita (#152), Cyndaquil (#155), Totodile (#158)."
+      }
+    ],
+
+    "diamond": [
+      { "id": 387, "name": "Turtwig", "method": "starter", "location": "Route 201 / Sandgem Town (Prof. Rowan)", "level": 5 },
+      { "id": 390, "name": "Chimchar", "method": "starter", "location": "Route 201 / Sandgem Town (Prof. Rowan)", "level": 5 },
+      { "id": 393, "name": "Piplup", "method": "starter", "location": "Route 201 / Sandgem Town (Prof. Rowan)", "level": 5 },
+      {
+        "id": 440, "name": "Happiny (Egg)",
+        "method": "gift_egg",
+        "location": "Route 209",
+        "giver": "Hiker on Route 209 gives an egg that hatches into Happiny",
+        "level": 1
+      },
+      {
+        "id": 175, "name": "Togepi (Egg)",
+        "method": "gift_egg",
+        "location": "Hearthome City",
+        "giver": "Cynthia gives Togepi egg",
+        "level": 1
+      },
+      {
+        "id": 438, "name": "Bonsly",
+        "_note": "NOT a gift — found via Honey Trees or Trophy Garden. Listed here as reminder that it is NOT wild on standard routes."
+      },
+      {
+        "id": 447, "name": "Riolu (Egg)",
+        "method": "gift_egg",
+        "location": "Iron Island",
+        "giver": "Riley gives Riolu egg after completing Iron Island together",
+        "level": 1,
+        "_pokeapi_error": "Riolu egg gift from Riley is not in PokéAPI encounter data."
+      },
+      {
+        "id": 133, "name": "Eevee",
+        "method": "gift_npc",
+        "location": "Hearthome City",
+        "giver": "Bebe (PC developer) gives one Eevee",
+        "level": 20,
+        "_pokeapi_error": "Eevee gift from Bebe is almost always missing from PokéAPI."
+      }
+    ],
+
+    "pearl": [
+      { "id": 387, "name": "Turtwig", "method": "starter", "level": 5 },
+      { "id": 390, "name": "Chimchar", "method": "starter", "level": 5 },
+      { "id": 393, "name": "Piplup", "method": "starter", "level": 5 },
+      { "id": 440, "name": "Happiny (Egg)", "method": "gift_egg", "location": "Route 209 (Hiker)", "level": 1 },
+      { "id": 175, "name": "Togepi (Egg)", "method": "gift_egg", "location": "Hearthome City (Cynthia)", "level": 1 },
+      { "id": 447, "name": "Riolu (Egg)", "method": "gift_egg", "location": "Iron Island (Riley)", "level": 1 },
+      { "id": 133, "name": "Eevee", "method": "gift_npc", "location": "Hearthome City (Bebe)", "level": 20 }
+    ],
+
+    "platinum": [
+      { "id": 387, "name": "Turtwig", "method": "starter", "level": 5 },
+      { "id": 390, "name": "Chimchar", "method": "starter", "level": 5 },
+      { "id": 393, "name": "Piplup", "method": "starter", "level": 5 },
+      { "id": 440, "name": "Happiny (Egg)", "method": "gift_egg", "location": "Route 209 (Hiker)", "level": 1 },
+      { "id": 175, "name": "Togepi (Egg)", "method": "gift_egg", "location": "Hearthome City (Cynthia)", "level": 1 },
+      { "id": 447, "name": "Riolu (Egg)", "method": "gift_egg", "location": "Iron Island (Riley)", "level": 1 },
+      { "id": 133, "name": "Eevee", "method": "gift_npc", "location": "Hearthome City (Bebe)", "level": 20 },
+      {
+        "id_choice": [1, 4, 7],
+        "name": "Kanto Starter (one of three)",
+        "method": "gift_choice",
+        "location": "Route 228 (Professor Oak)",
+        "level": 5,
+        "requirement": "Prof. Oak visits Pal Park after player obtains National Dex. Gives one Kanto starter.",
+        "_pokeapi_error": "Kanto starters in Platinum are not in PokéAPI encounter data."
+      }
+    ],
+
+    "heartgold": [
+      { "id": 152, "name": "Chikorita", "method": "starter", "location": "New Bark Town (Prof. Elm)", "level": 5 },
+      { "id": 155, "name": "Cyndaquil", "method": "starter", "location": "New Bark Town (Prof. Elm)", "level": 5 },
+      { "id": 158, "name": "Totodile", "method": "starter", "location": "New Bark Town (Prof. Elm)", "level": 5 },
+      {
+        "id": 175, "name": "Togepi (Egg)",
+        "method": "gift_egg",
+        "location": "Route 30 (Mr. Pokémon)",
+        "level": 1,
+        "giver": "Mr. Pokémon gives Togepi Egg as part of story"
+      },
+      {
+        "id": 131, "name": "Lapras",
+        "method": "gift_npc",
+        "location": "Union Cave (Friday only)",
+        "level": 20,
+        "requirement": "Only available on Fridays. The person's Lapras is in Union Cave B2F every Friday.",
+        "_note": "This is a time-based event that PokéAPI does not model."
+      },
+      {
+        "id_choice": [1, 4, 7],
+        "name": "Kanto Starter (one of three)",
+        "method": "gift_choice",
+        "location": "Pallet Town (Prof. Oak)",
+        "level": 5,
+        "requirement": "Obtain all 16 gym badges (Johto + Kanto). Prof. Oak gives one Kanto starter.",
+        "_pokeapi_error": "Kanto starters in HGSS almost certainly missing."
+      },
+      {
+        "id_choice": [252, 255, 258],
+        "name": "Hoenn Starter (one of three)",
+        "method": "gift_choice",
+        "location": "Silph Co. (Celadon City)",
+        "level": 5,
+        "requirement": "Defeat Red at Mt. Silver. Steven Stone gives one Hoenn starter.",
+        "_pokeapi_error": "Hoenn starters in HGSS definitely missing from PokéAPI."
+      }
+    ],
+
+    "soulsilver": [
+      { "id": 152, "name": "Chikorita", "method": "starter", "level": 5 },
+      { "id": 155, "name": "Cyndaquil", "method": "starter", "level": 5 },
+      { "id": 158, "name": "Totodile", "method": "starter", "level": 5 },
+      { "id": 175, "name": "Togepi (Egg)", "method": "gift_egg", "location": "Route 30 (Mr. Pokémon)", "level": 1 },
+      { "id": 131, "name": "Lapras", "method": "gift_npc", "location": "Union Cave (Fridays only)", "level": 20 },
+      { "id_choice": [1, 4, 7], "name": "Kanto Starter", "method": "gift_choice", "location": "Pallet Town (Prof. Oak)", "level": 5 },
+      { "id_choice": [252, 255, 258], "name": "Hoenn Starter", "method": "gift_choice", "location": "Silph Co. (after defeating Red)", "level": 5 }
+    ]
+  },
+
+  "game_corner_pokemon": {
+    "_note": "PokéAPI does not model Game Corner as an encounter method. These Pokémon are VERSION-EXCLUSIVE where noted and critical for living Pokédex completion.",
+
+    "firered_celadon_game_corner": {
+      "_location": "Celadon City Game Corner (prize counter)",
+      "pokemon": [
+        { "id": 63, "name": "Abra", "cost_coins": 180 },
+        { "id": 35, "name": "Clefairy", "cost_coins": 500 },
+        {
+          "id": 123, "name": "Scyther", "cost_coins": 5500,
+          "version_exclusive": "firered",
+          "_pokeapi_error": "Scyther is FireRed Game Corner ONLY. LeafGreen has Pinsir instead. This split is critical and PokéAPI does not represent it."
+        },
+        { "id": 147, "name": "Dratini", "cost_coins": 2800 },
+        { "id": 137, "name": "Porygon", "cost_coins": 9999 }
+      ]
+    },
+
+    "leafgreen_celadon_game_corner": {
+      "_location": "Celadon City Game Corner (prize counter)",
+      "pokemon": [
+        { "id": 63, "name": "Abra", "cost_coins": 180 },
+        { "id": 35, "name": "Clefairy", "cost_coins": 500 },
+        {
+          "id": 127, "name": "Pinsir", "cost_coins": 5500,
+          "version_exclusive": "leafgreen",
+          "_pokeapi_error": "Pinsir is LeafGreen Game Corner ONLY. FireRed has Scyther instead."
+        },
+        { "id": 147, "name": "Dratini", "cost_coins": 2800 },
+        { "id": 137, "name": "Porygon", "cost_coins": 9999 }
+      ]
+    }
+  },
+
+  "secondary_encounter_methods": {
+    "_note": "PokéAPI largely omits these. All require National Dex unless noted.",
+
+    "gba_insertion_encounters": {
+      "_description": "When specific Gen 3 GBA games are inserted in the DS's Slot-2, additional Pokémon appear in DPPt routes. PokéAPI almost certainly has no data for this.",
+      "_applies_to": ["diamond", "pearl", "platinum"],
+
+      "firered_inserted": [
+        { "id": 23, "name": "Ekans", "routes": ["Route 114", "Route 115"] },
+        { "id": 58, "name": "Growlithe", "routes": ["Route 201", "Route 202"] },
+        { "id": 100, "name": "Voltorb", "routes": ["Route 211 (East)"] },
+        { "id": 125, "name": "Electabuzz", "routes": ["Route 222"] },
+        { "id": 123, "name": "Scyther", "routes": ["Route 229"] },
+        { "id": 137, "name": "Porygon", "routes": ["Route 223"] }
+      ],
+      "leafgreen_inserted": [
+        { "id": 79, "name": "Slowpoke", "routes": ["Route 205 (South)", "Route 213"] },
+        { "id": 37, "name": "Vulpix", "routes": ["Route 114", "Route 115"] },
+        { "id": 102, "name": "Exeggcute", "routes": ["Route 123", "Route 114"] },
+        { "id": 127, "name": "Pinsir", "routes": ["Route 229"] },
+        { "id": 121, "name": "Starmie", "routes": ["Route 220"] }
+      ],
+      "ruby_inserted": [
+        { "id": 338, "name": "Solrock", "routes": ["Route 208", "Route 210 (North)"] },
+        { "id": 335, "name": "Zangoose", "routes": ["Route 208", "Route 210 (North)"] }
+      ],
+      "sapphire_inserted": [
+        { "id": 337, "name": "Lunatone", "routes": ["Route 208", "Route 210 (North)"] },
+        { "id": 336, "name": "Seviper", "routes": ["Route 208", "Route 210 (North)"] }
+      ],
+      "emerald_inserted": [
+        { "id": 300, "name": "Skitty", "routes": ["Route 222"] },
+        { "id": 177, "name": "Natu", "routes": ["Route 224", "Route 229"] },
+        { "id": 283, "name": "Surskit", "routes": ["Route 212 (South)"] },
+        { "id": 44, "name": "Gloom", "routes": ["Route 224"] }
+      ]
+    },
+
+    "honey_tree_encounters": {
+      "_description": "Honey Trees in DPPt: spread honey on golden trees, wait 6-24 hours, return to encounter Pokémon. Each save file has 4 trees that can produce Munchlax.",
+      "_applies_to": ["diamond", "pearl", "platinum"],
+      "common": [
+        { "id": 265, "name": "Wurmple", "rate": "very common" },
+        { "id": 415, "name": "Combee", "rate": "common" },
+        { "id": 412, "name": "Burmy", "rate": "common" }
+      ],
+      "semi_rare": [
+        { "id": 420, "name": "Cherubi", "rate": "semi-rare" },
+        { "id": 190, "name": "Aipom", "rate": "semi-rare" },
+        { "id": 266, "name": "Silcoon", "rate": "semi-rare" },
+        { "id": 268, "name": "Cascoon", "rate": "semi-rare" }
+      ],
+      "rare": [
+        {
+          "id": 446, "name": "Munchlax", "rate": "rare (~1%)",
+          "_note": "Munchlax only appears on 4 specific honey trees per save file, determined by Trainer ID. Cannot be predicted without looking up your TID. This is essentially the only non-event source of Munchlax in Gen 4."
+        },
+        { "id": 416, "name": "Vespiquen (female Combee only)", "rate": "rare" }
+      ],
+      "version_exclusive": [
+        { "id": 439, "name": "Mime Jr.", "games": ["diamond", "pearl"], "rate": "rare" },
+        { "id": 438, "name": "Bonsly", "games": ["diamond", "pearl"], "rate": "rare" },
+        { "id": 190, "name": "Aipom", "games": ["platinum"], "rate": "semi-rare" },
+        { "id": 214, "name": "Heracross", "games": ["all"], "rate": "rare" }
+      ]
+    },
+
+    "trophy_garden_encounters": {
+      "_description": "Mr. Backlot's garden (Route 212, Pokémon Mansion). After National Dex, Mr. Backlot changes the daily Pokémon. Rotate daily.",
+      "_applies_to": ["diamond", "pearl", "platinum"],
+      "rotating_pokemon": [
+        { "id": 35, "name": "Clefairy" },
+        { "id": 39, "name": "Jigglypuff" },
+        { "id": 183, "name": "Marill" },
+        { "id": 298, "name": "Azurill" },
+        { "id": 311, "name": "Plusle" },
+        { "id": 312, "name": "Minun" },
+        { "id": 137, "name": "Porygon" },
+        { "id": 133, "name": "Eevee" },
+        { "id": 351, "name": "Castform" },
+        { "id": 438, "name": "Bonsly" },
+        { "id": 439, "name": "Mime Jr." },
+        { "id": 440, "name": "Happiny" }
+      ],
+      "_note": "Only 2 Pokémon are available in the garden at any one time. Ask Mr. Backlot for a new Pokémon once per day."
+    },
+
+    "great_marsh_encounters": {
+      "_description": "Pastoria City Safari Zone equivalent. Some Pokémon only appear here. Pokémon available rotate by day and can be scouted via binoculars.",
+      "_applies_to": ["diamond", "pearl", "platinum"],
+      "pokemon": [
+        { "id": 54, "name": "Psyduck", "note": "Daily rotation" },
+        { "id": 55, "name": "Golduck", "note": "Daily rotation" },
+        { "id": 102, "name": "Exeggcute", "note": "Daily rotation — also requires National Dex" },
+        { "id": 114, "name": "Tangela", "note": "Daily rotation" },
+        { "id": 193, "name": "Yanma", "note": "Daily rotation" },
+        { "id": 285, "name": "Shroomish", "note": "Daily rotation" },
+        { "id": 315, "name": "Roselia", "note": "Daily rotation" },
+        { "id": 316, "name": "Gulpin", "note": "Always available" },
+        { "id": 367, "name": "Huntail", "_note": "NOT in Great Marsh; this is a placeholder correction — confirm actual list" },
+        { "id": 194, "name": "Wooper", "note": "Always available" },
+        { "id": 195, "name": "Quagsire", "note": "Always available" },
+        { "id": 400, "name": "Bibarel", "note": "Always available" },
+        { "id": 118, "name": "Goldeen", "note": "Always available (surfing/fishing)" },
+        { "id": 119, "name": "Seaking", "note": "Always available (surfing/fishing)" },
+        {
+          "id": 46, "name": "Paras",
+          "games": ["diamond", "pearl"],
+          "note": "Diamond/Pearl exclusive in Great Marsh"
+        },
+        {
+          "id": 83, "name": "Farfetch'd",
+          "games": ["diamond", "pearl"],
+          "note": "Requires National Dex. Daily rotation."
+        },
+        {
+          "id": 206, "name": "Dunsparce",
+          "games": ["diamond", "pearl"],
+          "note": "Daily rotation"
+        },
+        {
+          "id": 246, "name": "Larvitar",
+          "games": ["platinum"],
+          "note": "Platinum Great Marsh only. National Dex required."
+        },
+        {
+          "id": 228, "name": "Houndour",
+          "games": ["platinum"],
+          "note": "Platinum Great Marsh only. National Dex required."
+        }
+      ]
+    },
+
+    "poke_radar_exclusives": {
+      "_description": "Pokémon only obtainable via Poké Radar after National Dex. PokéAPI does not model this encounter method correctly.",
+      "_applies_to": ["diamond", "pearl", "platinum"],
+      "pokemon": [
+        { "id": 29, "name": "Nidoran♀", "routes": ["Route 201", "Route 221"], "games": ["platinum"] },
+        { "id": 32, "name": "Nidoran♂", "routes": ["Route 201", "Route 221"], "games": ["platinum"] },
+        { "id": 35, "name": "Clefairy", "routes": ["Mt. Coronet"], "games": ["all"] },
+        { "id": 39, "name": "Jigglypuff", "routes": ["Route 209", "Route 214"], "games": ["all"] },
+        { "id": 113, "name": "Chansey", "routes": ["Route 209", "Route 210 (South)"], "games": ["all"] },
+        { "id": 114, "name": "Tangela", "routes": ["Route 204 (South)"], "games": ["platinum"] },
+        { "id": 132, "name": "Ditto", "routes": ["Route 218"], "games": ["all"] },
+        { "id": 190, "name": "Aipom", "routes": ["Route 205", "Route 210", "Route 212", "Route 222", "Trophy Garden area"], "games": ["diamond", "pearl"] },
+        { "id": 193, "name": "Yanma", "routes": ["Route 214", "Route 224"], "games": ["diamond", "pearl"] },
+        { "id": 198, "name": "Murkrow", "routes": ["Route 209", "Route 210"], "games": ["diamond"] },
+        { "id": 200, "name": "Misdreavus", "routes": ["Route 209", "Route 210"], "games": ["pearl"] },
+        { "id": 207, "name": "Gligar", "routes": ["Route 206", "Route 207", "Route 214"], "games": ["diamond"] },
+        { "id": 209, "name": "Snubbull", "routes": ["Route 209"], "games": ["all"] },
+        { "id": 261, "name": "Poochyena", "routes": ["Route 214"], "games": ["platinum"] },
+        { "id": 263, "name": "Zigzagoon", "routes": ["Route 202"], "games": ["platinum"] },
+        { "id": 273, "name": "Seedot", "routes": ["Route 203", "Route 204"], "games": ["diamond"] },
+        { "id": 276, "name": "Taillow", "routes": ["Route 213"], "games": ["platinum"] },
+        { "id": 278, "name": "Wingull", "routes": ["Route 213", "Route 221", "Route 222"], "games": ["all"] },
+        { "id": 302, "name": "Sableye", "routes": ["Route 214"], "games": ["pearl"] },
+        { "id": 303, "name": "Mawile", "routes": ["Route 214"], "games": ["diamond"] },
+        { "id": 307, "name": "Meditite", "routes": ["Route 208", "Mt. Coronet"], "games": ["platinum"] },
+        { "id": 309, "name": "Electrike", "routes": ["Route 222"], "games": ["platinum"] },
+        { "id": 322, "name": "Numel", "routes": ["Route 227", "Stark Mountain"], "games": ["platinum"] },
+        { "id": 325, "name": "Spoink", "routes": ["Route 214"], "games": ["diamond", "pearl"] },
+        { "id": 333, "name": "Swablu", "routes": ["Route 211 (East)"], "games": ["all"] },
+        { "id": 363, "name": "Spheal", "routes": ["Route 226"], "games": ["platinum"] },
+        { "id": 431, "name": "Glameow", "routes": ["Route 222"], "games": ["pearl"] },
+        { "id": 434, "name": "Stunky", "routes": ["Route 222"], "games": ["diamond"] }
+      ]
+    },
+
+    "swarm_encounters": {
+      "_description": "Dawn/Lucas calls with daily swarm location. PokéAPI likely missing all of these. Requires National Dex.",
+      "_applies_to": ["diamond", "pearl", "platinum"],
+      "pokemon": [
+        { "id": 1, "name": "Bulbasaur", "route": "Route 228", "games": ["all"] },
+        { "id": 4, "name": "Charmander", "route": "Route 227", "games": ["all"] },
+        { "id": 7, "name": "Squirtle", "route": "Route 229", "games": ["all"] },
+        { "id": 21, "name": "Spearow", "route": "Route 225", "games": ["all"] },
+        { "id": 60, "name": "Poliwag", "route": "Route 225", "games": ["all"] },
+        { "id": 72, "name": "Tentacool", "route": "Route 223", "games": ["all"] },
+        { "id": 77, "name": "Ponyta", "route": "Route 206", "games": ["all"] },
+        { "id": 84, "name": "Doduo", "route": "Route 201", "games": ["all"] },
+        { "id": 86, "name": "Seel", "route": "Route 226", "games": ["all"] },
+        { "id": 90, "name": "Shellder", "route": "Route 230", "games": ["all"] },
+        { "id": 96, "name": "Drowzee", "route": "Route 215", "games": ["all"] },
+        { "id": 109, "name": "Koffing", "route": "Route 212 (South)", "games": ["all"] },
+        { "id": 116, "name": "Horsea", "route": "Route 226", "games": ["all"] },
+        { "id": 128, "name": "Tauros", "route": "Route 209", "games": ["all"] },
+        { "id": 170, "name": "Chinchou", "route": "Route 220", "games": ["all"] },
+        { "id": 183, "name": "Marill", "route": "Route 226", "games": ["all"] },
+        { "id": 202, "name": "Wobbuffet", "route": "Lake Valor", "games": ["all"] },
+        { "id": 204, "name": "Pineco", "route": "Route 203", "games": ["all"] },
+        { "id": 216, "name": "Teddiursa", "route": "Route 211 (East)", "games": ["diamond", "pearl"] },
+        { "id": 222, "name": "Corsola", "route": "Route 230", "games": ["all"] },
+        { "id": 225, "name": "Delibird", "route": "Route 216", "games": ["all"] },
+        { "id": 238, "name": "Smoochum", "route": "Route 217", "games": ["all"] },
+        { "id": 241, "name": "Miltank", "route": "Route 210 (South)", "games": ["all"] },
+        { "id": 261, "name": "Poochyena", "route": "Route 214", "games": ["diamond", "pearl"] },
+        { "id": 264, "name": "Linoone", "route": "Route 202", "games": ["diamond", "pearl"] },
+        { "id": 270, "name": "Lotad", "route": "Route 203", "games": ["pearl"] },
+        { "id": 273, "name": "Seedot", "route": "Route 203", "games": ["diamond"] },
+        { "id": 285, "name": "Shroomish", "route": "Route 229", "games": ["all"] },
+        { "id": 313, "name": "Volbeat", "route": "Route 229", "games": ["diamond"] },
+        { "id": 314, "name": "Illumise", "route": "Route 229", "games": ["pearl"] },
+        { "id": 328, "name": "Trapinch", "route": "Route 228", "games": ["all"] },
+        { "id": 341, "name": "Corphish", "route": "Route 213", "games": ["all"] },
+        { "id": 352, "name": "Kecleon", "route": "Route 210 (North)", "games": ["all"] },
+        { "id": 370, "name": "Luvdisc", "route": "Route 224", "games": ["all"] }
+      ]
+    }
+  },
+
+  "version_exclusive_splits": {
+    "_note": "Critical FRLG version splits that PokéAPI often conflates into single 'generation-iii' entries. These affect route encounter data directly.",
+
+    "firered_only_wild": [
+      { "id": 23, "name": "Ekans", "locations": ["Route 23", "Safari Zone"] },
+      { "id": 24, "name": "Arbok", "locations": ["Route 23"] },
+      { "id": 43, "name": "Oddish", "locations": ["Routes 12-15", "Safari Zone"] },
+      { "id": 44, "name": "Gloom", "locations": ["Routes 14-15", "Safari Zone"] },
+      { "id": 56, "name": "Mankey", "locations": ["Routes 22, 23"] },
+      { "id": 57, "name": "Primeape", "locations": ["Route 23"] },
+      { "id": 58, "name": "Growlithe", "locations": ["Routes 7, 8"] },
+      { "id": 123, "name": "Scyther", "locations": ["Safari Zone Area 1"] },
+      { "id": 125, "name": "Electabuzz", "locations": ["Route 10 (north of Power Plant)"] }
+    ],
+
+    "leafgreen_only_wild": [
+      { "id": 27, "name": "Sandshrew", "locations": ["Route 4", "Safari Zone"] },
+      { "id": 28, "name": "Sandslash", "locations": ["Route 23"] },
+      { "id": 69, "name": "Bellsprout", "locations": ["Routes 12-15"] },
+      { "id": 70, "name": "Weepinbell", "locations": ["Routes 12-15"] },
+      { "id": 52, "name": "Meowth", "locations": ["Routes 5-8"] },
+      { "id": 53, "name": "Persian", "locations": ["Routes 7, 8"] },
+      { "id": 37, "name": "Vulpix", "locations": ["Routes 7, 8"] },
+      { "id": 127, "name": "Pinsir", "locations": ["Safari Zone Area 1"] },
+      { "id": 126, "name": "Magmar", "locations": ["Pokémon Mansion (Cinnabar Island)"] }
+    ],
+
+    "ruby_only_wild": [
+      { "id": 273, "name": "Seedot", "locations": ["Routes 102, 114, 117, 120"] },
+      { "id": 274, "name": "Nuzleaf", "locations": ["Routes 114"] },
+      { "id": 321, "name": "Wailord", "locations": ["Route 129 (surfing)"] },
+      { "id": 320, "name": "Wailmer", "locations": ["Routes 122-134 (surfing)"] },
+      { "id": 302, "name": "Sableye", "locations": ["Cave of Origin", "Granite Cave", "Victory Road"] },
+      { "id": 335, "name": "Zangoose", "locations": ["Routes 114, 115"] },
+      { "id": 338, "name": "Solrock", "locations": ["Meteor Falls", "Victory Road"] }
+    ],
+
+    "sapphire_only_wild": [
+      { "id": 270, "name": "Lotad", "locations": ["Routes 102, 114, 117, 120"] },
+      { "id": 271, "name": "Lombre", "locations": ["Routes 114"] },
+      { "id": 303, "name": "Mawile", "locations": ["Cave of Origin", "Granite Cave", "Victory Road"] },
+      { "id": 336, "name": "Seviper", "locations": ["Routes 114, 115"] },
+      { "id": 337, "name": "Lunatone", "locations": ["Meteor Falls", "Victory Road"] }
+    ],
+
+    "diamond_only_wild": [
+      { "id": 72, "name": "Tentacool", "locations": ["Various water routes"] },
+      { "id": 73, "name": "Tentacruel", "locations": ["Various water routes"] },
+      { "id": 198, "name": "Murkrow", "locations": ["Route 209", "Route 210", "Eterna City"] },
+      { "id": 207, "name": "Gligar", "locations": ["Route 206", "Route 207"] },
+      { "id": 209, "name": "Snubbull", "locations": ["Route 209"] },
+      { "id": 210, "name": "Granbull", "locations": ["Route 210"] },
+      { "id": 303, "name": "Mawile", "locations": ["Iron Island"] },
+      { "id": 483, "name": "Dialga", "locations": ["Spear Pillar"] }
+    ],
+
+    "pearl_only_wild": [
+      { "id": 72, "name": "Tentacool", "_note": "Actually in both — double-check if Pearl-exclusive on specific routes" },
+      { "id": 200, "name": "Misdreavus", "locations": ["Route 209", "Route 210", "Eterna City"] },
+      { "id": 211, "name": "Qwilfish", "locations": ["Various water routes"] },
+      { "id": 214, "name": "Heracross", "locations": ["Route 214", "Route 216", "Route 217"] },
+      { "id": 302, "name": "Sableye", "locations": ["Iron Island"] },
+      { "id": 430, "name": "Honchkrow", "_note": "Evolves from Murkrow (Diamond-only) — cannot be caught in Pearl" },
+      { "id": 484, "name": "Palkia", "locations": ["Spear Pillar"] }
+    ]
+  },
+
+  "learnset_corrections": {
+    "_note": "PokéAPI's learnset data for Gen 3 commonly conflates FRLG and RSE tutor moves. These corrections are the most critical for your learnset viewer.",
+
+    "frlg_exclusive_move_tutors": {
+      "_description": "These moves are ONLY available via tutors in FireRed/LeafGreen. Not in Ruby/Sapphire. Some (marked *) are also available in Emerald but NOT in Ruby/Sapphire.",
+      "moves": [
+        "Swords Dance", "Mega Punch", "Body Slam", "Double-Edge", "Counter",
+        "Seismic Toss", "Mega Kick", "Thunder Wave", "Rock Slide", "Substitute"
+      ],
+      "_impact": "If your learnset viewer shows these moves as available in RSE, that is a PokéAPI error."
+    },
+
+    "emerald_exclusive_move_tutors": {
+      "_description": "Emerald has TWO sets of tutors: standard tutors (many overlap with FRLG) and Battle Frontier tutors (post-game, cost BP). Neither set is available in Ruby/Sapphire.",
+      "standard_tutors": [
+        "Mega Punch", "Mega Kick", "Body Slam", "Double-Edge", "Counter",
+        "Seismic Toss", "Mimic", "Thunder Wave", "Explosion", "Rock Slide",
+        "Substitute", "Softboiled", "Dream Eater", "Metronome", "Swagger",
+        "Defense Curl", "Rollout", "Psych Up", "Snore", "Mud-Slap",
+        "Icy Wind", "Endure", "Dynamic Punch", "Swift", "Thunderpunch",
+        "Fire Punch", "Ice Punch"
+      ],
+      "battle_frontier_tutors": [
+        "Explosion", "Self-Destruct", "Rock Slide", "Fury Cutter",
+        "Sky Attack", "Sleep Talk", "Swagger"
+      ]
+    },
+
+    "notable_gen3_learnset_quirks": [
+      {
+        "pokemon": "Scyther",
+        "note": "False Swipe is a TM move in Gen 3 (TM54). Scyther can learn it. Important for your living Pokédex catching strategy."
+      },
+      {
+        "pokemon": "Breloom",
+        "note": "Spore can ONLY be learned as a Shroomish. Once it evolves into Breloom, Spore cannot be relearned via Move Reminder in Gen 3. Plan accordingly."
+      },
+      {
+        "pokemon": "Mudkip",
+        "note": "Mudkip learns Hydro Pump at Lv. 42. Marshtomp and Swampert do NOT learn Hydro Pump by level-up. Transfer from Mudkip before evolving if needed."
+      },
+      {
+        "pokemon": "Poochyena / Lombre",
+        "note": "Both could learn Thief by level-up in Gen 3 but never again. PokéAPI may or may not have this correctly."
+      },
+      {
+        "pokemon": "Kabutops",
+        "note": "Kabutops learns Fury Cutter as a starting move in FRLG only. Cannot learn it in RSE and not in any later games."
+      }
+    ]
+  }
+}

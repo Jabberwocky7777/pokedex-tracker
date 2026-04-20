@@ -16,6 +16,9 @@
 
 import { useDexStore } from "../store/useDexStore";
 import { useIvStore } from "../store/useIvStore";
+import { useBoxSlotStore } from "../store/useBoxSlotStore";
+import { useDesignerStore } from "../store/useDesignerStore";
+import type { Pokemon } from "../types";
 
 const BACKUP_VERSION = 1;
 
@@ -29,6 +32,9 @@ export interface BackupData {
   ivChecker: {
     savedSessions: ReturnType<typeof useIvStore.getState>["savedSessions"];
   };
+  boxSlots?: Record<number, Record<string, (number | null)[][]>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  designer?: any[];
 }
 
 // ─── Export ────────────────────────────────────────────────────────────────────
@@ -36,12 +42,16 @@ export interface BackupData {
 export function downloadBackup(): void {
   const { caughtByGen, pendingByGen } = useDexStore.getState();
   const { savedSessions } = useIvStore.getState();
+  const { slotsByGen } = useBoxSlotStore.getState();
 
+  const { slots: designerSlots } = useDesignerStore.getState();
   const data: BackupData = {
     version: BACKUP_VERSION,
     exportedAt: new Date().toISOString(),
     tracker: { caughtByGen, pendingByGen },
     ivChecker: { savedSessions },
+    boxSlots: slotsByGen,
+    designer: designerSlots,
   };
 
   const json = JSON.stringify(data, null, 2);
@@ -54,6 +64,89 @@ export function downloadBackup(): void {
   a.download = `pokedex-backup-${date}.json`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function triggerDownload(content: string, filename: string, mimeType: string): void {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+export function exportFullJSON(): void {
+  const { caughtByGen, pendingByGen } = useDexStore.getState();
+  const { savedSessions } = useIvStore.getState();
+  const { slotsByGen } = useBoxSlotStore.getState();
+  const { slots: designerSlots } = useDesignerStore.getState();
+
+  const data = {
+    exportedAt: new Date().toISOString(),
+    version: 2,
+    tracker: { caughtByGen, pendingByGen },
+    boxSlots: slotsByGen,
+    designer: { slots: designerSlots },
+    ivSessions: { savedSessions },
+  };
+
+  const date = new Date().toISOString().slice(0, 10);
+  triggerDownload(JSON.stringify(data, null, 2), `pokedex-export-${date}.json`, "application/json");
+}
+
+export function exportFullCSV(allPokemon: Pokemon[]): void {
+  const { caughtByGen, pendingByGen } = useDexStore.getState();
+  const { slotsByGen } = useBoxSlotStore.getState();
+
+  const pokemonMap = new Map(allPokemon.map((p) => [p.id, p]));
+
+  const gens = new Set([
+    ...Object.keys(caughtByGen).map(Number),
+    ...Object.keys(pendingByGen).map(Number),
+  ]);
+
+  const rows: string[] = [
+    "dexNumber,name,gen,caught,pending,boxGame,boxNumber,boxSlot",
+  ];
+
+  for (const gen of gens) {
+    const caught = new Set(caughtByGen[gen] ?? []);
+    const pending = new Set(pendingByGen[gen] ?? []);
+    const allIds = new Set([...caught, ...pending]);
+
+    // Build box slot reverse map
+    const slotMap = new Map<number, { game: string; box: number; slot: number }>();
+    const genBoxes = slotsByGen[gen] ?? {};
+    for (const [game, boxes] of Object.entries(genBoxes)) {
+      boxes.forEach((box, boxIdx) => {
+        box.forEach((id, slotIdx) => {
+          if (id != null) slotMap.set(id, { game, box: boxIdx + 1, slot: slotIdx + 1 });
+        });
+      });
+    }
+
+    for (const id of allIds) {
+      const p = pokemonMap.get(id);
+      const name = p?.displayName ?? `#${id}`;
+      const slotInfo = slotMap.get(id);
+      rows.push(
+        [
+          id,
+          `"${name}"`,
+          gen,
+          caught.has(id) ? 1 : 0,
+          pending.has(id) ? 1 : 0,
+          slotInfo ? `"${slotInfo.game}"` : "",
+          slotInfo?.box ?? "",
+          slotInfo?.slot ?? "",
+        ].join(",")
+      );
+    }
+  }
+
+  const date = new Date().toISOString().slice(0, 10);
+  triggerDownload(rows.join("\n"), `pokedex-export-${date}.csv`, "text/csv");
 }
 
 // ─── Import / Restore ─────────────────────────────────────────────────────────
@@ -85,6 +178,18 @@ export function restoreBackup(file: File): Promise<RestoreResult> {
         // Restore IV checker
         useIvStore.setState({ savedSessions: data.ivChecker.savedSessions });
 
+        // Restore box slots (v2+)
+        if (data.boxSlots) {
+          useBoxSlotStore.getState().setSlotsByGen(data.boxSlots);
+        }
+
+        // Restore designer slots (v2+)
+        if (Array.isArray(data.designer)) {
+          useDesignerStore.getState().setSlots(
+            data.designer as ReturnType<typeof useDesignerStore.getState>["slots"]
+          );
+        }
+
         resolve({ ok: true });
       } catch {
         resolve({ ok: false, error: "Could not parse backup file — is it valid JSON?" });
@@ -106,10 +211,11 @@ function validateBackup(
 
   const obj = raw as Record<string, unknown>;
 
-  if (obj.version !== BACKUP_VERSION) {
+  const SUPPORTED_VERSIONS = [1, 2];
+  if (!SUPPORTED_VERSIONS.includes(obj.version as number)) {
     return {
       ok: false,
-      error: `Unsupported backup version: ${obj.version}. Expected version ${BACKUP_VERSION}.`,
+      error: `Unsupported backup version: ${obj.version}. Expected version 1 or 2.`,
     };
   }
 

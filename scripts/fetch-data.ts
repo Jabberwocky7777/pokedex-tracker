@@ -112,6 +112,381 @@ function mapEncounterMethod(apiMethod: string): string {
   return map[apiMethod] ?? "unknown";
 }
 
+// ─── Override Merge ─────────────────────────────────────────────────────
+// Reads overrides.json from the repo root and deep-merges it into the built
+// Pokémon array. The override file is the source of truth for data categories
+// PokéAPI gets wrong or omits (legendaries, roamers, gifts, game corner, etc.).
+
+type PokemonEntry = {
+  id: number;
+  encounters: {
+    version: string;
+    locations: {
+      locationAreaSlug: string;
+      locationDisplayName: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      details: any[];
+    }[];
+  }[];
+  availableInGames: string[];
+  hasStaticEncounter: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+};
+
+function locSlug(loc: string): string {
+  return loc
+    .replace(/\([^)]*\)/g, "") // strip parentheticals
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function addOverrideEncounter(
+  p: PokemonEntry,
+  game: string,
+  slug: string,
+  displayName: string,
+  detail: Record<string, unknown>,
+): void {
+  let enc = p.encounters.find((e) => e.version === game);
+  if (!enc) {
+    enc = { version: game, locations: [] };
+    p.encounters.push(enc);
+  }
+  const existing = enc.locations.find((l) => l.locationAreaSlug === slug);
+  if (existing) {
+    const dup = existing.details.some(
+      (d: Record<string, unknown>) => d.method === detail.method && d.minLevel === detail.minLevel,
+    );
+    if (!dup) existing.details.push(detail);
+  } else {
+    enc.locations.push({ locationAreaSlug: slug, locationDisplayName: displayName, details: [detail] });
+  }
+  if (!p.availableInGames.includes(game)) p.availableInGames.push(game);
+}
+
+function removePokeApiStaticForGame(p: PokemonEntry, game: string): void {
+  const enc = p.encounters.find((e) => e.version === game);
+  if (!enc) return;
+  enc.locations = enc.locations.filter(
+    (loc) => !loc.details.some((d: Record<string, unknown>) => d.isStatic || d.method === "unknown"),
+  );
+  if (enc.locations.length === 0) {
+    p.encounters = p.encounters.filter((e) => e !== enc);
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function applyOverrides(pokemon: PokemonEntry[], overrides: Record<string, any>): void {
+  const byId = new Map<number, PokemonEntry>();
+  for (const p of pokemon) byId.set(p.id, p);
+  let count = 0;
+
+  // ── static_legendaries ────────────────────────────────────────────────
+  const staticLegs = overrides.static_legendaries as Record<string, unknown[]> | undefined;
+  if (staticLegs) {
+    for (const [game, entries] of Object.entries(staticLegs)) {
+      if (!Array.isArray(entries)) continue;
+      for (const entry of entries as Record<string, unknown>[]) {
+        if (!entry.id || entry._remove_this_entry) continue;
+        const p = byId.get(entry.id as number);
+        if (!p) continue;
+        if (entry.method === "unobtainable_in_this_version") {
+          p.encounters = p.encounters.filter((e) => e.version !== game);
+          p.availableInGames = [...new Set(p.encounters.map((e) => e.version))];
+          count++; continue;
+        }
+        const location = entry.location as string | undefined;
+        if (!location || location === "N/A") continue;
+        removePokeApiStaticForGame(p, game);
+        addOverrideEncounter(p, game, locSlug(location), location, {
+          method: "static",
+          minLevel: (entry.level as number) ?? 0,
+          maxLevel: (entry.level as number) ?? 0,
+          chance: 100,
+          isStatic: true,
+          requirement: entry.requirement,
+          eventItem: entry.event_item,
+          respawnsAfterEliteFour: entry.respawns_after_elite_four,
+        });
+        p.hasStaticEncounter = true;
+        count++;
+      }
+    }
+  }
+
+  // ── roaming_legendaries ───────────────────────────────────────────────
+  const roamers = overrides.roaming_legendaries as Record<string, unknown[]> | undefined;
+  if (roamers) {
+    for (const [game, entries] of Object.entries(roamers)) {
+      if (!Array.isArray(entries)) continue;
+      for (const raw of entries as Record<string, unknown>[]) {
+        const list: Record<string, unknown>[] =
+          Array.isArray(raw.pokemon) ? (raw.pokemon as Record<string, unknown>[]) : [raw];
+        for (const entry of list) {
+          if (!entry.id || entry._remove_this_entry) continue;
+          const p = byId.get(entry.id as number);
+          if (!p) continue;
+          const region = (entry.roam_region as string) ?? "Region";
+          addOverrideEncounter(p, game, `roaming-${region.toLowerCase()}`, `Roaming (${region})`, {
+            method: "walk",
+            minLevel: (entry.level as number) ?? 0,
+            maxLevel: (entry.level as number) ?? 0,
+            chance: 1,
+            isStatic: false,
+            requirement: entry.trigger,
+            isRoaming: true,
+          });
+          count++;
+        }
+      }
+    }
+  }
+
+  // ── gift_pokemon ──────────────────────────────────────────────────────
+  const gifts = overrides.gift_pokemon as Record<string, unknown[]> | undefined;
+  if (gifts) {
+    for (const [game, entries] of Object.entries(gifts)) {
+      if (!Array.isArray(entries)) continue;
+      for (const entry of entries as Record<string, unknown>[]) {
+        if (!entry.id || entry._remove_this_entry) continue;
+        const p = byId.get(entry.id as number);
+        if (!p) continue;
+        const location = (entry.location as string) ?? "Unknown Location";
+        if (location === "N/A") continue;
+        const method = entry.method === "fossil" ? "fossil" : "gift";
+        addOverrideEncounter(p, game, locSlug(location.split(" (")[0]), location, {
+          method,
+          minLevel: (entry.level as number) ?? 1,
+          maxLevel: (entry.level as number) ?? 1,
+          chance: 100,
+          isStatic: true,
+          requirement: (entry.giver ?? entry.fossil_item) as string | undefined,
+        });
+        count++;
+      }
+    }
+  }
+
+  // ── game_corner_pokemon ───────────────────────────────────────────────
+  const gc = overrides.game_corner_pokemon as Record<string, unknown> | undefined;
+  if (gc) {
+    const CORNER_GAME_MAP: Record<string, string> = {
+      firered_celadon_game_corner: "firered",
+      leafgreen_celadon_game_corner: "leafgreen",
+    };
+    for (const [key, section] of Object.entries(gc)) {
+      if (key.startsWith("_")) continue;
+      const game = CORNER_GAME_MAP[key];
+      if (!game) continue;
+      const s = section as Record<string, unknown>;
+      const loc = (s._location as string) ?? "Game Corner";
+      const entries = (s.pokemon as Record<string, unknown>[]) ?? [];
+      for (const entry of entries) {
+        if (!entry.id || entry._remove_this_entry) continue;
+        const p = byId.get(entry.id as number);
+        if (!p) continue;
+        addOverrideEncounter(p, game, locSlug(loc), loc, {
+          method: "gift",
+          minLevel: (entry.level as number) ?? 1,
+          maxLevel: (entry.level as number) ?? 1,
+          chance: 100,
+          isStatic: true,
+          requirement: entry.cost_coins ? `${entry.cost_coins} coins` : undefined,
+        });
+        count++;
+      }
+    }
+  }
+
+  // ── secondary_encounter_methods ───────────────────────────────────────
+  const secondary = overrides.secondary_encounter_methods as Record<string, unknown> | undefined;
+  if (secondary) {
+    const DPPt = ["diamond", "pearl", "platinum"];
+
+    // GBA insertion encounters (slot2)
+    const gba = secondary.gba_insertion_encounters as Record<string, unknown> | undefined;
+    if (gba) {
+      const INSERTION_MAP: Record<string, string> = {
+        firered_inserted: "slot2-firered",
+        leafgreen_inserted: "slot2-leafgreen",
+        ruby_inserted: "slot2-ruby",
+        sapphire_inserted: "slot2-sapphire",
+        emerald_inserted: "slot2-emerald",
+      };
+      for (const [key, entries] of Object.entries(gba)) {
+        if (key.startsWith("_") || !Array.isArray(entries)) continue;
+        const method = INSERTION_MAP[key];
+        if (!method) continue;
+        for (const entry of entries as Record<string, unknown>[]) {
+          if (!entry.id) continue;
+          const p = byId.get(entry.id as number);
+          if (!p) continue;
+          const routes = (entry.routes as string[]) ?? [];
+          for (const game of DPPt) {
+            for (const route of routes) {
+              addOverrideEncounter(p, game, locSlug(route), route, {
+                method,
+                minLevel: 10,
+                maxLevel: 40,
+                chance: 10,
+                isStatic: false,
+              });
+              count++;
+            }
+          }
+        }
+      }
+    }
+
+    // Honey tree encounters (some already in MANUAL_ENCOUNTERS — deduplicate via addOverrideEncounter)
+    const ht = secondary.honey_tree_encounters as Record<string, unknown> | undefined;
+    if (ht) {
+      const RATE_MAP: Record<string, number> = { common: 40, "very common": 40, "semi-rare": 20, rare: 5, "rare (~1%)": 1 };
+      const allGroups: { entries: Record<string, unknown>[]; rate: string }[] = [];
+      for (const [key, val] of Object.entries(ht)) {
+        if (key.startsWith("_")) continue;
+        if (key === "version_exclusive") {
+          for (const entry of val as Record<string, unknown>[]) {
+            allGroups.push({ entries: [entry], rate: (entry.rate as string) ?? "semi-rare" });
+          }
+        } else if (Array.isArray(val)) {
+          for (const entry of val as Record<string, unknown>[]) {
+            allGroups.push({ entries: [entry], rate: (entry.rate as string) ?? key });
+          }
+        }
+      }
+      for (const { entries, rate } of allGroups) {
+        for (const entry of entries) {
+          if (!entry.id) continue;
+          const p = byId.get(entry.id as number);
+          if (!p) continue;
+          const games = Array.isArray(entry.games) ? (entry.games as string[]) : DPPt;
+          const gameList = games.includes("all") ? DPPt : games;
+          for (const game of gameList) {
+            addOverrideEncounter(p, game, "honey-tree", "Honey Tree", {
+              method: "honey-tree",
+              minLevel: 5,
+              maxLevel: 15,
+              chance: RATE_MAP[rate] ?? 10,
+              isStatic: false,
+            });
+            count++;
+          }
+        }
+      }
+    }
+
+    // Trophy garden encounters
+    const tg = secondary.trophy_garden_encounters as Record<string, unknown> | undefined;
+    if (tg && Array.isArray(tg.rotating_pokemon)) {
+      for (const entry of tg.rotating_pokemon as Record<string, unknown>[]) {
+        if (!entry.id) continue;
+        const p = byId.get(entry.id as number);
+        if (!p) continue;
+        for (const game of DPPt) {
+          addOverrideEncounter(p, game, "route-212-south-pokemon-mansion", "Trophy Garden (Route 212)", {
+            method: "walk",
+            minLevel: 16,
+            maxLevel: 22,
+            chance: 5,
+            isStatic: false,
+          });
+          count++;
+        }
+      }
+    }
+
+    // Great marsh encounters (some already in MANUAL_ENCOUNTERS — deduplicate)
+    const gm = secondary.great_marsh_encounters as Record<string, unknown> | undefined;
+    if (gm && Array.isArray(gm.pokemon)) {
+      for (const entry of gm.pokemon as Record<string, unknown>[]) {
+        if (!entry.id) continue;
+        const p = byId.get(entry.id as number);
+        if (!p) continue;
+        const games = Array.isArray(entry.games) ? (entry.games as string[]) : DPPt;
+        const gameList = games.includes("all") ? DPPt : games;
+        for (const game of gameList) {
+          addOverrideEncounter(p, game, "great-marsh", "Great Marsh", {
+            method: "safari",
+            minLevel: 22,
+            maxLevel: 30,
+            chance: 10,
+            isStatic: false,
+          });
+          count++;
+        }
+      }
+    }
+
+    // Poké Radar exclusives
+    const pr = secondary.poke_radar_exclusives as Record<string, unknown> | undefined;
+    if (pr && Array.isArray(pr.pokemon)) {
+      for (const entry of pr.pokemon as Record<string, unknown>[]) {
+        if (!entry.id) continue;
+        const p = byId.get(entry.id as number);
+        if (!p) continue;
+        const games = Array.isArray(entry.games) ? (entry.games as string[]) : DPPt;
+        const gameList = games.includes("all") ? DPPt : games;
+        const routes = (entry.routes as string[]) ?? [];
+        for (const game of gameList) {
+          for (const route of routes) {
+            addOverrideEncounter(p, game, locSlug(route), route, {
+              method: "poke-radar",
+              minLevel: 15,
+              maxLevel: 35,
+              chance: 10,
+              isStatic: false,
+            });
+            count++;
+          }
+        }
+      }
+    }
+
+    // Swarm encounters
+    const sw = secondary.swarm_encounters as Record<string, unknown> | undefined;
+    if (sw && Array.isArray(sw.pokemon)) {
+      for (const entry of sw.pokemon as Record<string, unknown>[]) {
+        if (!entry.id) continue;
+        const p = byId.get(entry.id as number);
+        if (!p) continue;
+        const games = Array.isArray(entry.games) ? (entry.games as string[]) : DPPt;
+        const gameList = games.includes("all") ? DPPt : games;
+        const route = (entry.route as string) ?? "Unknown Route";
+        for (const game of gameList) {
+          addOverrideEncounter(p, game, locSlug(route), route, {
+            method: "swarm",
+            minLevel: 15,
+            maxLevel: 45,
+            chance: 10,
+            isStatic: false,
+          });
+          count++;
+        }
+      }
+    }
+  }
+
+  // ── learnset_corrections — attach as metadata on relevant Pokémon ────
+  const lc = overrides.learnset_corrections as Record<string, unknown> | undefined;
+  if (lc?.notable_gen3_learnset_quirks && Array.isArray(lc.notable_gen3_learnset_quirks)) {
+    const nameToId: Record<string, number> = {};
+    for (const p of pokemon) nameToId[p.displayName?.toLowerCase()] = p.id;
+    for (const quirk of lc.notable_gen3_learnset_quirks as Record<string, string>[]) {
+      const name = (quirk.pokemon ?? "").split(" ")[0].toLowerCase(); // handle "Poochyena / Lombre"
+      const id = nameToId[name];
+      if (id !== undefined) {
+        const p = byId.get(id);
+        if (p) { p.learnsetNote = quirk.note; count++; }
+      }
+    }
+  }
+
+  console.log(`   Applied ${count} override entries`);
+}
+
 // ─── Manual Encounter Data ───────────────────────────────────────────────
 // PokéAPI is missing encounter data for some Gen 4 mechanics.
 // These entries are injected after normalizing PokéAPI data.
@@ -447,6 +822,18 @@ async function main() {
     johtoHgssDexMap,
   ));
 
+  // --- Step 6.5: Apply overrides.json patches ---
+  console.log("🔧 Step 6.5: Applying overrides.json...");
+  const overridesPath = path.join(__dirname, "../overrides.json");
+  if (fs.existsSync(overridesPath)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const overrides = JSON.parse(fs.readFileSync(overridesPath, "utf8")) as Record<string, any>;
+    applyOverrides(pokemon as PokemonEntry[], overrides);
+  } else {
+    console.log("   overrides.json not found — skipping (run won't corrupt data)");
+  }
+  console.log("");
+
   // --- Step 7: Build box layout ---
   const boxes = buildBoxLayout(pokemon);
 
@@ -489,7 +876,7 @@ interface PokemonRaw {
   id: number;
   name: string;
   types: { type: { name: string } }[];
-  stats: { base_stat: number; stat: { name: string } }[];
+  stats: { base_stat: number; effort: number; stat: { name: string } }[];
   sprites: {
     front_default: string | null;
     versions: {
@@ -573,16 +960,24 @@ function buildPokemonEntry(
       )
     );
 
-  // Base stats
-  const statLookup = (name: string) =>
-    pokemon.stats.find((s) => s.stat.name === name)?.base_stat ?? 0;
+  // Base stats and EV yields (PokéAPI provides both in the same stats array)
+  const statLookup = (name: string, field: "base_stat" | "effort") =>
+    pokemon.stats.find((s) => s.stat.name === name)?.[field] ?? 0;
   const baseStats = {
-    hp:    statLookup("hp"),
-    atk:   statLookup("attack"),
-    def:   statLookup("defense"),
-    spAtk: statLookup("special-attack"),
-    spDef: statLookup("special-defense"),
-    spe:   statLookup("speed"),
+    hp:    statLookup("hp", "base_stat"),
+    atk:   statLookup("attack", "base_stat"),
+    def:   statLookup("defense", "base_stat"),
+    spAtk: statLookup("special-attack", "base_stat"),
+    spDef: statLookup("special-defense", "base_stat"),
+    spe:   statLookup("speed", "base_stat"),
+  };
+  const evYield = {
+    hp:    statLookup("hp", "effort"),
+    atk:   statLookup("attack", "effort"),
+    def:   statLookup("defense", "effort"),
+    spAtk: statLookup("special-attack", "effort"),
+    spDef: statLookup("special-defense", "effort"),
+    spe:   statLookup("speed", "effort"),
   };
 
   // Evolution
@@ -605,6 +1000,7 @@ function buildPokemonEntry(
     isBaby: species.is_baby,
     catchRate: species.capture_rate,
     baseStats,
+    evYield,
     evolutionChainId: evoChainId,
     evolvesFrom,
     evolvesTo,

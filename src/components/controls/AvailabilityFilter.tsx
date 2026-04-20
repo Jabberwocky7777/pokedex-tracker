@@ -20,6 +20,11 @@ export default function AvailabilityFilter() {
       label: "Catchable",
       title: "Only Pokémon with direct wild, gift, or static encounters in selected games",
     },
+    {
+      id: "needs-attention",
+      label: "Needs Attention",
+      title: "Caught but unevolved · Requires trade to evolve · Requires breeding · Uncaught version exclusives",
+    },
   ];
 
   return (

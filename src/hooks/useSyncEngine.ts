@@ -1,78 +1,88 @@
 import { useEffect, useRef } from "react";
 import { useDexStore } from "../store/useDexStore";
 import { useIvStore } from "../store/useIvStore";
-import { pullSync, pushSync } from "../lib/sync";
+import { useBoxSlotStore } from "../store/useBoxSlotStore";
+import { useDesignerStore } from "../store/useDesignerStore";
+import { getToken, hasToken, buildPayload } from "../lib/sync";
+import { connect } from "../lib/ws-sync";
+import type { WsSyncConnection, WsMessage } from "../lib/ws-sync";
 import { useSyncStatus } from "./useSyncStatus";
+import type { BackupData } from "../lib/backup";
 
-const DEBOUNCE_MS      = 2_000;  // wait 2 s after the last change before pushing
-const RETRY_MS         = 10_000; // retry a failed push after 10 s
-const POLL_INTERVAL_MS = 30_000; // poll for remote changes every 30 s
+const DEBOUNCE_MS = 2_000;
+const WS_ENDPOINT = "/api/ws";
 
-/**
- * Mounts sync behaviour into the app:
- *  - Pulls from server once on mount (after Zustand localStorage rehydration)
- *  - Polls every 30 s for remote changes; only applies data when server is newer
- *  - Pushes to server on every caught/pending/session change, debounced 2 s
- *
- * Does nothing if SYNC_TOKEN is not configured (sync silently disabled).
- */
-export function useSyncEngine() {
-  const { setSyncing, setLastSynced, setError } = useSyncStatus();
-
-  const debounceRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const retryRef      = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isFirstRender = useRef(true);
-  const isPulling     = useRef(false); // true while pull is writing to stores, suppresses push
-
-  // ── Pull once on mount ──────────────────────────────────────────────────────
-  // useEffect fires after the first render, which is after Zustand rehydrates
-  // from localStorage — so the pull correctly overwrites the hydrated state.
-  useEffect(() => {
-    isPulling.current = true;
-    pullSync().then((result) => {
-      if (result.ok) {
-        if (result.savedAt) setLastSynced(new Date(result.savedAt));
-      } else if (result.error !== "Sync not configured") {
-        setError(result.error);
-      }
-    }).finally(() => {
-      // Allow a tick for the store setState calls to settle before re-enabling push
-      setTimeout(() => { isPulling.current = false; }, 0);
+function applySnapshot(data: BackupData) {
+  if (data?.tracker) {
+    useDexStore.setState({
+      caughtByGen: data.tracker.caughtByGen,
+      pendingByGen: data.tracker.pendingByGen,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // intentional — one pull on mount only
+  }
+  if (data?.ivChecker) {
+    useIvStore.setState({ savedSessions: data.ivChecker.savedSessions });
+  }
+  if (data?.boxSlots) {
+    useBoxSlotStore.getState().setSlotsByGen(data.boxSlots);
+  }
+  if (Array.isArray(data?.designer)) {
+    useDesignerStore.getState().setSlots(data.designer as ReturnType<typeof useDesignerStore.getState>["slots"]);
+  }
+}
 
-  // ── Poll every 30 s for remote changes ─────────────────────────────────────
-  // Skips when a pull or debounced push is already in flight so we never
-  // overwrite pending local changes with stale server data.
-  // Uses skipIfNotNewerThan so setState is only called when the server has
-  // data the client hasn't seen yet — no spurious echo pushes.
+export function useSyncEngine() {
+  const { setSyncing, setLastSynced, setError, setForcePush } = useSyncStatus();
+
+  const connRef      = useRef<WsSyncConnection | null>(null);
+  const debounceRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isPulling    = useRef(false);
+  const isFirstRender = useRef(true);
+  const isConnected  = useRef(false);
+
   useEffect(() => {
-    const intervalId = setInterval(async () => {
-      // Don't poll while a pull is in progress or the user has unsaved local changes
-      if (isPulling.current || debounceRef.current) return;
+    if (!hasToken()) return;
 
-      const { lastSynced } = useSyncStatus.getState();
-      isPulling.current = true;
-      try {
-        const result = await pullSync({ skipIfNotNewerThan: lastSynced ?? undefined });
-        if (result.ok && result.savedAt) {
-          const remoteDate = new Date(result.savedAt);
-          // Only update the "Synced X ago" indicator when remote data was applied
-          if (!lastSynced || remoteDate > lastSynced) {
-            setLastSynced(remoteDate);
-          }
-        }
-        // Silently ignore 204, auth errors, and network failures during polling
-      } catch { /* silent — don't spam the UI with polling errors */ }
-      finally {
+    const token = getToken();
+    const wsUrl = `${window.location.protocol}//${window.location.host}${WS_ENDPOINT}`;
+
+    function handleMessage(msg: WsMessage) {
+      if (msg.type === "snapshot") {
+        isPulling.current = true;
+        applySnapshot(msg.data as BackupData);
+        setLastSynced(new Date(msg.savedAt));
         setTimeout(() => { isPulling.current = false; }, 0);
+      } else if (msg.type === "no-data") {
+        isPulling.current = false;
+      } else if (msg.type === "error") {
+        setError(msg.message);
       }
-    }, POLL_INTERVAL_MS);
+    }
 
-    return () => clearInterval(intervalId);
+    function handleConnected() {
+      isConnected.current = true;
+      // Server sends snapshot on connect automatically — no manual pull needed
+    }
+
+    function handleDisconnected() {
+      isConnected.current = false;
+      setError("Disconnected — reconnecting…");
+    }
+
+    connRef.current = connect(wsUrl, token, handleMessage, handleConnected, handleDisconnected);
+
+    setForcePush(() => {
+      if (connRef.current && isConnected.current) {
+        connRef.current.push(buildPayload());
+      }
+    });
+
+    return () => {
+      connRef.current?.close();
+      connRef.current = null;
+      setForcePush(null);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // intentional — one interval for the app lifetime
+  }, []); // one connection for the app lifetime
 
   // ── Push on state changes (debounced) ──────────────────────────────────────
   const caughtByGen   = useDexStore((s) => s.caughtByGen);
@@ -80,38 +90,21 @@ export function useSyncEngine() {
   const savedSessions = useIvStore((s) => s.savedSessions);
 
   useEffect(() => {
-    // Skip the very first render — data came from localStorage, not a user action.
-    // Also skip while a pull is in progress — we don't want to echo pulled data back.
     if (isFirstRender.current || isPulling.current) {
       isFirstRender.current = false;
       return;
     }
 
-    // Clear any pending debounce / retry
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (retryRef.current)    clearTimeout(retryRef.current);
-
     setSyncing(true);
 
-    debounceRef.current = setTimeout(async () => {
-      debounceRef.current = null; // clear so the poller can see there's no pending push
-      const result = await pushSync();
-
-      if (result.ok) {
-        // Use the server's savedAt so the poller can compare timestamps accurately
-        setLastSynced(result.savedAt ? new Date(result.savedAt) : new Date());
-      } else if (result.error !== "Sync not configured") {
-        setError(result.error);
-        // Schedule one automatic retry
-        retryRef.current = setTimeout(async () => {
-          const retry = await pushSync();
-          if (retry.ok) setLastSynced(retry.savedAt ? new Date(retry.savedAt) : new Date());
-          else setError(retry.error);
-        }, RETRY_MS);
-      } else {
-        // Sync not configured — clear the syncing spinner silently
+    debounceRef.current = setTimeout(() => {
+      debounceRef.current = null;
+      if (!connRef.current || !isConnected.current) {
         setSyncing(false);
+        return;
       }
+      connRef.current.push(buildPayload());
     }, DEBOUNCE_MS);
 
     return () => {

@@ -137,6 +137,11 @@ export interface EncounterDetail {
   maxLevel: number;
   chance: number;    // 0–100; 0 = N/A (gift/static)
   isStatic: boolean; // one-time encounter flag
+  // Override-injected fields (may be absent on PokéAPI-sourced encounters)
+  requirement?: string;           // e.g. "Requires Surf and Strength"
+  eventItem?: string;             // e.g. "MysticTicket"
+  respawnsAfterEliteFour?: boolean;
+  isRoaming?: boolean;
 }
 
 export interface LocationEncounter {
@@ -196,6 +201,7 @@ export interface Pokemon {
   // Catch rate & base stats (merged from pokemon-stats.json)
   catchRate: number;
   baseStats: BaseStats;
+  evYield?: BaseStats; // populated after running npm run generate-data
 
   // Encounters
   encounters: GameEncounters[];
@@ -241,13 +247,13 @@ export interface MetaData {
 
 // ─── Store / UI Types ───────────────────────────────────────────────────
 
-export type ViewMode = "box" | "list";
+export type ViewMode = "box" | "list" | "slots";
 
 export type DexMode = "national" | string; // "national" or a regionalDexId like "hoenn"
 
-export type AvailabilityMode = "all" | "obtainable" | "catchable";
+export type AvailabilityMode = "all" | "obtainable" | "catchable" | "needs-attention";
 
-export type AppTab = "tracker" | "catch-calc" | "iv-checker" | "routes" | "pokedex";
+export type AppTab = "tracker" | "catch-calc" | "designer" | "routes" | "pokedex";
 
 // ─── Base Stats ─────────────────────────────────────────────────────────────
 

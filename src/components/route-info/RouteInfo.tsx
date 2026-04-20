@@ -7,6 +7,7 @@ import type { Pokemon, MetaData, GameVersion, EncounterMethod } from "../../type
 import { formatDexNumber } from "../../lib/pokemon-display";
 import TypeBadge from "../shared/TypeBadge";
 import Header from "../layout/Header";
+import FilterSubbar from "../layout/FilterSubbar";
 
 interface Props {
   allPokemon: Pokemon[];
@@ -39,7 +40,8 @@ export default function RouteInfo({ allPokemon, meta }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      <Header meta={meta} caught={0} total={0} percentage={0} />
+      <Header meta={meta} />
+      <FilterSubbar meta={meta} caught={0} total={0} tab="routes" />
 
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">

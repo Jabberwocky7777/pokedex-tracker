@@ -118,6 +118,13 @@ export const useSettingsStore = create<SettingsStore>()(
         const { selectedPokemonId: _a, searchQuery: _b, activeRoute: _c, activePokedexId: _d, ...persistent } = state;
         return persistent;
       },
+      // Migration: rename iv-checker tab → designer, coerce unknown viewModes to "box"
+      merge: (persisted, current) => {
+        const p = persisted as Partial<typeof current>;
+        if ((p.activeTab as string) === "iv-checker") p.activeTab = "designer";
+        if (p.viewMode && !["box", "list", "slots"].includes(p.viewMode)) p.viewMode = "box";
+        return { ...current, ...p };
+      },
     }
   )
 );

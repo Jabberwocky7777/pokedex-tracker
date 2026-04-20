@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useSettingsStore } from "./store/useSettingsStore";
 import Layout from "./components/layout/Layout";
 import CatchCalculator from "./components/catch-calculator/CatchCalculator";
-import IvChecker from "./components/iv-checker/IvChecker";
+import DesignerTab from "./components/designer/DesignerTab";
 import RouteInfo from "./components/route-info/RouteInfo";
 import PokedexTab from "./components/pokedex/PokedexTab";
 import LoginScreen from "./components/auth/LoginScreen";
+import MobileBottomNav from "./components/layout/MobileBottomNav";
+import SyncToast from "./components/layout/SyncToast";
 import { useSyncEngine } from "./hooks/useSyncEngine";
 import { hasToken, clearToken } from "./lib/sync";
 import metaData from "./data/meta.json";
@@ -65,14 +67,22 @@ function App() {
       {activeTab === "catch-calc" && (
         <CatchCalculator allPokemon={allPokemon} meta={meta} />
       )}
-      {activeTab === "iv-checker" && (
-        <IvChecker allPokemon={allPokemon} meta={meta} />
+      {activeTab === "designer" && (
+        <DesignerTab allPokemon={allPokemon} meta={meta} />
       )}
       {activeTab === "routes" && (
         <RouteInfo allPokemon={allPokemon} meta={meta} />
       )}
       {activeTab === "pokedex" && (
         <PokedexTab allPokemon={allPokemon} meta={meta} />
+      )}
+      {/* Global shell elements rendered for all non-tracker tabs.
+          Layout already renders these for the tracker tab. */}
+      {activeTab !== "tracker" && (
+        <>
+          <MobileBottomNav />
+          <SyncToast />
+        </>
       )}
     </div>
   );
