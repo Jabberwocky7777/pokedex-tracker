@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import type { Pokemon } from "../../types";
 import { getGenSprite } from "../../lib/pokemon-display";
@@ -30,7 +30,7 @@ export default function PcBoxSlot({
 }: Props) {
   const [showMenu, setShowMenu] = useState(false);
   const [dragOver, setDragOver] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
 
   function handleContextMenu(e: React.MouseEvent) {
     if (!pokemon) return;
@@ -82,6 +82,8 @@ export default function PcBoxSlot({
       draggable
       onClick={onSelect}
       onContextMenu={handleContextMenu}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       onDragStart={onDragStart}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={() => setDragOver(false)}
@@ -99,17 +101,25 @@ export default function PcBoxSlot({
         {pokemon.displayName}
       </span>
 
-      {statusDot && (
+      {statusDot && !hovered && (
         <span className={`absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full ${statusDot}`} />
+      )}
+
+      {/* Hover clear button — replaces the status dot on hover */}
+      {hovered && (
+        <button
+          className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 rounded-bl rounded-tr bg-red-600 text-white"
+          onClick={handleClear}
+          title="Remove from box"
+        >
+          <X size={9} />
+        </button>
       )}
 
       {showMenu && (
         <>
           <div className="fixed inset-0 z-50" onClick={() => setShowMenu(false)} />
-          <div
-            ref={menuRef}
-            className="absolute top-full left-0 z-50 mt-0.5 bg-gray-800 border border-gray-700 rounded shadow-xl text-xs min-w-[100px]"
-          >
+          <div className="absolute top-full left-0 z-50 mt-0.5 bg-gray-800 border border-gray-700 rounded shadow-xl text-xs min-w-[100px]">
             <button
               className="w-full text-left px-3 py-1.5 hover:bg-gray-700 flex items-center gap-1.5 text-red-400"
               onClick={handleClear}

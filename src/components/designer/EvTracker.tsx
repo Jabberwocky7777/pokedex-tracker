@@ -292,7 +292,7 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
           {showKoSearch && koSuggestions.length > 0 && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowKoSearch(false)} />
-              <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-gray-800 border border-gray-700 rounded shadow-lg">
+              <div className="absolute bottom-full left-0 right-0 z-50 mb-0.5 bg-gray-800 border border-gray-700 rounded shadow-lg">
                 {koSuggestions.map((p) => (
                   <button
                     key={p.id}

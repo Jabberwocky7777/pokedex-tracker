@@ -1,4 +1,4 @@
-import { LayoutGrid, BookOpen, Map, Calculator, Wand2, LogOut, FileJson, FileSpreadsheet } from "lucide-react";
+import { LayoutGrid, BookOpen, Map, Calculator, Wand2, LogOut, FileJson, FileSpreadsheet, Upload } from "lucide-react";
 import GenerationSelector from "../controls/GenerationSelector";
 import DarkModeToggle from "../controls/DarkModeToggle";
 import SyncDot from "./SyncDot";
@@ -11,6 +11,7 @@ interface Props {
   onExport?: () => void;
   onExportJSON?: () => void;
   onExportCSV?: () => void;
+  onImport?: () => void;
 }
 
 const TABS: { id: AppTab; label: string; Icon: React.ComponentType<{ size?: number }> }[] = [
@@ -31,7 +32,7 @@ function PokeBall() {
   );
 }
 
-export default function Header({ meta, onLogout, onExport, onExportJSON, onExportCSV }: Props) {
+export default function Header({ meta, onLogout, onExport, onExportJSON, onExportCSV, onImport }: Props) {
   const { activeTab, setActiveTab } = useSettingsStore();
   const currentLabel = TABS.find((t) => t.id === activeTab)?.label ?? "Pokédex Tracker";
 
@@ -113,6 +114,15 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
               className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
             >
               <FileSpreadsheet size={16} />
+            </button>
+          )}
+          {onImport && (
+            <button
+              onClick={onImport}
+              title="Import backup (JSON)"
+              className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
+            >
+              <Upload size={16} />
             </button>
           )}
           {onLogout && (

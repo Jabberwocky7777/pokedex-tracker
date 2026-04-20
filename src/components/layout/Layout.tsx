@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Header from "./Header";
 import FilterSubbar from "./FilterSubbar";
 import ViewportProgressBar from "./ViewportProgressBar";
@@ -14,7 +14,7 @@ import { usePokemonFilter } from "../../hooks/usePokemonFilter";
 import { useProgress } from "../../hooks/useProgress";
 import boxesData from "../../data/boxes.json";
 import type { Pokemon, MetaData, DexBox } from "../../types";
-import { exportFullJSON, exportFullCSV } from "../../lib/backup";
+import { exportFullJSON, exportFullCSV, restoreBackup } from "../../lib/backup";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 import ShortcutModal from "../shared/ShortcutModal";
 
@@ -72,7 +72,22 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
   const { caught: caughtCount, total, percentage } = useProgress(filteredPokemon, caught);
 
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [importMsg, setImportMsg] = useState<string | null>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
   useKeyboardShortcuts(filteredPokemon, activeGeneration, () => setShortcutsOpen(true));
+
+  const handleImportClick = useCallback(() => {
+    importInputRef.current?.click();
+  }, []);
+
+  const handleImportFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    const result = await restoreBackup(file);
+    setImportMsg(result.ok ? "Backup restored!" : `Import failed: ${result.error}`);
+    setTimeout(() => setImportMsg(null), 4000);
+  }, []);
 
   const selectedPokemon = selectedPokemonId
     ? allPokemon.find((p) => p.id === selectedPokemonId) ?? null
@@ -146,7 +161,24 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
           onLogout={onLogout}
           onExportJSON={exportFullJSON}
           onExportCSV={() => exportFullCSV(allPokemon)}
+          onImport={handleImportClick}
         />
+        {/* Hidden file input for backup import */}
+        <input
+          ref={importInputRef}
+          type="file"
+          accept=".json"
+          className="hidden"
+          onChange={handleImportFile}
+        />
+        {/* Import result toast */}
+        {importMsg && (
+          <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-full border text-sm font-medium shadow-lg backdrop-blur pointer-events-none ${
+            importMsg.startsWith("Backup") ? "bg-gray-800/90 border-gray-700 text-emerald-300" : "bg-red-900/90 border-red-700 text-red-200"
+          }`}>
+            {importMsg}
+          </div>
+        )}
 
         {/* Filter sub-bar — sticky below top bar, tracker-specific */}
         <FilterSubbar meta={meta} caught={caughtCount} total={total} tab="tracker" />
