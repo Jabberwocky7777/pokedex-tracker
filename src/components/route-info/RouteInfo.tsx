@@ -2,7 +2,7 @@ import { useState, useMemo, Fragment } from "react";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import { useRouteIndex, METHOD_ORDER, METHOD_LABELS, METHOD_ICONS } from "../../hooks/useRouteIndex";
 import type { RouteData, RouteEntry } from "../../hooks/useRouteIndex";
-import { GAME_LABELS, GAME_COLORS, GEN3_GAME_ORDER } from "../../types";
+import { GAME_LABELS, GAME_COLORS, GEN3_GAME_ORDER, GEN4_GAME_ORDER } from "../../types";
 import type { Pokemon, MetaData, GameVersion, EncounterMethod } from "../../types";
 import { formatDexNumber } from "../../lib/pokemon-display";
 import TypeBadge from "../shared/TypeBadge";
@@ -16,7 +16,7 @@ interface Props {
 
 // Game ordering for column display — imported from types so all components stay in sync.
 // Widened to GameVersion[] so .includes() accepts any GameVersion at callsites.
-const GAME_ORDER: GameVersion[] = GEN3_GAME_ORDER;
+const ALL_GAME_ORDER: GameVersion[] = [...GEN3_GAME_ORDER, ...GEN4_GAME_ORDER];
 
 export default function RouteInfo({ allPokemon, meta }: Props) {
   const { activeGames, activeGeneration, activeRoute, setActiveRoute } = useSettingsStore();
@@ -36,7 +36,7 @@ export default function RouteInfo({ allPokemon, meta }: Props) {
   const genMeta = meta.generations.find((g) => g.id === activeGeneration);
   const allGenGames = (genMeta?.versions ?? []) as GameVersion[];
   const gamesToShow = activeGames.length > 0 ? activeGames : allGenGames;
-  const orderedGames = GAME_ORDER.filter((g) => gamesToShow.includes(g));
+  const orderedGames = ALL_GAME_ORDER.filter((g) => gamesToShow.includes(g));
 
   return (
     <div className="flex flex-col h-full">
@@ -104,8 +104,8 @@ export default function RouteInfo({ allPokemon, meta }: Props) {
                     </span>
                     <div className="flex gap-1 ml-2 flex-shrink-0">
                       {route.versions
-                        .filter((v) => GAME_ORDER.includes(v as GameVersion))
-                        .sort((a, b) => GAME_ORDER.indexOf(a as GameVersion) - GAME_ORDER.indexOf(b as GameVersion))
+                        .filter((v) => ALL_GAME_ORDER.includes(v as GameVersion))
+                        .sort((a, b) => ALL_GAME_ORDER.indexOf(a as GameVersion) - ALL_GAME_ORDER.indexOf(b as GameVersion))
                         .map((v) => (
                           <span
                             key={v}
@@ -208,8 +208,8 @@ function RouteDetail({
         <h2 className="text-2xl font-bold text-white">{route.displayName}</h2>
         <div className="flex gap-2 mt-2 flex-wrap">
           {route.versions
-            .filter((v) => GAME_ORDER.includes(v as GameVersion))
-            .sort((a, b) => GAME_ORDER.indexOf(a as GameVersion) - GAME_ORDER.indexOf(b as GameVersion))
+            .filter((v) => ALL_GAME_ORDER.includes(v as GameVersion))
+            .sort((a, b) => ALL_GAME_ORDER.indexOf(a as GameVersion) - ALL_GAME_ORDER.indexOf(b as GameVersion))
             .map((v) => (
               <span
                 key={v}
