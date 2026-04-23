@@ -128,6 +128,18 @@ export default function RouteInfo({ allPokemon, meta }: Props) {
 
 // ─── Route Detail ──────────────────────────────────────────────────────────────
 
+type PokemonRow = {
+  pokemonId: number;
+  displayName: string;
+  types: string[];
+  sprite: string;
+  byGame: Map<string, RouteEntry>;
+};
+
+const SLOT2_METHOD_SET = new Set<EncounterMethod>([
+  "slot2", "slot2-ruby", "slot2-sapphire", "slot2-emerald", "slot2-firered", "slot2-leafgreen",
+]);
+
 function RouteDetail({
   route,
   orderedGames,
@@ -146,14 +158,6 @@ function RouteDetail({
 
   // Pre-compute all method data in one memo so getMethodData doesn't rebuild Maps on every render.
   const allMethodData = useMemo(() => {
-    type PokemonRow = {
-      pokemonId: number;
-      displayName: string;
-      types: string[];
-      sprite: string;
-      byGame: Map<string, RouteEntry>;
-    };
-
     const result = new Map<EncounterMethod, PokemonRow[]>();
 
     for (const method of methodsPresent) {
@@ -189,6 +193,75 @@ function RouteDetail({
     return result;
   }, [route, orderedGames, methodsPresent]);
 
+  // Build the display sections: non-slot2 as-is; slot2 methods deduplicated by unique species set.
+  const displaySections = useMemo(() => {
+    type Section = { key: string; label: string; icon: string; rows: PokemonRow[] };
+    const walkIds = new Set((allMethodData.get("walk") ?? []).map((r) => r.pokemonId));
+    const sections: Section[] = [];
+    const seenSlot2Sigs = new Set<string>();
+
+    for (const method of methodsPresent) {
+      const rows = allMethodData.get(method) ?? [];
+      if (rows.length === 0) continue;
+
+      if (!SLOT2_METHOD_SET.has(method)) {
+        sections.push({ key: method, label: METHOD_LABELS[method] ?? method, icon: METHOD_ICONS[method] ?? "•", rows });
+        continue;
+      }
+
+      // Slot2: skip if it adds no species beyond what walking already has.
+      const uniqueIds = rows
+        .filter((r) => !walkIds.has(r.pokemonId))
+        .map((r) => r.pokemonId)
+        .sort((a, b) => a - b);
+      if (uniqueIds.length === 0) continue;
+
+      const sig = uniqueIds.join(",");
+      if (seenSlot2Sigs.has(sig)) continue;
+      seenSlot2Sigs.add(sig);
+
+      // Gather all slot2 methods that produce the same unique species set, then merge their rows.
+      const groupMethods = methodsPresent.filter((m) => {
+        if (!SLOT2_METHOD_SET.has(m)) return false;
+        const mIds = (allMethodData.get(m) ?? [])
+          .filter((r) => !walkIds.has(r.pokemonId))
+          .map((r) => r.pokemonId)
+          .sort((a, b) => a - b)
+          .join(",");
+        return mIds === sig;
+      });
+
+      // Merge byGame maps across all methods in the group so per-game columns stay accurate.
+      const mergedById = new Map<number, PokemonRow>();
+      for (const m of groupMethods) {
+        for (const row of allMethodData.get(m) ?? []) {
+          if (!mergedById.has(row.pokemonId)) {
+            mergedById.set(row.pokemonId, { ...row, byGame: new Map(row.byGame) });
+          } else {
+            const existing = mergedById.get(row.pokemonId)!;
+            for (const [game, entry] of row.byGame) existing.byGame.set(game, entry);
+          }
+        }
+      }
+      const mergedRows = Array.from(mergedById.values()).sort((a, b) => {
+        const aMax = Math.max(...Array.from(a.byGame.values()).map((e) => e.totalChance));
+        const bMax = Math.max(...Array.from(b.byGame.values()).map((e) => e.totalChance));
+        return bMax !== aMax ? bMax - aMax : a.pokemonId - b.pokemonId;
+      });
+
+      const gameNames = groupMethods.map((m) =>
+        (METHOD_LABELS[m] ?? m).replace(/^Slot 2 \(/, "").replace(/\)$/, "")
+      );
+      const label = groupMethods.length === 1
+        ? (METHOD_LABELS[method] ?? method)
+        : `Slot 2 (${gameNames.join(" / ")})`;
+
+      sections.push({ key: `slot2-${sig}`, label, icon: "🎮", rows: mergedRows });
+    }
+
+    return sections;
+  }, [allMethodData, methodsPresent]);
+
   function isUniform(rows: { byGame: Map<string, RouteEntry> }[]): boolean {
     if (orderedGames.length <= 1) return true;
     for (const row of rows) {
@@ -222,21 +295,20 @@ function RouteDetail({
         </div>
       </div>
 
-      {methodsPresent.length === 0 ? (
+      {displaySections.length === 0 ? (
         <div className="text-gray-500 text-sm italic">No encounter data for selected games.</div>
       ) : (
-        methodsPresent.map((method) => {
-          const rows = allMethodData.get(method) ?? [];
+        displaySections.map(({ key, label, icon, rows }) => {
           if (rows.length === 0) return null;
           const uniform = isUniform(rows);
           const showPerGame = !uniform && orderedGames.length > 1;
 
           return (
-            <section key={method}>
+            <section key={key}>
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-700">
-                <span className="text-lg">{METHOD_ICONS[method] ?? "•"}</span>
+                <span className="text-lg">{icon}</span>
                 <h3 className="text-base font-semibold text-gray-100">
-                  {METHOD_LABELS[method] ?? method}
+                  {label}
                 </h3>
               </div>
 

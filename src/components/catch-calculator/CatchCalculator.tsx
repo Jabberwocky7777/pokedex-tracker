@@ -24,11 +24,14 @@ export default function CatchCalculator({ allPokemon, meta }: Props) {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const [level, setLevel] = useState(5);
+  const [levelDraft, setLevelDraft] = useState<string | null>(null);
   const [hpPercent, setHpPercent] = useState(100);
   const [ballId, setBallId] = useState<BallId>("poke");
   const [statusId, setStatusId] = useState<StatusId>("none");
   const [turns, setTurns] = useState(1);
   const [leadLevel, setLeadLevel] = useState(50);
+  const [leadLevelDraft, setLeadLevelDraft] = useState<string | null>(null);
+  const [inDark, setInDark] = useState(false);
 
   const selectedPokemon = selectedId ? allPokemon.find((p) => p.id === selectedId) : null;
 
@@ -55,6 +58,7 @@ export default function CatchCalculator({ allPokemon, meta }: Props) {
           targetLevel: level,
           leadLevel,
           targetTypes: selectedPokemon?.types,
+          inDark,
         });
 
   const statusMult = STATUS_CONDITIONS.find((s) => s.id === statusId)?.multiplier ?? 1;
@@ -73,8 +77,9 @@ export default function CatchCalculator({ allPokemon, meta }: Props) {
   const pctColor =
     pctNum >= 50 ? "text-green-400" : pctNum >= 20 ? "text-yellow-400" : "text-red-400";
 
-  const needsTurns = ballId === "timer";
+  const needsTurns = ballId === "timer" || ballId === "quick";
   const needsLead = ballId === "level";
+  const needsDark = ballId === "dusk";
 
   return (
     <div className="flex flex-col h-full">
@@ -153,8 +158,12 @@ export default function CatchCalculator({ allPokemon, meta }: Props) {
               type="number"
               min={1}
               max={100}
-              value={level}
-              onChange={(e) => setLevel(Math.max(1, Math.min(100, Number(e.target.value))))}
+              value={levelDraft ?? level}
+              onChange={(e) => setLevelDraft(e.target.value)}
+              onBlur={(e) => {
+                setLevel(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)));
+                setLevelDraft(null);
+              }}
               className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-sm text-gray-200 focus:outline-none focus:border-indigo-500"
             />
           </div>
@@ -265,11 +274,13 @@ export default function CatchCalculator({ allPokemon, meta }: Props) {
             </select>
           </div>
 
-          {/* Timer Ball turns */}
+          {/* Timer / Quick Ball turns */}
           {needsTurns && (
             <div className="flex flex-col gap-1.5 sm:col-span-2">
               <label className="text-sm font-medium text-gray-300">
-                Turns elapsed: {turns} → bonus {Math.min(4, 1 + turns / 10).toFixed(2)}×
+                {ballId === "quick"
+                  ? `Turn: ${turns} → bonus ${turns === 1 ? "5.00" : "1.00"}×`
+                  : `Turns elapsed: ${turns} → bonus ${Math.min(4, 1 + turns / 10).toFixed(2)}×`}
               </label>
               <input
                 type="range"
@@ -282,6 +293,23 @@ export default function CatchCalculator({ allPokemon, meta }: Props) {
             </div>
           )}
 
+          {/* Dusk Ball: cave / night toggle */}
+          {needsDark && (
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={inDark}
+                  onChange={(e) => setInDark(e.target.checked)}
+                  className="rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-0"
+                />
+                <span className="text-sm font-medium text-gray-300">
+                  Cave / Night — {inDark ? "3.50×" : "1.00×"} bonus
+                </span>
+              </label>
+            </div>
+          )}
+
           {/* Level Ball lead level */}
           {needsLead && (
             <div className="flex flex-col gap-1.5 sm:col-span-2">
@@ -290,8 +318,12 @@ export default function CatchCalculator({ allPokemon, meta }: Props) {
                 type="number"
                 min={1}
                 max={100}
-                value={leadLevel}
-                onChange={(e) => setLeadLevel(Math.max(1, Math.min(100, Number(e.target.value))))}
+                value={leadLevelDraft ?? leadLevel}
+                onChange={(e) => setLeadLevelDraft(e.target.value)}
+                onBlur={(e) => {
+                  setLeadLevel(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)));
+                  setLeadLevelDraft(null);
+                }}
                 className="px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-sm text-gray-200 focus:outline-none focus:border-indigo-500"
               />
             </div>

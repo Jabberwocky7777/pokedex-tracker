@@ -22,7 +22,9 @@ export type BallId =
   | "nest"
   | "net"
   | "dive"
-  | "level";
+  | "level"
+  | "dusk"
+  | "quick";
 
 export interface Ball {
   id: BallId;
@@ -45,6 +47,8 @@ export const BALLS: Ball[] = [
   { id: "nest",    name: "Nest Ball",    bonus: null, note: "Bonus = max(1, (41 − level) / 10)" },
   { id: "net",     name: "Net Ball",     bonus: null, note: "3× for Water or Bug types; else 1×" },
   { id: "dive",    name: "Dive Ball",    bonus: 3.5, note: "3.5× when surfing or diving" },
+  { id: "dusk",    name: "Dusk Ball",    bonus: null, note: "3.5× in caves or at night; else 1×" },
+  { id: "quick",   name: "Quick Ball",   bonus: null, note: "5× on turn 1; else 1×" },
   { id: "level",   name: "Level Ball",   bonus: null, note: "Depends on player's lead Pokémon level" },
   { id: "luxury",  name: "Luxury Ball",  bonus: 1 },
   { id: "heal",    name: "Heal Ball",    bonus: 1 },
@@ -128,7 +132,7 @@ export function calcCatchRate(inputs: CatchRateInputs): CatchRateResult {
 }
 
 /** Ball IDs whose bonus is computed dynamically (bonus === null in BALLS). */
-export type DynamicBallId = "timer" | "nest" | "net" | "level";
+export type DynamicBallId = "timer" | "nest" | "net" | "level" | "dusk" | "quick";
 
 /** Ball bonus for balls with dynamic bonuses */
 export function getDynamicBallBonus(
@@ -139,6 +143,7 @@ export function getDynamicBallBonus(
     leadLevel?: number;
     targetTypes?: string[];
     inWater?: boolean;
+    inDark?: boolean;
   }
 ): number {
   switch (ballId) {
@@ -161,6 +166,12 @@ export function getDynamicBallBonus(
       if (lead >= target * 2) return 4;
       if (lead > target) return 2;
       return 1;
+    }
+    case "dusk": {
+      return opts.inDark ? 3.5 : 1;
+    }
+    case "quick": {
+      return (opts.turns ?? 1) === 1 ? 5 : 1;
     }
     default: {
       const _exhaustive: never = ballId;

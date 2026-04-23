@@ -59,20 +59,22 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
       {/* ── Desktop top bar (hidden below md) ───────────────────────── */}
       <div className="hidden md:flex items-center h-16 px-4 max-w-screen-2xl mx-auto">
 
-        {/* Left zone: logo + wordmark */}
-        <button
-          onClick={() => setActiveTab("tracker")}
-          className="flex items-center gap-2 flex-shrink-0 hover:opacity-80 transition-opacity mr-6"
-          aria-label="Go to Tracker"
-        >
-          <PokeBall />
-          <span className="text-sm font-bold text-white whitespace-nowrap tracking-tight">
-            Pokédex Tracker
-          </span>
-        </button>
+        {/* Left zone: flex-1 keeps it equal-width to right zone so center nav stays truly centered */}
+        <div className="flex items-center flex-1">
+          <button
+            onClick={() => setActiveTab("tracker")}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            aria-label="Go to Tracker"
+          >
+            <PokeBall />
+            <span className="text-sm font-bold text-white whitespace-nowrap tracking-tight">
+              Pokédex Tracker
+            </span>
+          </button>
+        </div>
 
-        {/* Center zone: pill nav tabs */}
-        <nav className="flex items-center gap-1 flex-1 justify-center" aria-label="Main navigation">
+        {/* Center zone: flex-shrink-0 so it never gets pushed around */}
+        <nav className="flex items-center gap-1 flex-shrink-0" aria-label="Main navigation">
           {TABS.map(({ id, label, Icon }) => {
             const isActive = activeTab === id;
             return (
@@ -93,8 +95,8 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
           })}
         </nav>
 
-        {/* Right zone: gen + sync dot + dark mode + (export + logout) */}
-        <div className="flex items-center gap-2 flex-shrink-0 ml-6">
+        {/* Right zone: flex-1 + justify-end mirrors left zone width */}
+        <div className="flex items-center gap-2 flex-1 justify-end ml-6">
           <GenerationSelector meta={meta} />
           <SyncDot />
           <DarkModeToggle />

@@ -26,6 +26,7 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
       ? slot.ivDataPoints
       : [{ level: 50, stats: emptyStats() }]
   );
+  const [levelDrafts, setLevelDrafts] = useState<Record<number, string>>({});
 
   function addPoint() {
     setDraftPoints((p) => [...p, { level: 50, stats: emptyStats() }]);
@@ -86,8 +87,13 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
               type="number"
               min={1}
               max={100}
-              value={pt.level}
-              onChange={(e) => updatePoint(idx, { level: parseInt(e.target.value) || 1 })}
+              value={levelDrafts[idx] ?? pt.level}
+              onChange={(e) => setLevelDrafts((d) => ({ ...d, [idx]: e.target.value }))}
+              onBlur={(e) => {
+                const n = Math.max(1, Math.min(100, parseInt(e.target.value) || 1));
+                updatePoint(idx, { level: n });
+                setLevelDrafts((d) => { const next = { ...d }; delete next[idx]; return next; });
+              }}
               className="w-14 px-2 py-1 rounded bg-gray-800 border border-gray-700 text-xs text-white focus:outline-none focus:border-indigo-500"
             />
             {STAT_KEYS.map((stat) => (

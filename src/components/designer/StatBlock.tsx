@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { NATURES, STAT_KEYS, STAT_LABELS, getNatureMultiplier } from "../../lib/iv-calc";
 import { calcAllStats } from "../../lib/stat-calc";
 import type { StatKey } from "../../lib/iv-calc";
@@ -18,6 +18,7 @@ const EV_DEAD_ZONE = 252;
 export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }: Props) {
   const nature = NATURES.find((n) => n.name === slot.natureName) ?? NATURES[0];
   const sprite = getGenSprite(pokemon, activeGeneration);
+  const [levelDraft, setLevelDraft] = useState<string | null>(null);
 
   const computedStats = useMemo(() => {
     const ivs = STAT_KEYS.reduce((acc, k) => {
@@ -67,8 +68,12 @@ export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }:
                 type="number"
                 min={1}
                 max={100}
-                value={slot.level}
-                onChange={(e) => setLevel(parseInt(e.target.value) || 1)}
+                value={levelDraft ?? slot.level}
+                onChange={(e) => setLevelDraft(e.target.value)}
+                onBlur={(e) => {
+                  setLevel(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)));
+                  setLevelDraft(null);
+                }}
                 className="w-14 px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-sm text-white focus:outline-none focus:border-indigo-500"
               />
             </div>
