@@ -88,14 +88,14 @@ export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }:
               ))}
             </select>
             {/* Ability */}
-            {pokemon.abilities.length > 0 && (
+            {(pokemon.abilities?.length ?? 0) > 0 && (
               <select
                 value={slot.ability ?? ""}
                 onChange={(e) => onUpdate({ ability: e.target.value || null })}
                 className="px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-sm text-white focus:outline-none focus:border-indigo-500"
               >
                 <option value="">— Ability —</option>
-                {pokemon.abilities.map((a) => (
+                {(pokemon.abilities ?? []).map((a) => (
                   <option key={a.name} value={a.name}>
                     {a.displayName}{a.isHidden ? " (Hidden)" : ""}
                   </option>
