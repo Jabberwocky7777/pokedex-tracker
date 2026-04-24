@@ -15,6 +15,22 @@ interface Props {
 
 const EV_DEAD_ZONE = 252;
 
+// Speed benchmarks — base speed, neutral 31 IV / 0 EV / neutral nature reference label
+const SPEED_TIERS = [
+  { baseSpe: 130, label: "Jolteon / Aerodactyl" },
+  { baseSpe: 115, label: "Alakazam / Starmie" },
+  { baseSpe: 110, label: "Gengar" },
+  { baseSpe: 100, label: "base 100" },
+  { baseSpe: 95,  label: "Heracross / Marowak" },
+  { baseSpe: 90,  label: "Gyarados / Houndoom" },
+  { baseSpe: 80,  label: "Lapras / Slowbro" },
+];
+
+/** Speed for a Pokémon with given baseSpe at level, 31 IVs, 0 EVs, neutral nature */
+function neutralSpeedAtLevel(baseSpe: number, level: number): number {
+  return Math.floor(Math.floor((2 * baseSpe + 31) * level / 100) + 5);
+}
+
 export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }: Props) {
   const nature = NATURES.find((n) => n.name === slot.natureName) ?? NATURES[0];
   const sprite = getGenSprite(pokemon, activeGeneration);
@@ -102,6 +118,14 @@ export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }:
                 ))}
               </select>
             )}
+            {/* Held item */}
+            <input
+              type="text"
+              placeholder="Item…"
+              value={slot.item ?? ""}
+              onChange={(e) => onUpdate({ item: e.target.value || null })}
+              className="px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-sm text-white focus:outline-none focus:border-indigo-500 w-28"
+            />
           </div>
           {/* Nature note */}
           {(nature.plus || nature.minus) && (
@@ -187,6 +211,23 @@ export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }:
         </table>
         <p className="text-xs text-gray-600 mt-1">EVs marked amber exceed the 252 effective cap</p>
       </div>
+
+      {/* Speed tier reference */}
+      {(() => {
+        const spd = computedStats.spe;
+        const tier = SPEED_TIERS.find((t) => spd > neutralSpeedAtLevel(t.baseSpe, slot.level));
+        const slowestRef = SPEED_TIERS[SPEED_TIERS.length - 1];
+        return (
+          <p className="text-xs text-gray-600">
+            {tier
+              ? <>Speed {spd} — outspeeds <span className="text-gray-400">base {tier.baseSpe} ({tier.label})</span> at neutral Lv.{slot.level}</>
+              : spd <= neutralSpeedAtLevel(slowestRef.baseSpe, slot.level)
+                ? <>Speed {spd} — slower than base {slowestRef.baseSpe} ({slowestRef.label}) at neutral Lv.{slot.level}</>
+                : null
+            }
+          </p>
+        );
+      })()}
     </div>
   );
 }

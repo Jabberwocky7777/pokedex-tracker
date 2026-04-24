@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import type { Pokemon, MetaData } from "../../types";
 import Header from "../layout/Header";
 import { useSettingsStore } from "../../store/useSettingsStore";
+import { detectStatKey, STAT_LABELS_SHORT } from "../../lib/ev-search";
 import { TYPE_COLORS } from "../../lib/type-colors";
 import { getGenSprite, formatDexNumber } from "../../lib/pokemon-display";
 import TypeBadge from "../shared/TypeBadge";
@@ -22,6 +23,14 @@ interface Props {
   meta: MetaData;
 }
 
+// ── Search suggestion type ────────────────────────────────────────────────────
+
+interface PokemonSuggestion {
+  pokemon: Pokemon;
+  evYield?: number;
+  statLabel?: string;
+}
+
 // ── Search bar (PokedexTab-specific — has onClear callback) ───────────────────
 
 function PokemonSearchBar({
@@ -40,7 +49,7 @@ function PokemonSearchBar({
   setQuery: (q: string) => void;
   showDropdown: boolean;
   setShowDropdown: (v: boolean) => void;
-  suggestions: Pokemon[];
+  suggestions: PokemonSuggestion[];
   onSelect: (p: Pokemon) => void;
   onClear: () => void;
   placeholder: string;
@@ -66,7 +75,7 @@ function PokemonSearchBar({
       />
       {showDropdown && suggestions.length > 0 && (
         <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
-          {suggestions.map((p) => (
+          {suggestions.map(({ pokemon: p, evYield, statLabel }) => (
             <button
               key={p.id}
               onMouseDown={(e) => e.preventDefault()}
@@ -83,7 +92,11 @@ function PokemonSearchBar({
                 style={{ imageRendering: "pixelated" }}
               />
               <span className="text-sm text-gray-200 flex-1">{p.displayName}</span>
-              <span className="text-xs text-gray-500">#{formatDexNumber(p.id)}</span>
+              {evYield != null && statLabel ? (
+                <span className="text-xs text-emerald-400 font-mono">+{evYield} {statLabel}</span>
+              ) : (
+                <span className="text-xs text-gray-500">#{formatDexNumber(p.id)}</span>
+              )}
             </button>
           ))}
         </div>
@@ -144,17 +157,39 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
   const movesA = usePokemonMoves(activePokedexId);
   const movesB = usePokemonMoves(compareMode ? compareId : null);
 
-  // Suggestions
-  const suggestionsA = useMemo(() => {
+  // Suggestions (support stat-keyword search like "attack" → EV yield results)
+  const suggestionsA = useMemo((): PokemonSuggestion[] => {
     if (!queryA.trim() || pokemonA?.displayName === queryA) return [];
     const q = queryA.toLowerCase();
-    return allPokemon.filter((p) => p.displayName.toLowerCase().includes(q)).slice(0, 8);
+    const statKey = detectStatKey(q);
+    if (statKey) {
+      return allPokemon
+        .filter((p) => (p.evYield?.[statKey] ?? 0) > 0)
+        .sort((a, b) => (b.evYield?.[statKey] ?? 0) - (a.evYield?.[statKey] ?? 0))
+        .slice(0, 8)
+        .map((p) => ({ pokemon: p, evYield: p.evYield?.[statKey] ?? 0, statLabel: STAT_LABELS_SHORT[statKey] }));
+    }
+    return allPokemon
+      .filter((p) => p.displayName.toLowerCase().includes(q))
+      .slice(0, 8)
+      .map((p) => ({ pokemon: p }));
   }, [queryA, allPokemon, pokemonA]);
 
-  const suggestionsB = useMemo(() => {
+  const suggestionsB = useMemo((): PokemonSuggestion[] => {
     if (!queryB.trim() || pokemonB?.displayName === queryB) return [];
     const q = queryB.toLowerCase();
-    return allPokemon.filter((p) => p.displayName.toLowerCase().includes(q)).slice(0, 8);
+    const statKey = detectStatKey(q);
+    if (statKey) {
+      return allPokemon
+        .filter((p) => (p.evYield?.[statKey] ?? 0) > 0)
+        .sort((a, b) => (b.evYield?.[statKey] ?? 0) - (a.evYield?.[statKey] ?? 0))
+        .slice(0, 8)
+        .map((p) => ({ pokemon: p, evYield: p.evYield?.[statKey] ?? 0, statLabel: STAT_LABELS_SHORT[statKey] }));
+    }
+    return allPokemon
+      .filter((p) => p.displayName.toLowerCase().includes(q))
+      .slice(0, 8)
+      .map((p) => ({ pokemon: p }));
   }, [queryB, allPokemon, pokemonB]);
 
   function exitCompareMode() {

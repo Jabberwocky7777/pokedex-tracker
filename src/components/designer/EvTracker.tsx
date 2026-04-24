@@ -6,6 +6,7 @@ import type { DesignerSlot } from "../../store/useDesignerStore";
 import type { Pokemon } from "../../types";
 import { getGenSprite } from "../../lib/pokemon-display";
 import { formatDexNumber } from "../../lib/pokemon-display";
+import { detectStatKey } from "../../lib/ev-search";
 
 interface Props {
   slot: DesignerSlot;
@@ -26,20 +27,6 @@ const VITAMIN_LABELS: Record<StatKey, string> = {
 const MAX_VITAMIN_EVS = 100;
 const EV_TOTAL_CAP = 510;
 const EV_STAT_CAP = 252;
-
-// Stat keyword detection for EV-yield-based search
-const STAT_KEYWORDS: Record<string, StatKey> = {
-  hp: "hp", health: "hp",
-  attack: "atk", atk: "atk",
-  defense: "def", defence: "def", def: "def",
-  "sp atk": "spAtk", spatk: "spAtk", "special attack": "spAtk", spa: "spAtk",
-  "sp def": "spDef", spdef: "spDef", "special defense": "spDef", "special defence": "spDef", spd: "spDef",
-  speed: "spe", spe: "spe",
-};
-
-function detectStatKey(q: string): StatKey | null {
-  return STAT_KEYWORDS[q.trim().toLowerCase()] ?? null;
-}
 
 // Gen-aware curated EV grinding spots (community favourites, 3★ = best, 2★ = great)
 const FEATURED_GRINDERS: Record<number, Partial<Record<StatKey, { id: number; stars: 2 | 3 }[]>>> = {
@@ -198,6 +185,34 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
 
   return (
     <div className="flex flex-col gap-6">
+      {/* ── Grinder search (top) ── */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder='Find grinders — search by name or stat (e.g. "attack")…'
+          value={koQuery}
+          onChange={(e) => { setKoQuery(e.target.value); setShowKoSearch(true); }}
+          onFocus={() => setShowKoSearch(true)}
+          className="w-full px-3 py-1.5 rounded bg-gray-800 border border-gray-700 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+        />
+        {showKoSearch && (featuredSuggestions.length > 0 || regularSuggestions.length > 0) && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setShowKoSearch(false)} />
+            <div className="absolute top-full left-0 right-0 z-50 mt-0.5 bg-gray-800 border border-gray-700 rounded shadow-lg max-h-60 overflow-y-auto">
+              <SuggestionList
+                featured={featuredSuggestions}
+                regular={regularSuggestions}
+                detectedStat={detectedStat}
+                activeGeneration={activeGeneration}
+                compact
+                onAdd={(id) => addKOSpecies(id)}
+                onClose={() => setShowKoSearch(false)}
+              />
+            </div>
+          </>
+        )}
+      </div>
+
       {/* ── Allocated EVs summary ── */}
       <div>
         <div className="flex items-center justify-between mb-2">
@@ -382,33 +397,6 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
           </div>
         )}
 
-        {/* Species search */}
-        <div className="relative">
-          <input
-            type="text"
-            placeholder='Search by name or stat (e.g. "attack")…'
-            value={koQuery}
-            onChange={(e) => { setKoQuery(e.target.value); setShowKoSearch(true); }}
-            onFocus={() => setShowKoSearch(true)}
-            className="w-full px-3 py-1.5 rounded bg-gray-800 border border-gray-700 text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500"
-          />
-          {showKoSearch && (featuredSuggestions.length > 0 || regularSuggestions.length > 0) && (
-            <>
-              <div className="fixed inset-0 z-40" onClick={() => setShowKoSearch(false)} />
-              <div className="absolute bottom-full left-0 right-0 z-50 mb-0.5 bg-gray-800 border border-gray-700 rounded shadow-lg max-h-60 overflow-y-auto">
-                <SuggestionList
-                  featured={featuredSuggestions}
-                  regular={regularSuggestions}
-                  detectedStat={detectedStat}
-                  activeGeneration={activeGeneration}
-                  compact
-                  onAdd={(id) => addKOSpecies(id)}
-                  onClose={() => setShowKoSearch(false)}
-                />
-              </div>
-            </>
-          )}
-        </div>
       </div>
 
       {/* ── KO Counter fullscreen overlay ── */}

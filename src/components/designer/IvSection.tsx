@@ -62,6 +62,12 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
 
   function clearAllConfirmedIVs() {
     onUpdate({ confirmedIVs: { hp: null, atk: null, def: null, spAtk: null, spDef: null, spe: null } });
+    // Re-sync draftPoints from stored observations so ranges recompute from existing data
+    setDraftPoints(
+      slot.ivDataPoints.length > 0
+        ? slot.ivDataPoints
+        : [{ level: 50, stats: emptyStats() }]
+    );
   }
 
   const ranges = useMemo(() => {
@@ -85,6 +91,7 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
   }, [draftPoints, pokemon, slot.evAllocation, nature]);
 
   const allConfirmed = STAT_KEYS.every((k) => slot.confirmedIVs[k] != null);
+  const allUnknown = STAT_KEYS.every((k) => ranges[k] === null && slot.confirmedIVs[k] == null);
   const hiddenPower = allConfirmed
     ? calculateHiddenPower(slot.confirmedIVs as Record<StatKey, number>)
     : null;
@@ -172,7 +179,7 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
                     <span>{range.min}–{range.max}</span>
                   )
                 ) : (
-                  <span className="text-gray-600">?</span>
+                  <span className="text-gray-700">—</span>
                 )}
               </div>
               {isSingle && confirmed == null && (
@@ -187,6 +194,10 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
           );
         })}
       </div>
+
+      {allUnknown && (
+        <p className="text-xs text-gray-600">Enter observed stats in the rows above to compute ranges</p>
+      )}
 
       {/* Hidden Power */}
       {hiddenPower && (

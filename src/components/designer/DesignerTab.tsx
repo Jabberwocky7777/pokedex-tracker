@@ -3,7 +3,6 @@ import { Columns2, X } from "lucide-react";
 import DesignerPcBox from "./DesignerPcBox";
 import DesignerPanel from "./DesignerPanel";
 import DesignerPokemonPicker from "./DesignerPokemonPicker";
-import StatBlock from "./StatBlock";
 import Header from "../layout/Header";
 import { useDesignerStore } from "../../store/useDesignerStore";
 import { useSettingsStore } from "../../store/useSettingsStore";
@@ -65,49 +64,39 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
           />
         </div>
       ) : inCompareMode ? (
-        // ── Compare mode: two StatBlock columns side by side ─────────────────
+        // ── Compare mode: two full DesignerPanel columns side by side ────────
         <>
           <DesignerPcBox
             allPokemon={allPokemon}
             activeGeneration={activeGeneration}
             onPickPokemon={handlePickPokemon}
           />
+          {/* Close bar */}
+          <div className="flex-shrink-0 flex items-center justify-end px-3 pt-2">
+            <button
+              onClick={closeCompare}
+              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors"
+            >
+              <X size={13} />
+              Close compare
+            </button>
+          </div>
           <div className="flex-1 overflow-y-auto pb-[76px] md:pb-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 p-3">
-              {([activeSlotIndex, compareSlotIndex] as number[]).map((idx, col) => {
-                const s = slots[idx];
-                const mon = s?.pokemonId != null ? pokemonMap.get(s.pokemonId) ?? null : null;
-                return (
-                  <div key={idx} className="bg-gray-900 border border-gray-700 rounded-xl p-4 flex flex-col gap-4">
-                    {/* Column header */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-gray-300 truncate">
-                        {s?.nickname || mon?.displayName || `Slot ${idx + 1}`}
-                      </span>
-                      {col === 1 && (
-                        <button
-                          onClick={closeCompare}
-                          className="text-gray-500 hover:text-white transition-colors flex-shrink-0 ml-2"
-                          title="Close compare"
-                        >
-                          <X size={15} />
-                        </button>
-                      )}
-                    </div>
-                    {s && mon ? (
-                      <StatBlock
-                        key={idx}
-                        slot={s}
-                        pokemon={mon}
-                        activeGeneration={activeGeneration}
-                        onUpdate={(patch) => updateSlot(idx, patch)}
-                      />
-                    ) : (
-                      <p className="text-gray-600 text-sm text-center py-4">No Pokémon in this slot</p>
-                    )}
-                  </div>
-                );
-              })}
+              <DesignerPanel
+                key={`cmp-${activeSlotIndex}`}
+                slotIndex={activeSlotIndex ?? undefined}
+                allPokemon={allPokemon}
+                activeGeneration={activeGeneration}
+                compact
+              />
+              <DesignerPanel
+                key={`cmp-${compareSlotIndex}`}
+                slotIndex={compareSlotIndex ?? undefined}
+                allPokemon={allPokemon}
+                activeGeneration={activeGeneration}
+                compact
+              />
             </div>
           </div>
         </>

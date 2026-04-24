@@ -18,6 +18,7 @@ export interface DesignerSlot {
   selectedVersionGroup: VersionGroup;
   selectedMoves: (string | null)[];
   ability: string | null;
+  item: string | null;
   ivDataPoints: IvDataPoint[];
   confirmedIVs: Record<StatKey, number | null>;
   evAllocation: Record<StatKey, number>;
@@ -40,6 +41,7 @@ function emptySlot(slotIndex: number): DesignerSlot {
     selectedVersionGroup: "ruby-sapphire",
     selectedMoves: [null, null, null, null],
     ability: null,
+    item: null,
     ivDataPoints: [],
     confirmedIVs: nullStats() as Record<StatKey, number | null>,
     evAllocation: zeroStats(),
