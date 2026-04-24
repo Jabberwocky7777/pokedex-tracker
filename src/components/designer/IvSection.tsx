@@ -79,8 +79,9 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
         .map((pt) => {
           const observed = parseInt(pt.stats[stat] || "");
           if (isNaN(observed)) return [];
-          // Use the EV snapshot captured when this data point was added, falling back to current EVs
-          const ptEv = (pt.evSnapshot ?? slot.evAllocation)[stat] ?? 0;
+          // Use the EV snapshot from when this row was added; default to 0 (not the planned EV
+          // allocation) so wild-caught / freshly-caught checks work regardless of EV plans.
+          const ptEv = pt.evSnapshot ? (pt.evSnapshot[stat] ?? 0) : 0;
           return findIVs(base, ptEv, pt.level, mod, observed, stat === "hp");
         })
         .filter((s) => s.length > 0);
@@ -88,10 +89,17 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
       result[stat] = ivRange(intersection);
     }
     return result;
-  }, [draftPoints, pokemon, slot.evAllocation, nature]);
+  }, [draftPoints, pokemon, nature]);
 
   const allConfirmed = STAT_KEYS.every((k) => slot.confirmedIVs[k] != null);
-  const allUnknown = STAT_KEYS.every((k) => ranges[k] === null && slot.confirmedIVs[k] == null);
+
+  // True when every stat field in every row is empty (no data entered at all)
+  const noDataEntered = draftPoints.every((pt) =>
+    STAT_KEYS.every((k) => !pt.stats[k].trim())
+  );
+  // True when ranges are all null but confirmed IVs haven't been set (includes "impossible stats" case)
+  const allRangesNull = STAT_KEYS.every((k) => ranges[k] === null && slot.confirmedIVs[k] == null);
+  const allUnknown = allRangesNull;
   const hiddenPower = allConfirmed
     ? calculateHiddenPower(slot.confirmedIVs as Record<StatKey, number>)
     : null;
@@ -195,8 +203,13 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
         })}
       </div>
 
-      {allUnknown && (
+      {allUnknown && noDataEntered && (
         <p className="text-xs text-gray-600">Enter observed stats in the rows above to compute ranges</p>
+      )}
+      {allUnknown && !noDataEntered && (
+        <p className="text-xs text-amber-700">
+          No valid IVs found — check that the level, nature, and EVs match your in-game Pokémon
+        </p>
       )}
 
       {/* Hidden Power */}
