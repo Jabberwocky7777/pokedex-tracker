@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import type { Pokemon, MetaData } from "../../types";
 import Header from "../layout/Header";
 import { useSettingsStore } from "../../store/useSettingsStore";
-import { detectStatKey, STAT_LABELS_SHORT } from "../../lib/ev-search";
+import { detectStatKey, STAT_LABELS_SHORT, FEATURED_GRINDERS } from "../../lib/ev-search";
+import type { StatKey } from "../../lib/iv-calc";
 import { TYPE_COLORS } from "../../lib/type-colors";
 import { getGenSprite, formatDexNumber } from "../../lib/pokemon-display";
 import TypeBadge from "../shared/TypeBadge";
@@ -29,6 +30,7 @@ interface PokemonSuggestion {
   pokemon: Pokemon;
   evYield?: number;
   statLabel?: string;
+  stars?: 2 | 3;
 }
 
 // ── Search bar (PokedexTab-specific — has onClear callback) ───────────────────
@@ -74,8 +76,8 @@ function PokemonSearchBar({
         className={`w-full px-3 py-2 rounded-lg bg-gray-800 border border-gray-700 text-sm text-gray-200 placeholder-gray-500 focus:outline-none ${focusRing}`}
       />
       {showDropdown && suggestions.length > 0 && (
-        <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-hidden">
-          {suggestions.map(({ pokemon: p, evYield, statLabel }) => (
+        <div className="absolute z-20 top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl overflow-y-auto max-h-80">
+          {suggestions.map(({ pokemon: p, evYield, statLabel, stars }) => (
             <button
               key={p.id}
               onMouseDown={(e) => e.preventDefault()}
@@ -83,19 +85,22 @@ function PokemonSearchBar({
                 onSelect(p);
                 setShowDropdown(false);
               }}
-              className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-700 text-left"
+              className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-700 text-left border-b border-gray-700/40 last:border-0"
             >
               <img
                 src={getGenSprite(p, activeGeneration)}
                 alt={p.displayName}
-                className="w-8 h-8 object-contain"
+                className="w-8 h-8 object-contain flex-shrink-0"
                 style={{ imageRendering: "pixelated" }}
               />
               <span className="text-sm text-gray-200 flex-1">{p.displayName}</span>
               {evYield != null && statLabel ? (
-                <span className="text-xs text-emerald-400 font-mono">+{evYield} {statLabel}</span>
+                <span className="text-xs text-emerald-400 font-mono flex-shrink-0">+{evYield} {statLabel}</span>
               ) : (
-                <span className="text-xs text-gray-500">#{formatDexNumber(p.id)}</span>
+                <span className="text-xs text-gray-500 flex-shrink-0">#{formatDexNumber(p.id)}</span>
+              )}
+              {stars != null && (
+                <span className="text-xs text-amber-400 flex-shrink-0 ml-1">{stars === 3 ? "★★★" : "★★"}</span>
               )}
             </button>
           ))}
@@ -157,40 +162,50 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
   const movesA = usePokemonMoves(activePokedexId);
   const movesB = usePokemonMoves(compareMode ? compareId : null);
 
+  // Build EV-yield suggestions: featured grinders first (with ★ rating), then all others sorted by yield
+  function buildEvSuggestions(statKey: ReturnType<typeof detectStatKey>): PokemonSuggestion[] {
+    if (!statKey) return [];
+    const genKey = activeGeneration === 3 ? 3 : 4;
+    const featured = FEATURED_GRINDERS[genKey]?.[statKey] ?? [];
+    const featuredIds = new Set(featured.map((f) => f.id));
+    const featuredSuggestions: PokemonSuggestion[] = featured
+      .flatMap(({ id, stars }) => {
+        const p = allPokemon.find((p) => p.id === id);
+        if (!p) return [];
+        const s: PokemonSuggestion = { pokemon: p, evYield: p.evYield?.[statKey] ?? 0, statLabel: STAT_LABELS_SHORT[statKey], stars };
+        return [s];
+      });
+    const rest: PokemonSuggestion[] = allPokemon
+      .filter((p) => !featuredIds.has(p.id) && (p.evYield?.[statKey] ?? 0) > 0)
+      .sort((a, b) => (b.evYield?.[statKey] ?? 0) - (a.evYield?.[statKey] ?? 0))
+      .map((p) => ({ pokemon: p, evYield: p.evYield?.[statKey] ?? 0, statLabel: STAT_LABELS_SHORT[statKey] }));
+    return [...featuredSuggestions, ...rest];
+  }
+
   // Suggestions (support stat-keyword search like "attack" → EV yield results)
   const suggestionsA = useMemo((): PokemonSuggestion[] => {
     if (!queryA.trim() || pokemonA?.displayName === queryA) return [];
     const q = queryA.toLowerCase();
     const statKey = detectStatKey(q);
-    if (statKey) {
-      return allPokemon
-        .filter((p) => (p.evYield?.[statKey] ?? 0) > 0)
-        .sort((a, b) => (b.evYield?.[statKey] ?? 0) - (a.evYield?.[statKey] ?? 0))
-        .slice(0, 8)
-        .map((p) => ({ pokemon: p, evYield: p.evYield?.[statKey] ?? 0, statLabel: STAT_LABELS_SHORT[statKey] }));
-    }
+    if (statKey) return buildEvSuggestions(statKey);
     return allPokemon
       .filter((p) => p.displayName.toLowerCase().includes(q))
       .slice(0, 8)
       .map((p) => ({ pokemon: p }));
-  }, [queryA, allPokemon, pokemonA]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryA, allPokemon, pokemonA, activeGeneration]);
 
   const suggestionsB = useMemo((): PokemonSuggestion[] => {
     if (!queryB.trim() || pokemonB?.displayName === queryB) return [];
     const q = queryB.toLowerCase();
     const statKey = detectStatKey(q);
-    if (statKey) {
-      return allPokemon
-        .filter((p) => (p.evYield?.[statKey] ?? 0) > 0)
-        .sort((a, b) => (b.evYield?.[statKey] ?? 0) - (a.evYield?.[statKey] ?? 0))
-        .slice(0, 8)
-        .map((p) => ({ pokemon: p, evYield: p.evYield?.[statKey] ?? 0, statLabel: STAT_LABELS_SHORT[statKey] }));
-    }
+    if (statKey) return buildEvSuggestions(statKey);
     return allPokemon
       .filter((p) => p.displayName.toLowerCase().includes(q))
       .slice(0, 8)
       .map((p) => ({ pokemon: p }));
-  }, [queryB, allPokemon, pokemonB]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryB, allPokemon, pokemonB, activeGeneration]);
 
   function exitCompareMode() {
     setCompareMode(false);
@@ -392,8 +407,19 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                             <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pink-900/50 text-pink-300 border border-pink-700/50">♡ Baby</span>
                           )}
                         </div>
-                        <div className="flex gap-4 text-sm text-gray-400">
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-400">
                           <span>Catch rate: <span className="text-gray-200 font-medium">{pokemonA.catchRate}</span></span>
+                          {pokemonA.evYield && Object.entries(pokemonA.evYield).some(([, v]) => (v ?? 0) > 0) && (
+                            <span>
+                              EV yield:{" "}
+                              <span className="text-emerald-400 font-medium">
+                                {Object.entries(pokemonA.evYield)
+                                  .filter(([, v]) => (v ?? 0) > 0)
+                                  .map(([k, v]) => `${v} ${STAT_LABELS_SHORT[k as StatKey]}`)
+                                  .join(", ")}
+                              </span>
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>

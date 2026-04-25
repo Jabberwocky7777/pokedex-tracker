@@ -2,6 +2,8 @@ import type { Pokemon } from "../../types";
 import { TYPE_COLORS } from "../../lib/type-colors";
 import { getGenSprite, formatDexNumber } from "../../lib/pokemon-display";
 import TypeBadge from "../shared/TypeBadge";
+import { STAT_LABELS_SHORT } from "../../lib/ev-search";
+import type { StatKey } from "../../lib/iv-calc";
 
 export function PokemonHeroCard({ pokemon, activeGeneration, compact = false }: {
   pokemon: Pokemon;
@@ -40,6 +42,17 @@ export function PokemonHeroCard({ pokemon, activeGeneration, compact = false }: 
           <div className="text-xs text-gray-400">
             Catch rate: <span className="text-gray-200 font-medium">{pokemon.catchRate}</span>
           </div>
+          {pokemon.evYield && Object.entries(pokemon.evYield).some(([, v]) => (v ?? 0) > 0) && (
+            <div className="text-xs text-gray-400">
+              EV yield:{" "}
+              <span className="text-emerald-400 font-medium">
+                {Object.entries(pokemon.evYield)
+                  .filter(([, v]) => (v ?? 0) > 0)
+                  .map(([k, v]) => `${v} ${STAT_LABELS_SHORT[k as StatKey]}`)
+                  .join(", ")}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>
