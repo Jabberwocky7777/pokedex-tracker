@@ -38,11 +38,12 @@ export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }:
 
   const computedStats = useMemo(() => {
     const ivs = STAT_KEYS.reduce((acc, k) => {
-      acc[k] = slot.confirmedIVs[k] ?? 15;
+      // confirmedIVs (user-set) → inferredIVs (auto from ranges) → 15 (midpoint fallback)
+      acc[k] = slot.confirmedIVs[k] ?? slot.inferredIVs?.[k] ?? 15;
       return acc;
     }, {} as Record<StatKey, number>);
     return calcAllStats(pokemon.baseStats, ivs, slot.evAllocation, nature, slot.level);
-  }, [pokemon.baseStats, slot.confirmedIVs, slot.evAllocation, nature, slot.level]);
+  }, [pokemon.baseStats, slot.confirmedIVs, slot.inferredIVs, slot.evAllocation, nature, slot.level]);
 
   function setNature(name: string) {
     onUpdate({ natureName: name });
@@ -158,7 +159,10 @@ export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }:
               const mod = getNatureMultiplier(nature, stat);
               const ev = slot.evAllocation[stat] ?? 0;
               const iv = slot.confirmedIVs[stat];
+              const inferred = slot.inferredIVs?.[stat];
               const isConfirmed = iv != null;
+              const isInferred = iv == null && inferred != null;
+              const displayIv = iv ?? inferred;
               const barPct = Math.min(100, (computed / 714) * 100);
 
               let labelClass = "text-gray-300";
@@ -174,11 +178,16 @@ export default function StatBlock({ slot, pokemon, activeGeneration, onUpdate }:
                       type="number"
                       min={0}
                       max={31}
-                      value={isConfirmed ? iv : ""}
+                      value={displayIv ?? ""}
                       placeholder="?"
                       onChange={(e) => setIV(stat, e.target.value)}
+                      title={isInferred ? `Inferred from IV ranges (min possible: ${inferred})` : undefined}
                       className={`w-12 px-1 py-0.5 rounded text-center bg-gray-800 focus:outline-none focus:border-indigo-500 ${
-                        isConfirmed ? "border border-gray-600 text-white" : "border border-dashed border-gray-600 text-gray-500"
+                        isConfirmed
+                          ? "border border-gray-600 text-white"
+                          : isInferred
+                          ? "border border-dashed border-blue-700 text-blue-400"
+                          : "border border-dashed border-gray-600 text-gray-500"
                       }`}
                     />
                   </td>

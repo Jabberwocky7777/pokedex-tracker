@@ -21,6 +21,7 @@ export interface DesignerSlot {
   item: string | null;
   ivDataPoints: IvDataPoint[];
   confirmedIVs: Record<StatKey, number | null>;
+  inferredIVs: Partial<Record<StatKey, number>>;
   evAllocation: Record<StatKey, number>;
   vitaminEVs: Record<StatKey, number>;
   machobraceActive: boolean;
@@ -44,6 +45,7 @@ function emptySlot(slotIndex: number): DesignerSlot {
     item: null,
     ivDataPoints: [],
     confirmedIVs: nullStats() as Record<StatKey, number | null>,
+    inferredIVs: {},
     evAllocation: zeroStats(),
     vitaminEVs: zeroStats(),
     machobraceActive: false,

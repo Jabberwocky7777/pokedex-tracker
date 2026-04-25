@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { RotateCcw } from "lucide-react";
 import {
   NATURES, STAT_KEYS, STAT_LABELS,
@@ -61,7 +61,7 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
   }
 
   function clearAllConfirmedIVs() {
-    onUpdate({ confirmedIVs: { hp: null, atk: null, def: null, spAtk: null, spDef: null, spe: null } });
+    onUpdate({ confirmedIVs: { hp: null, atk: null, def: null, spAtk: null, spDef: null, spe: null }, inferredIVs: {} });
     // Re-sync draftPoints from stored observations so ranges recompute from existing data
     setDraftPoints(
       slot.ivDataPoints.length > 0
@@ -90,6 +90,17 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
     }
     return result;
   }, [draftPoints, pokemon, nature]);
+
+  // Auto-fill inferredIVs from range.min so StatBlock can show minimum-possible stats
+  useEffect(() => {
+    const inferred: Partial<Record<StatKey, number>> = {};
+    for (const stat of STAT_KEYS) {
+      const range = ranges[stat];
+      if (range) inferred[stat] = range.min;
+    }
+    onUpdate({ inferredIVs: inferred });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ranges]);
 
   const allConfirmed = STAT_KEYS.every((k) => slot.confirmedIVs[k] != null);
 
