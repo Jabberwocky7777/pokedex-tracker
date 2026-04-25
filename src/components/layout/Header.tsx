@@ -1,8 +1,10 @@
-import { LayoutGrid, BookOpen, Map, Calculator, Wand2, LogOut, FileJson, FileSpreadsheet, Upload } from "lucide-react";
+import { useState } from "react";
+import { LayoutGrid, BookOpen, Map, Calculator, Wand2, LogOut, FileJson, FileSpreadsheet, Upload, RefreshCw } from "lucide-react";
 import GenerationSelector from "../controls/GenerationSelector";
 import DarkModeToggle from "../controls/DarkModeToggle";
 import SyncDot from "./SyncDot";
 import { useSettingsStore } from "../../store/useSettingsStore";
+import { getToken } from "../../lib/sync";
 import type { MetaData, AppTab } from "../../types";
 
 interface Props {
@@ -21,6 +23,43 @@ const TABS: { id: AppTab; label: string; Icon: React.ComponentType<{ size?: numb
   { id: "catch-calc", label: "Catch Calc",Icon: Calculator },
   { id: "designer",   label: "Designer",  Icon: Wand2      },
 ];
+
+/** Restart button — calls /api/restart, Docker restart policy brings up the new image */
+function RestartButton() {
+  const [state, setState] = useState<"idle" | "restarting" | "done">("idle");
+
+  async function handleRestart() {
+    if (!window.confirm("Restart the server? The app will be unavailable for a few seconds while Docker restarts.")) return;
+    setState("restarting");
+    try {
+      const token = getToken();
+      await fetch("/api/restart", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch {
+      // expected — server closed the connection while restarting
+    }
+    setState("done");
+    // After ~8 s the container should be back up; reload the page
+    setTimeout(() => window.location.reload(), 8000);
+  }
+
+  return (
+    <button
+      onClick={handleRestart}
+      disabled={state !== "idle"}
+      title={state === "restarting" ? "Restarting…" : state === "done" ? "Reloading page…" : "Restart server"}
+      className={`p-1.5 rounded-md transition-colors ${
+        state !== "idle"
+          ? "text-amber-400 cursor-not-allowed"
+          : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+      }`}
+    >
+      <RefreshCw size={16} className={state === "restarting" ? "animate-spin" : ""} />
+    </button>
+  );
+}
 
 /** CSS-only PokéBall — no emoji, no image */
 function PokeBall() {
@@ -99,6 +138,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
         <div className="flex items-center gap-2 flex-1 justify-end ml-6">
           <GenerationSelector meta={meta} />
           <SyncDot />
+          <RestartButton />
           <DarkModeToggle />
           {(onExportJSON ?? onExport) && (
             <button

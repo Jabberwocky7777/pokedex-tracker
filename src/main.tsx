@@ -19,6 +19,17 @@ if (darkMode) {
   document.documentElement.classList.add("dark");
 }
 
+// Double-click any number input to select all — makes it easy to retype a value.
+document.addEventListener("dblclick", (e) => {
+  const el = e.target as HTMLElement;
+  if (
+    el instanceof HTMLInputElement &&
+    (el.type === "number" || el.inputMode === "numeric")
+  ) {
+    el.select();
+  }
+});
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
