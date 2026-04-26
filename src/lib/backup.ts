@@ -18,6 +18,7 @@ import { useDexStore } from "../store/useDexStore";
 import { useIvStore } from "../store/useIvStore";
 import { useBoxSlotStore } from "../store/useBoxSlotStore";
 import { useDesignerStore } from "../store/useDesignerStore";
+import type { DesignerSlot } from "../store/useDesignerStore";
 import type { Pokemon } from "../types";
 
 const BACKUP_VERSION = 1;
@@ -33,8 +34,7 @@ export interface BackupData {
     savedSessions: ReturnType<typeof useIvStore.getState>["savedSessions"];
   };
   boxSlots?: Record<number, Record<string, (number | null)[][]>>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  designer?: any[];
+  designer?: DesignerSlot[];
 }
 
 // ─── Export ────────────────────────────────────────────────────────────────────

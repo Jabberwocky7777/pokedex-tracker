@@ -24,15 +24,23 @@ function SyncEngine() {
 function App() {
   const { activeTab } = useSettingsStore();
   const [allPokemon, setAllPokemon] = useState<Pokemon[] | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
   // Auth state — initialize from localStorage so we don't flash the login screen on reload
   const [isAuthed, setIsAuthed] = useState(() => hasToken());
 
   useEffect(() => {
+    setAllPokemon(null);
+    setLoadError(false);
     fetch("/data/pokemon.json")
-      .then((r) => r.json())
-      .then((pokemon) => setAllPokemon(pokemon as Pokemon[]));
-  }, []);
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((pokemon) => setAllPokemon(pokemon as Pokemon[]))
+      .catch(() => setLoadError(true));
+  }, [retryKey]);
 
   function handleLogout() {
     clearToken();
@@ -42,6 +50,26 @@ function App() {
   // Show login screen until the user has entered (or bypassed) their sync token
   if (!isAuthed) {
     return <LoginScreen onSuccess={() => setIsAuthed(true)} />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-950 text-gray-400">
+        <div className="flex flex-col items-center gap-4 text-center px-6">
+          <span className="text-4xl">⚠️</span>
+          <div>
+            <p className="text-gray-200 font-semibold mb-1">Failed to load Pokédex data</p>
+            <p className="text-sm text-gray-500">Could not fetch <code className="text-gray-400">/data/pokemon.json</code>.</p>
+          </div>
+          <button
+            onClick={() => setRetryKey((k) => k + 1)}
+            className="mt-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (!allPokemon) {

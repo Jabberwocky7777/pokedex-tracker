@@ -25,6 +25,12 @@ export async function fetchMoveList(): Promise<MoveSummary[]> {
       moveListCache = list;
       fetchPromise = null;
       return list;
+    })
+    .catch((err) => {
+      // Clear the cached promise so the next call retries instead of
+      // returning the same rejected promise forever.
+      fetchPromise = null;
+      throw err;
     });
 
   return fetchPromise;

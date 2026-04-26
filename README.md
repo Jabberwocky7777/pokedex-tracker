@@ -12,8 +12,9 @@ A Gen III–IV Pokémon collection tracker with cross-device sync, a catch rate 
 - **Regional dex** — Switch between National, Hoenn, and Kanto dex numbering
 - **Catch rate calculator** — Gen III/IV formula with all Poké Balls, status conditions, and HP modifiers
 - **Designer** — IV range narrowing, stat projections, nature support, EV planning, PC Box slot management, and move picker via PokéAPI
-- **Pokédex tab** — Base stat bars, side-by-side comparisons, and full learnset viewer (level-up, TM/HM, egg moves, tutors) via PokéAPI for both Gen III and Gen IV games
-- **Route info** — Browse encounter tables by location, version, and method
+- **Pokédex tab** — Base stat bars, side-by-side comparisons, full learnset viewer (level-up, TM/HM, egg moves, tutors) via PokéAPI, and a "Where to Find" encounter table with clickable route links
+- **Attackdex** — Full move browser: search any move to see its type, power, accuracy, PP, effect, and which Pokémon learn it
+- **Route info** — Browse encounter tables by location, version, and method, including time-of-day encounter differences (morning/day/night) for HGSS
 - **Cross-device sync** — Optional self-hosted sync server (included in the Docker image) keeps progress in sync between PC and phone; polls every 30 s so changes appear automatically without a page reload
 - **Mobile & tablet ready** — Hamburger drawer navigation, horizontally-scrollable filter controls, and touch-friendly tap targets for iPhone and iPad
 - **Dark mode** — Enabled by default, no flash on load
@@ -103,6 +104,7 @@ openssl rand -hex 32
      - `APP_USER` = *(your chosen username)*
      - `APP_PASSWORD` = *(your chosen password)*
      - `SYNC_TOKEN` = *(your generated token)*
+     - `CORS_ORIGIN` = *(optional — restrict CORS to your app's origin, e.g. `http://192.168.1.50:7777`; defaults to `*` if unset)*
    - **Storage:** Add a host path volume — mount path `/data`
 3. Click **Install**
 

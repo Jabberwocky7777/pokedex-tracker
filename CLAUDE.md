@@ -21,14 +21,17 @@ src/
 ├── store/                   # Zustand stores (see below)
 ├── hooks/                   # Custom React hooks
 ├── lib/                     # Pure utility modules (no React)
-├── data/                    # Static JSON (genMeta, learnsets — committed)
+├── data/                    # Static JSON (genMeta, npc-trades — committed)
 ├── styles/                  # Tailwind CSS entry (index.css)
 └── components/
     ├── layout/              # Header, FilterSubbar, SyncDot, SyncToast, MobileBottomNav, Layout
     ├── auth/                # LoginScreen
+    ├── controls/            # Shared input components (SearchBar, …)
     ├── tracker/             # TrackerTab, BoxView, ListView, PokemonCell, FilterPanel
-    ├── pokedex/             # PokedexTab, StatPanel, StatComparison, LearnsetViewer, …
-    ├── routes/              # RoutesTab, RouteInfo
+    ├── pokedex/             # PokedexTab, StatPanel, MovesSection, MoveTable, SectionHeading, …
+    ├── attackdex/           # AttackdexPanel, MoveSearchBar, MoveDetailPanel
+    ├── detail-panel/        # DetailPanel, LocationTable (encounter locations for a Pokémon)
+    ├── route-info/          # RouteInfo, RouteDetail (encounter tables browsed by location)
     ├── catch-calculator/    # CatchCalculator
     ├── designer/            # DesignerTab, SlotAccordion, IvSection, EvSection, MovePicker, PcBoxPanel
     ├── pc-box/              # PcBoxLayout, PcBoxGrid, BoxGameSelector
@@ -39,10 +42,11 @@ sync-server/
 └── package.json
 
 scripts/
-└── generate-data.js        # Fetches PokéAPI → writes public/data/pokemon.json + src/data/*.json
+└── fetch-data.ts           # Fetches PokéAPI → writes public/data/pokemon.json + src/data/*.json
+                            # Run via: npm run generate-data
 
 public/
-├── data/pokemon.json       # Pre-generated Pokémon data (committed, ~3 MB)
+├── data/pokemon.json       # Pre-generated Pokémon data (committed, ~9 MB)
 └── env.js                  # Runtime sync config (gitignored — created per-device)
 ```
 
@@ -62,10 +66,11 @@ public/
 | Tab ID | Component | Description |
 |--------|-----------|-------------|
 | `tracker` | `TrackerTab` | Grid/list/PC-box view for all 493 Gen I–IV Pokémon. Caught/pending toggles, progress bar, game + availability filtering. |
-| `pokedex` | `PokedexTab` | Single Pokémon detail: base stats, side-by-side stat comparison, full learnset (level-up, TM/HM, egg, tutor) via PokéAPI. |
-| `routes` | `RoutesTab` | Browse encounter tables by location, version, and method. |
+| `pokedex` | `PokedexTab` | Single Pokémon detail: base stats, side-by-side stat comparison, full learnset (level-up, TM/HM, egg, tutor) via PokéAPI, and "Where to Find" encounter location table. |
+| `routes` | `RoutesTab` | Browse encounter tables by location, version, and method. HGSS routes show morning/day/night time-of-day encounter badges. |
 | `catch-calc` | `CatchCalculator` | Gen III/IV catch rate formula with all Poké Balls, status conditions, HP modifiers, and retro battle HP bar UI. |
 | `designer` | `DesignerTab` | Team builder: IV range narrowing, stat projections, EV planning, nature selection, move picker (PokéAPI), PC Box slot management. |
+| `attackdex` | `AttackdexPanel` | Move browser: search any of the 467 Gen I–IV moves, view power/accuracy/PP/effect, and see which Pokémon learn it. |
 
 > **Note:** The designer tab was previously called "IV checker". A store migration in `useSettingsStore` maps the old tab name transparently.
 
@@ -128,7 +133,7 @@ window.__ENV__ = { SYNC_TOKEN: "dev-token" };
 | `npm run build` | TypeScript check + Vite production build → `dist/` |
 | `npm run preview` | Serve the `dist/` build locally |
 | `npm run lint` | ESLint |
-| `npm run generate-data` | Fetch from PokéAPI → regenerate `public/data/pokemon.json` (3–5 min) |
+| `npm run generate-data` | Run `scripts/fetch-data.ts` → regenerate `public/data/pokemon.json` (3–5 min) |
 
 ## Design System Notes
 

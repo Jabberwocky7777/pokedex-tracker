@@ -49,8 +49,8 @@ export function MovesSection({ learnset, moveDetails, loading, error, versionGro
       levelUpRows.push({ label: level === 0 ? "—" : `Lv ${level}`, move: slug, detail: moveDetails.get(slug)! });
     }
     levelUpRows.sort((a, b) => {
-      const la = parseInt(a.label!.replace("Lv ", "")) || 0;
-      const lb = parseInt(b.label!.replace("Lv ", "")) || 0;
+      const la = parseInt((a.label ?? "").replace("Lv ", "")) || 0;
+      const lb = parseInt((b.label ?? "").replace("Lv ", "")) || 0;
       return la !== lb ? la - lb : a.detail.displayName.localeCompare(b.detail.displayName);
     });
 
@@ -58,10 +58,10 @@ export function MovesSection({ learnset, moveDetails, loading, error, versionGro
       machineRows.push({ label: machines[slug] ?? "??", move: slug, detail: moveDetails.get(slug)! });
     }
     machineRows.sort((a, b) => {
-      const aHM = a.label!.startsWith("H");
-      const bHM = b.label!.startsWith("H");
+      const aHM = (a.label ?? "").startsWith("H");
+      const bHM = (b.label ?? "").startsWith("H");
       if (aHM !== bHM) return aHM ? 1 : -1;
-      return parseInt(a.label!.slice(2)) - parseInt(b.label!.slice(2));
+      return parseInt((a.label ?? "").slice(2)) - parseInt((b.label ?? "").slice(2));
     });
 
     for (const slug of seenEgg) eggRows.push({ move: slug, detail: moveDetails.get(slug)! });
