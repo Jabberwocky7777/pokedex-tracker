@@ -8,6 +8,8 @@ import { formatDexNumber } from "../../lib/pokemon-display";
 import TypeBadge from "../shared/TypeBadge";
 import Header from "../layout/Header";
 import FilterSubbar from "../layout/FilterSubbar";
+import GreatMarshBanner from "./GreatMarshBanner";
+import { isGreatMarshSlug } from "../../data/great-marsh";
 
 interface Props {
   allPokemon: Pokemon[];
@@ -86,7 +88,15 @@ export default function RouteInfo({ allPokemon, meta }: Props) {
 
           {/* ── Route selected: show encounter table ── */}
           {selectedRoute ? (
-            <RouteDetail route={selectedRoute} orderedGames={orderedGames} />
+            <div className="flex flex-col gap-6">
+              {isGreatMarshSlug(selectedRoute.slug) && (
+                <GreatMarshBanner
+                  allPokemon={allPokemon}
+                  activeGeneration={activeGeneration}
+                />
+              )}
+              <RouteDetail route={selectedRoute} orderedGames={orderedGames} />
+            </div>
           ) : (
             /* ── Route grid: all routes when no search, filtered when searching ── */
             routeList.length === 0 ? (

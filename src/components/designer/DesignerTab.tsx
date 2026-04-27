@@ -15,9 +15,10 @@ interface Props {
 
 export default function DesignerTab({ allPokemon, meta }: Props) {
   const { activeGeneration, compareSlotIndex, setCompareSlotIndex } = useSettingsStore();
-  const { slots, activeSlotIndex, updateSlot, setActiveSlot } = useDesignerStore();
+  const { slots, activeSlotIndex, updateSlot, setActiveSlot, copySlotTo } = useDesignerStore();
   const [pickerSlot, setPickerSlot] = useState<number | null>(null);
   const [showComparePicker, setShowComparePicker] = useState(false);
+  const [copiedSlotIndex, setCopiedSlotIndex] = useState<number | null>(null);
 
   const hasActiveSlot = activeSlotIndex !== null;
   const pokemonMap = new Map(allPokemon.map((p) => [p.id, p]));
@@ -32,6 +33,16 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
     setActiveSlot(slotIndex);
   }
 
+  function handleCopySlot(index: number) {
+    setCopiedSlotIndex((prev) => (prev === index ? null : index));
+  }
+
+  function handlePasteToSlot(toIndex: number) {
+    if (copiedSlotIndex === null || copiedSlotIndex === toIndex) return;
+    copySlotTo(copiedSlotIndex, toIndex);
+    setCopiedSlotIndex(null);
+  }
+
   function openCompare(idx: number) {
     setCompareSlotIndex(idx);
     setShowComparePicker(false);
@@ -42,12 +53,20 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
     setShowComparePicker(false);
   }
 
-  // Occupied slots other than the active one
   const comparableSlotsExist = slots.some(
     (s, i) => i !== activeSlotIndex && s.pokemonId !== null
   );
 
   const inCompareMode = hasActiveSlot && compareSlotIndex !== null;
+
+  const pcBoxProps = {
+    allPokemon,
+    activeGeneration,
+    onPickPokemon: handlePickPokemon,
+    copiedSlotIndex,
+    onCopySlot: handleCopySlot,
+    onPasteToSlot: handlePasteToSlot,
+  };
 
   return (
     <div className="flex flex-col h-full">
@@ -56,22 +75,12 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
       {!hasActiveSlot ? (
         // ── No slot selected: PC box fills the whole screen ──────────────────
         <div className="flex-1 overflow-y-auto pb-[76px] md:pb-0">
-          <DesignerPcBox
-            allPokemon={allPokemon}
-            activeGeneration={activeGeneration}
-            onPickPokemon={handlePickPokemon}
-            fullScreen
-          />
+          <DesignerPcBox {...pcBoxProps} fullScreen />
         </div>
       ) : inCompareMode ? (
         // ── Compare mode: two full DesignerPanel columns side by side ────────
         <>
-          <DesignerPcBox
-            allPokemon={allPokemon}
-            activeGeneration={activeGeneration}
-            onPickPokemon={handlePickPokemon}
-          />
-          {/* Close bar */}
+          <DesignerPcBox {...pcBoxProps} />
           <div className="flex-shrink-0 flex items-center justify-end px-3 pt-2">
             <button
               onClick={closeCompare}
@@ -88,6 +97,8 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
                 slotIndex={activeSlotIndex ?? undefined}
                 allPokemon={allPokemon}
                 activeGeneration={activeGeneration}
+                copiedSlotIndex={copiedSlotIndex}
+                onCopySlot={handleCopySlot}
                 compact
               />
               <DesignerPanel
@@ -95,6 +106,8 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
                 slotIndex={compareSlotIndex ?? undefined}
                 allPokemon={allPokemon}
                 activeGeneration={activeGeneration}
+                copiedSlotIndex={copiedSlotIndex}
+                onCopySlot={handleCopySlot}
                 compact
               />
             </div>
@@ -103,11 +116,7 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
       ) : (
         // ── Single slot: slim PC box header + designer panel ─────────────────
         <>
-          <DesignerPcBox
-            allPokemon={allPokemon}
-            activeGeneration={activeGeneration}
-            onPickPokemon={handlePickPokemon}
-          />
+          <DesignerPcBox {...pcBoxProps} />
 
           {/* Compare toolbar */}
           {comparableSlotsExist && (
@@ -124,7 +133,6 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
                 Compare
               </button>
 
-              {/* Slot picker dropdown */}
               {showComparePicker && (
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowComparePicker(false)} />
@@ -164,6 +172,8 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
               allPokemon={allPokemon}
               meta={meta}
               activeGeneration={activeGeneration}
+              copiedSlotIndex={copiedSlotIndex}
+              onCopySlot={handleCopySlot}
             />
           </div>
         </>

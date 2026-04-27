@@ -31,15 +31,21 @@ function applySnapshot(data: BackupData) {
 export function useSyncEngine() {
   const { setSyncing, setLastSynced, setError, setForcePush } = useSyncStatus();
 
-  const isPulling     = useRef(false);
-  const isFirstRender = useRef(true);
-  const debounceRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isPulling      = useRef(false);
+  const hasPendingPush = useRef(false);
+  const isFirstRender  = useRef(true);
+  const debounceRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Pull on mount + every 30s (pauses when tab is hidden) ───────────────
   useEffect(() => {
     if (!hasToken()) return;
 
     async function doPull() {
+      // Skip pull if the user is actively typing or has unsaved local changes
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      const userIsTyping = tag === "input" || tag === "textarea" || tag === "select";
+      if (userIsTyping || hasPendingPush.current) return;
+
       try {
         const result = await pullData();
         if (!result.ok) {
@@ -117,11 +123,12 @@ export function useSyncEngine() {
     }
 
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    hasPendingPush.current = true;
     setSyncing(true);
 
     debounceRef.current = setTimeout(async () => {
       debounceRef.current = null;
-      if (!hasToken()) { setSyncing(false); return; }
+      if (!hasToken()) { hasPendingPush.current = false; setSyncing(false); return; }
       try {
         const result = await pushData(buildPayload());
         if (result.ok) {
@@ -133,6 +140,7 @@ export function useSyncEngine() {
       } catch {
         setError("Push failed");
       } finally {
+        hasPendingPush.current = false;
         setSyncing(false);
       }
     }, DEBOUNCE_MS);

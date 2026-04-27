@@ -62,6 +62,10 @@ interface DesignerStore {
   updateSlot: (index: number, patch: Partial<DesignerSlot>) => void;
   clearSlot: (index: number) => void;
   duplicateSlot: (fromIndex: number, toIndex: number) => void;
+  /** Copy a slot's full contents into another slot, overwriting the target. */
+  copySlotTo: (fromIndex: number, toIndex: number) => void;
+  /** Change only the pokemonId, preserving all IVs/EVs/nature/moves. */
+  evolveSlot: (index: number, newPokemonId: number) => void;
   setSlots: (slots: DesignerSlot[]) => void;
 }
 
@@ -93,6 +97,33 @@ export const useDesignerStore = create<DesignerStore>()(
         set((state) => {
           const slots = [...state.slots];
           slots[toIndex] = { ...slots[fromIndex], slotIndex: toIndex };
+          return { slots };
+        }),
+
+      copySlotTo: (fromIndex, toIndex) =>
+        set((state) => {
+          const slots = [...state.slots];
+          const src = state.slots[fromIndex];
+          slots[toIndex] = {
+            ...src,
+            slotIndex: toIndex,
+            // Deep-clone nested objects so edits to the copy don't alias the original
+            ivDataPoints: src.ivDataPoints.map((p) => ({ ...p, stats: { ...p.stats }, evSnapshot: p.evSnapshot ? { ...p.evSnapshot } : undefined })),
+            confirmedIVs: { ...src.confirmedIVs },
+            inferredIVs: { ...src.inferredIVs },
+            evAllocation: { ...src.evAllocation },
+            vitaminEVs: { ...src.vitaminEVs },
+            selectedMoves: [...src.selectedMoves],
+            knockOutLog: src.knockOutLog.map((e) => ({ ...e })),
+            routePresets: src.routePresets.map((r) => ({ ...r, species: [...r.species] })),
+          };
+          return { slots };
+        }),
+
+      evolveSlot: (index, newPokemonId) =>
+        set((state) => {
+          const slots = [...state.slots];
+          slots[index] = { ...slots[index], pokemonId: newPokemonId };
           return { slots };
         }),
 

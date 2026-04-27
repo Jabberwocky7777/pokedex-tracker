@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, X, Copy, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, X, Copy, ClipboardPaste, ChevronDown, ChevronUp } from "lucide-react";
 import { useDesignerStore } from "../../store/useDesignerStore";
 import type { Pokemon } from "../../types";
 import { getGenSprite } from "../../lib/pokemon-display";
@@ -9,12 +9,23 @@ interface Props {
   allPokemon: Pokemon[];
   activeGeneration: number;
   onPickPokemon: (slotIndex: number) => void;
+  copiedSlotIndex?: number | null;
+  onCopySlot?: (index: number) => void;
+  onPasteToSlot?: (toIndex: number) => void;
   /** When true, fills the page like the tracker BoxView. When false, renders as a slim accordion. */
   fullScreen?: boolean;
 }
 
-export default function DesignerPcBox({ allPokemon, activeGeneration, onPickPokemon, fullScreen = false }: Props) {
-  const { slots, activeSlotIndex, setActiveSlot, clearSlot, duplicateSlot } = useDesignerStore();
+export default function DesignerPcBox({
+  allPokemon,
+  activeGeneration,
+  onPickPokemon,
+  copiedSlotIndex = null,
+  onCopySlot,
+  onPasteToSlot,
+  fullScreen = false,
+}: Props) {
+  const { slots, activeSlotIndex, setActiveSlot, clearSlot } = useDesignerStore();
   const [menuSlot, setMenuSlot] = useState<number | null>(null);
   const [accordionOpen, setAccordionOpen] = useState(false);
 
@@ -28,20 +39,23 @@ export default function DesignerPcBox({ allPokemon, activeGeneration, onPickPoke
     setMenuSlot(index);
   }
 
-  function handleDuplicate(fromIndex: number) {
-    const emptyTarget = slots.findIndex((s, i) => i !== fromIndex && s.pokemonId === null);
-    if (emptyTarget !== -1) duplicateSlot(fromIndex, emptyTarget);
-    setMenuSlot(null);
-  }
-
   const BOX_SIZE = 30;
   const COLS = 6;
   const numBoxes = Math.ceil(slots.length / BOX_SIZE);
 
-  // ── Slot grid (shared between full-screen and accordion-expanded modes) ────────
   function renderBoxes(slotSizeClass: string, centered = false) {
+    const isPasting = copiedSlotIndex !== null;
+
     return (
       <div className={`flex flex-wrap gap-4 ${centered ? "justify-center" : ""}`}>
+        {isPasting && (
+          <div className="w-full text-xs text-indigo-300 bg-indigo-900/30 border border-indigo-700 rounded px-3 py-1.5 flex items-center justify-between">
+            <span>Click a slot to paste. Right-click for more options.</span>
+            <button onClick={() => onCopySlot?.(copiedSlotIndex!)} className="text-gray-400 hover:text-white ml-3">
+              <X size={12} />
+            </button>
+          </div>
+        )}
         {Array.from({ length: numBoxes }, (_, boxIdx) => {
           const start = boxIdx * BOX_SIZE;
           const boxSlots = slots.slice(start, start + BOX_SIZE);
@@ -58,18 +72,24 @@ export default function DesignerPcBox({ allPokemon, activeGeneration, onPickPoke
                   const pokemon = slot.pokemonId != null ? pokemonMap.get(slot.pokemonId) : null;
                   const nature = NATURES.find((n) => n.name === slot.natureName);
                   const isActive = activeSlotIndex === index;
+                  const isCopied = copiedSlotIndex === index;
+                  const isPasteTarget = isPasting && index !== copiedSlotIndex;
 
                   if (!pokemon) {
                     return (
                       <button
                         key={index}
-                        onClick={() => onPickPokemon(index)}
-                        className={`${slotSizeClass} flex items-center justify-center border-2 border-dashed rounded-lg text-gray-600 hover:text-gray-400 hover:border-gray-500 transition-colors ${
-                          isActive ? "border-indigo-500 bg-indigo-900/20" : "border-gray-700"
+                        onClick={() => isPasteTarget ? onPasteToSlot?.(index) : onPickPokemon(index)}
+                        className={`${slotSizeClass} flex items-center justify-center border-2 border-dashed rounded-lg transition-colors ${
+                          isPasteTarget
+                            ? "border-indigo-400 bg-indigo-900/30 text-indigo-400 hover:bg-indigo-900/50"
+                            : isActive
+                            ? "border-indigo-500 bg-indigo-900/20 text-gray-600"
+                            : "border-gray-700 text-gray-600 hover:text-gray-400 hover:border-gray-500"
                         }`}
-                        title={`Slot ${index + 1}`}
+                        title={isPasteTarget ? "Paste here" : `Slot ${index + 1}`}
                       >
-                        <Plus size={14} />
+                        {isPasteTarget ? <ClipboardPaste size={14} /> : <Plus size={14} />}
                       </button>
                     );
                   }
@@ -83,43 +103,68 @@ export default function DesignerPcBox({ allPokemon, activeGeneration, onPickPoke
                     <div
                       key={index}
                       className={`relative ${slotSizeClass} flex flex-col items-center justify-center rounded-lg cursor-pointer transition-colors border group ${
-                        isActive
+                        isCopied
+                          ? "border-indigo-400 bg-indigo-900/40 ring-1 ring-indigo-400"
+                          : isActive
                           ? "border-indigo-500 bg-indigo-900/30"
+                          : isPasteTarget
+                          ? "border-indigo-400/50 hover:border-indigo-400 hover:bg-indigo-900/20"
                           : "border-transparent hover:border-gray-600 hover:bg-gray-800/50"
                       }`}
-                      onClick={() => setActiveSlot(isActive ? null : index)}
+                      onClick={() => {
+                        if (isPasteTarget) {
+                          onPasteToSlot?.(index);
+                        } else {
+                          setActiveSlot(isActive ? null : index);
+                        }
+                      }}
                       onContextMenu={(e) => handleContextMenu(e, index)}
-                      title={slot.nickname || pokemon.displayName}
+                      title={isPasteTarget ? `Paste onto ${slot.nickname || pokemon.displayName}` : (slot.nickname || pokemon.displayName)}
                     >
                       {sprite && (
                         <img src={sprite} alt="" className="w-8 h-8 object-contain pixelated" draggable={false} />
                       )}
-                      {!isNeutral && (
+                      {!isNeutral && !isPasteTarget && (
                         <span
                           className={`absolute top-0.5 right-0.5 w-1.5 h-1.5 rounded-full ${
                             hasPlusNature && !hasMinusNature ? "bg-emerald-500" : "bg-red-500"
                           }`}
                         />
                       )}
+                      {isPasteTarget && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-indigo-900/60 rounded-lg">
+                          <ClipboardPaste size={16} className="text-indigo-300" />
+                        </div>
+                      )}
 
-                      <button
-                        className="absolute -top-1 -right-1 hidden group-hover:flex items-center justify-center w-3.5 h-3.5 rounded-full bg-red-600 text-white z-10"
-                        onClick={(e) => { e.stopPropagation(); clearSlot(index); }}
-                        title="Clear slot"
-                      >
-                        <X size={8} />
-                      </button>
+                      {!isPasteTarget && (
+                        <button
+                          className="absolute -top-1 -right-1 hidden group-hover:flex items-center justify-center w-3.5 h-3.5 rounded-full bg-red-600 text-white z-10"
+                          onClick={(e) => { e.stopPropagation(); clearSlot(index); }}
+                          title="Clear slot"
+                        >
+                          <X size={8} />
+                        </button>
+                      )}
 
                       {menuSlot === index && (
                         <>
                           <div className="fixed inset-0 z-50" onClick={() => setMenuSlot(null)} />
-                          <div className="absolute top-full left-0 z-50 mt-0.5 bg-gray-800 border border-gray-700 rounded shadow-xl text-xs min-w-[110px]">
+                          <div className="absolute top-full left-0 z-50 mt-0.5 bg-gray-800 border border-gray-700 rounded shadow-xl text-xs min-w-[120px]">
                             <button
                               className="w-full text-left px-3 py-1.5 hover:bg-gray-700 flex items-center gap-1.5 text-gray-200"
-                              onClick={(e) => { e.stopPropagation(); handleDuplicate(index); }}
+                              onClick={(e) => { e.stopPropagation(); onCopySlot?.(index); setMenuSlot(null); }}
                             >
-                              <Copy size={11} /> Duplicate
+                              <Copy size={11} /> {isCopied ? "Cancel copy" : "Copy slot"}
                             </button>
+                            {isPasting && index !== copiedSlotIndex && (
+                              <button
+                                className="w-full text-left px-3 py-1.5 hover:bg-gray-700 flex items-center gap-1.5 text-indigo-300"
+                                onClick={(e) => { e.stopPropagation(); onPasteToSlot?.(index); setMenuSlot(null); }}
+                              >
+                                <ClipboardPaste size={11} /> Paste here
+                              </button>
+                            )}
                             <button
                               className="w-full text-left px-3 py-1.5 hover:bg-gray-700 flex items-center gap-1.5 text-red-400"
                               onClick={(e) => { e.stopPropagation(); clearSlot(index); setMenuSlot(null); }}
