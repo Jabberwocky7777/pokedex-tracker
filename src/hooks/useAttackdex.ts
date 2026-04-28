@@ -124,7 +124,7 @@ export function useAttackdex(
             const bo = METHOD_ORDER[b.method] ?? 9;
             if (ao !== bo) return ao - bo;
             if (a.method === "level-up") return a.level - b.level;
-            return a.displayName.localeCompare(b.displayName);
+            return a.pokemonId - b.pokemonId;
           });
           learnersMap.set(vg, list);
         }
