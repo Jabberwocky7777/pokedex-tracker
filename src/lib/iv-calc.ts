@@ -161,6 +161,31 @@ export function projectStats(
 }
 
 /**
+ * Find the lowest level >= fromLevel at which the given IV candidates would
+ * produce different stat values (i.e. checking at that level would narrow the range).
+ * Returns null if the candidates never diverge between fromLevel and 100.
+ */
+export function nextDivergentLevel(
+  candidates: number[],
+  base: number,
+  ev: number,
+  natureMult: number,
+  isHP: boolean,
+  fromLevel: number
+): number | null {
+  if (candidates.length <= 1) return null;
+  for (let lv = Math.max(1, fromLevel); lv <= 100; lv++) {
+    const vals = new Set(
+      candidates.map((iv) =>
+        isHP ? calcHPStat(base, iv, ev, lv) : calcStat(base, iv, ev, lv, natureMult)
+      )
+    );
+    if (vals.size > 1) return lv;
+  }
+  return null;
+}
+
+/**
  * Calculate Hidden Power type and base power from confirmed IVs (Gen III/IV formula).
  * Returns null if any IV is missing.
  */

@@ -3,7 +3,7 @@ import { RotateCcw, AlertTriangle } from "lucide-react";
 import {
   NATURES, STAT_KEYS, STAT_LABELS,
   findIVs, ivRange, intersectIVSets, getNatureMultiplier,
-  calculateHiddenPower,
+  calculateHiddenPower, nextDivergentLevel,
 } from "../../lib/iv-calc";
 import type { StatKey, Nature } from "../../lib/iv-calc";
 import type { DesignerSlot, IvDataPoint } from "../../store/useDesignerStore";
@@ -24,8 +24,8 @@ function computeRanges(
   draftPoints: IvDataPoint[],
   pokemon: Pokemon,
   nature: Nature
-): Record<StatKey, { min: number; max: number } | null> {
-  const result = {} as Record<StatKey, { min: number; max: number } | null>;
+): Record<StatKey, { min: number; max: number; candidates: number[] } | null> {
+  const result = {} as Record<StatKey, { min: number; max: number; candidates: number[] } | null>;
   for (const stat of STAT_KEYS) {
     const base = pokemon.baseStats[stat as keyof typeof pokemon.baseStats];
     const mod = getNatureMultiplier(nature, stat);
@@ -38,7 +38,8 @@ function computeRanges(
       })
       .filter((s) => s.length > 0);
     const intersection = intersectIVSets(sets);
-    result[stat] = ivRange(intersection);
+    const range = ivRange(intersection);
+    result[stat] = range ? { ...range, candidates: intersection } : null;
   }
   return result;
 }
@@ -108,6 +109,31 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
     () => computeRanges(draftPoints, pokemon, nature),
     [draftPoints, pokemon, nature]
   );
+
+  // Highest level with any stat entered — used as the starting point for check-level hints.
+  const maxDataLevel = useMemo(() => {
+    return draftPoints
+      .filter((pt) => STAT_KEYS.some((k) => pt.stats[k].trim() !== ""))
+      .reduce((max, pt) => Math.max(max, pt.level), 0);
+  }, [draftPoints]);
+
+  // For each ambiguous stat, the lowest level >= maxDataLevel+1 where candidates diverge.
+  const checkLevels = useMemo(() => {
+    const result = {} as Record<StatKey, number | null>;
+    const fromLevel = maxDataLevel + 1;
+    for (const stat of STAT_KEYS) {
+      const range = ranges[stat];
+      if (!range || range.min === range.max || range.candidates.length <= 1) {
+        result[stat] = null;
+        continue;
+      }
+      const base = pokemon.baseStats[stat as keyof typeof pokemon.baseStats];
+      const mod = getNatureMultiplier(nature, stat);
+      const ev = slot.evAllocation[stat] ?? 0;
+      result[stat] = nextDivergentLevel(range.candidates, base, ev, mod, stat === "hp", fromLevel);
+    }
+    return result;
+  }, [ranges, maxDataLevel, pokemon, nature, slot.evAllocation]);
 
   // Sync inferredIVs whenever ranges change (nature or data point edits)
   useEffect(() => {
@@ -185,6 +211,14 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
                   >
                     ✕
                   </button>
+                )}
+                {!isSingle && confirmed == null && checkLevels[stat] != null && (
+                  <span
+                    className="text-xs text-yellow-700 leading-tight"
+                    title={`Check this stat at Lv. ${checkLevels[stat]} to narrow the range`}
+                  >
+                    → Lv. {checkLevels[stat]}
+                  </span>
                 )}
               </div>
             );
