@@ -106,7 +106,19 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
     for (const stat of STAT_KEYS) {
       const yieldVal = pokemon.evYield[stat] ?? 0;
       const gained = yieldVal * delta * multiplier;
-      newEvs[stat] = Math.min(255, Math.max(0, (newEvs[stat] ?? 0) + gained));
+      newEvs[stat] = Math.min(EV_STAT_CAP, Math.max(0, (newEvs[stat] ?? 0) + gained));
+    }
+    // Enforce total EV cap — clamp the stat that was just modified if we've gone over
+    const total = STAT_KEYS.reduce((sum, k) => sum + (newEvs[k] ?? 0), 0);
+    if (total > EV_TOTAL_CAP) {
+      const excess = total - EV_TOTAL_CAP;
+      for (const stat of STAT_KEYS) {
+        const gained = (pokemon.evYield[stat] ?? 0) * delta * multiplier;
+        if (gained > 0) {
+          newEvs[stat] = Math.max(0, (newEvs[stat] ?? 0) - excess);
+          break;
+        }
+      }
     }
     onUpdate({ knockOutLog: log, evAllocation: newEvs });
   }

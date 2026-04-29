@@ -32,7 +32,7 @@ export default function PokemonRow({
     <tr
       onClick={onSelect}
       className={`
-        border-b border-gray-800 cursor-pointer transition-colors
+        group border-b border-gray-800 cursor-pointer transition-colors
         ${isSelected ? "bg-indigo-900/30 hover:bg-indigo-900/40" : "hover:bg-gray-800/50"}
         ${!isHighlighted ? "opacity-40" : ""}
         ${isCaught ? "bg-green-900/10" : isPending ? "bg-yellow-900/10" : ""}

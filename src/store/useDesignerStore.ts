@@ -81,6 +81,7 @@ export const useDesignerStore = create<DesignerStore>()(
 
       updateSlot: (index, patch) =>
         set((state) => {
+          if (index < 0 || index >= state.slots.length) return state;
           const slots = [...state.slots];
           slots[index] = { ...slots[index], ...patch };
           return { slots };

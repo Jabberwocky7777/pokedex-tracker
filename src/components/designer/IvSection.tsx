@@ -48,7 +48,7 @@ export default function IvSection({ slot, pokemon, onUpdate }: Props) {
   const [draftPoints, setDraftPoints] = useState<IvDataPoint[]>(
     slot.ivDataPoints.length > 0
       ? slot.ivDataPoints
-      : [{ level: 50, stats: emptyStats() }]
+      : [{ level: 50, stats: emptyStats(), evSnapshot: { ...slot.evAllocation } }]
   );
   const [levelDrafts, setLevelDrafts] = useState<Record<number, string>>({});
 

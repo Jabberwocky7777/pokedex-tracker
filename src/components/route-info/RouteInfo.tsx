@@ -1,4 +1,4 @@
-import { useState, useMemo, Fragment } from "react";
+import { useState, useMemo, useEffect, Fragment } from "react";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import { useRouteIndex, METHOD_ORDER, METHOD_LABELS, METHOD_ICONS } from "../../hooks/useRouteIndex";
 import type { RouteData, RouteEntry } from "../../hooks/useRouteIndex";
@@ -23,6 +23,12 @@ const ALL_GAME_ORDER: GameVersion[] = [...GEN3_GAME_ORDER, ...GEN4_GAME_ORDER];
 export default function RouteInfo({ allPokemon, meta }: Props) {
   const { activeGames, activeGeneration, activeRoute, setActiveRoute } = useSettingsStore();
   const [search, setSearch] = useState("");
+
+  // Clear selected route when switching generations so stale slugs don't persist
+  useEffect(() => {
+    setActiveRoute(null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeGeneration]);
 
   const routeIndex = useRouteIndex(allPokemon, activeGames);
 

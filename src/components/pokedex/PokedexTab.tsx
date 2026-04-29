@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Pokemon, MetaData, GameVersion } from "../../types";
 import { GEN3_VERSIONS, GEN4_VERSIONS } from "../../types";
 import Header from "../layout/Header";
@@ -82,7 +82,7 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
   const [moveQuery, setMoveQuery] = useState("");
   const [showMoveDropdown, setShowMoveDropdown] = useState(false);
   const [moveSuggestions, setMoveSuggestions] = useState<MoveSummary[]>([]);
-  const moveListRef = useRef<MoveSummary[]>([]);
+  const [moveList, setMoveList] = useState<MoveSummary[]>([]);
 
   // Version group — driven by activeGeneration
   const activeVersionGroups = activeGeneration === 4 ? GEN4_VERSION_GROUPS : GEN3_VERSION_GROUPS;
@@ -98,19 +98,19 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
 
   // Fetch the move list once for autocomplete
   useEffect(() => {
-    fetchMoveList().then((list) => { moveListRef.current = list; }).catch(() => {});
+    fetchMoveList().then((list) => setMoveList(list)).catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Filter move suggestions as the user types
+  // Filter move suggestions as the user types (also re-runs when list finishes loading)
   useEffect(() => {
     const q = moveQuery.trim().toLowerCase();
     if (!q) { setMoveSuggestions([]); return; }
-    const results = moveListRef.current
+    const results = moveList
       .filter((m) => m.displayName.toLowerCase().includes(q) || m.slug.includes(q))
       .slice(0, 10);
     setMoveSuggestions(results);
-  }, [moveQuery]);
+  }, [moveQuery, moveList]);
 
   const pokemonA = activePokedexId ? allPokemon.find((p) => p.id === activePokedexId) ?? null : null;
   const pokemonB = compareId ? allPokemon.find((p) => p.id === compareId) ?? null : null;
