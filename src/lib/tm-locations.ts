@@ -378,57 +378,57 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   },
   // TM04 Calm Mind
   "calm-mind": {
-    "diamond-pearl":        "Veilstone City Gym (reward from Maylene)",
-    "platinum":             "Veilstone City Gym (reward from Maylene)",
-    "heartgold-soulsilver": "Saffron City Gym (reward from Sabrina)",
+    "diamond-pearl":        "Battle Tower (prize)",
+    "platinum":             "Battle Frontier (48 BP)",
+    "heartgold-soulsilver": "Battle Frontier (48 BP)",
   },
   // TM05 Roar
   "roar": {
     "diamond-pearl":        "Route 213 (found on ground)",
     "platinum":             "Route 213 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Route 32",
   },
   // TM06 Toxic
   "toxic": {
     "diamond-pearl":        "Pastoria City (found on ground near the Great Marsh)",
-    "platinum":             "Pastoria City (found on ground near the Great Marsh)",
-    "heartgold-soulsilver": "Fuchsia City Gym (reward from Janine)",
+    "platinum":             "Battle Frontier (32 BP)",
+    "heartgold-soulsilver": "Battle Frontier (32 BP)",
   },
   // TM07 Hail
   "hail": {
     "diamond-pearl":        "Snowpoint City (purchase in Pokémart, ¥2,000)",
     "platinum":             "Snowpoint City (purchase in Pokémart, ¥2,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Mahogany Town Gym (reward from Pryce)",
   },
   // TM08 Bulk Up
   "bulk-up": {
-    "diamond-pearl":        "Veilstone City Gym (reward from Maylene)",
-    "platinum":             "Veilstone City Gym (reward from Maylene)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "diamond-pearl":        "Battle Tower (prize)",
+    "platinum":             "Battle Frontier (48 BP)",
+    "heartgold-soulsilver": "Battle Frontier (48 BP)",
   },
   // TM09 Bullet Seed
   "bullet-seed": {
     "diamond-pearl":        "Route 204 (found on ground)",
     "platinum":             "Route 204 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Route 32",
   },
   // TM10 Hidden Power
   "hidden-power": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Veilstone City Game Corner (exchange)",
+    "heartgold-soulsilver": "Lake of Rage / Celadon City Game Corner (5,000 coins)",
   },
   // TM11 Sunny Day
   "sunny-day": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥2,000)",
     "platinum":             "Veilstone Dept. Store 3F (purchase, ¥2,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Goldenrod Radio Tower",
   },
   // TM12 Taunt
   "taunt": {
     "diamond-pearl":        "Veilstone City (found in warehouse)",
     "platinum":             "Veilstone City (found in warehouse)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,500)",
+    "heartgold-soulsilver": "Ilex Forest / Burned Tower / Celadon City Dept. Store (¥1,500)",
   },
   // TM13 Ice Beam
   "ice-beam": {
@@ -451,20 +451,20 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM16 Light Screen
   "light-screen": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥2,000)",
   },
   // TM17 Protect
   "protect": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥2,000)",
   },
   // TM18 Rain Dance
   "rain-dance": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥2,000)",
     "platinum":             "Veilstone Dept. Store 3F (purchase, ¥2,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Slowpoke's Well",
   },
   // TM19 Giga Drain
   "giga-drain": {
@@ -475,8 +475,8 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM20 Safeguard
   "safeguard": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥2,000)",
   },
   // TM21 Frustration
   "frustration": {
@@ -499,8 +499,8 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM24 Thunderbolt
   "thunderbolt": {
     "diamond-pearl":        "Veilstone City Game Corner (10,000 coins)",
-    "platinum":             "Sunyshore City Gym (reward from Volkner)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥5,500)",
+    "platinum":             "Veilstone City Game Corner (10,000 coins)",
+    "heartgold-soulsilver": "Goldenrod City Game Corner (10,000 coins) / Cerulean Cave",
   },
   // TM25 Thunder
   "thunder": {
@@ -511,7 +511,7 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM26 Earthquake
   "earthquake": {
     "diamond-pearl":        "Wayward Cave B1F (found in cave)",
-    "platinum":             "Wayward Cave B1F (found in cave)",
+    "platinum":             "Wayward Cave B1F (found in cave) / Battle Frontier (80 BP)",
     "heartgold-soulsilver": "Victory Road (found in cave)",
   },
   // TM27 Return
@@ -535,26 +535,26 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM30 Shadow Ball
   "shadow-ball": {
     "diamond-pearl":        "Route 210 (found on ground)",
-    "platinum":             "Route 210 (found on ground)",
+    "platinum":             "Battle Frontier (64 BP)",
     "heartgold-soulsilver": "Ecruteak City Gym (reward from Morty)",
   },
   // TM31 Brick Break
   "brick-break": {
     "diamond-pearl":        "Oreburgh Gate 1F (found in cave)",
-    "platinum":             "Oreburgh Gate 1F (found in cave)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Battle Frontier (40 BP)",
+    "heartgold-soulsilver": "Battle Frontier (48 BP)",
   },
   // TM32 Double Team
   "double-team": {
     "diamond-pearl":        "Veilstone City Game Corner (1,500 coins)",
     "platinum":             "Veilstone City Game Corner (1,500 coins)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Celadon City Game Corner (4,000 coins)",
   },
   // TM33 Reflect
   "reflect": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥2,000)",
   },
   // TM34 Shock Wave
   "shock-wave": {
@@ -571,14 +571,14 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM36 Sludge Bomb
   "sludge-bomb": {
     "diamond-pearl":        "Pastoria City (found near the Great Marsh)",
-    "platinum":             "Pastoria City (found near the Great Marsh)",
+    "platinum":             "Battle Frontier (80 BP)",
     "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
   },
   // TM37 Sandstorm
   "sandstorm": {
     "diamond-pearl":        "Route 228 (found on ground)",
     "platinum":             "Route 228 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Route 27",
   },
   // TM38 Fire Blast
   "fire-blast": {
@@ -590,49 +590,49 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   "rock-tomb": {
     "diamond-pearl":        "Oreburgh City Gym (reward from Roark)",
     "platinum":             "Oreburgh City Gym (reward from Roark)",
-    "heartgold-soulsilver": "Mt. Moon Square (found on ground)",
+    "heartgold-soulsilver": "Union Cave",
   },
   // TM40 Aerial Ace
   "aerial-ace": {
     "diamond-pearl":        "Route 213 (found on ground)",
-    "platinum":             "Route 213 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Battle Frontier (40 BP)",
+    "heartgold-soulsilver": "Mt. Mortar / Battle Frontier (40 BP)",
   },
   // TM41 Torment
   "torment": {
     "diamond-pearl":        "Veilstone City (found in warehouse)",
     "platinum":             "Veilstone City (found in warehouse)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,500)",
+    "heartgold-soulsilver": "Celadon City Dept. Store (¥1,500)",
   },
   // TM42 Facade
   "facade": {
     "diamond-pearl":        "Route 209 (found on ground)",
     "platinum":             "Route 209 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Goldenrod City Lottery (Friday)",
   },
   // TM43 Secret Power
   "secret-power": {
     "diamond-pearl":        "Amity Square (found inside)",
     "platinum":             "Route 212 (given by a character)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Lake of Rage",
   },
   // TM44 Rest
   "rest": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Veilstone City Game Corner (exchange)",
+    "heartgold-soulsilver": "Goldenrod City Game Corner (6,000 coins)",
   },
   // TM45 Attract
   "attract": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "platinum":             "Battle Frontier (32 BP)",
+    "heartgold-soulsilver": "Goldenrod City Gym (reward from Whitney) / Battle Frontier (32 BP)",
   },
   // TM46 Thief
   "thief": {
     "diamond-pearl":        "Eterna City (found in building)",
     "platinum":             "Eterna City (found in building)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,500)",
+    "heartgold-soulsilver": "Mahogany Town Rocket Hideout",
   },
   // TM47 Steel Wing
   "steel-wing": {
@@ -650,7 +650,7 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   "snatch": {
     "diamond-pearl":        "Veilstone City (found in warehouse)",
     "platinum":             "Veilstone City (found in warehouse)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Mahogany Town Rocket Hideout",
   },
   // TM50 Overheat
   "overheat": {
@@ -673,43 +673,43 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM53 Energy Ball
   "energy-ball": {
     "diamond-pearl":        "Route 226 (found on ground)",
-    "platinum":             "Route 226 (found on ground)",
+    "platinum":             "Battle Frontier (64 BP)",
     "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥3,000)",
   },
   // TM54 False Swipe
   "false-swipe": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥2,000)",
     "platinum":             "Veilstone Dept. Store 3F (purchase, ¥2,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥2,000)",
   },
   // TM55 Brine
   "brine": {
     "diamond-pearl":        "Pastoria City Gym (reward from Crasher Wake)",
     "platinum":             "Pastoria City Gym (reward from Crasher Wake)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Celadon City Dept. Store (¥3,000)",
   },
   // TM56 Fling
   "fling": {
     "diamond-pearl":        "Route 222 (found on ground)",
     "platinum":             "Route 222 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Rock Tunnel",
   },
   // TM57 Charge Beam
   "charge-beam": {
     "diamond-pearl":        "Sunyshore City Gym (reward from Volkner)",
     "platinum":             "Sunyshore City Gym (reward from Volkner)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Goldenrod City Lottery (Wednesday) / Power Plant / Olivine City",
   },
   // TM58 Endure
   "endure": {
     "diamond-pearl":        "Veilstone City Game Corner (1,000 coins)",
     "platinum":             "Veilstone City Game Corner (1,000 coins)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Celadon City Game Corner (2,000 coins)",
   },
   // TM59 Dragon Pulse
   "dragon-pulse": {
     "diamond-pearl":        "Victory Road (found in cave)",
-    "platinum":             "Victory Road (found in cave)",
+    "platinum":             "Battle Frontier (80 BP)",
     "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥3,000)",
   },
   // TM60 Drain Punch
@@ -721,20 +721,20 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM61 Will-O-Wisp
   "will-o-wisp": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "platinum":             "Battle Frontier (32 BP)",
+    "heartgold-soulsilver": "Battle Frontier (32 BP)",
   },
   // TM62 Silver Wind
   "silver-wind": {
     "diamond-pearl":        "Route 212 (found on ground)",
     "platinum":             "Route 212 (found on ground)",
-    "heartgold-soulsilver": "National Park (prize for the Bug-Catching Contest)",
+    "heartgold-soulsilver": "Route 6 / Goldenrod City Lottery (Saturday)",
   },
   // TM63 Embargo
   "embargo": {
     "diamond-pearl":        "Veilstone City (found in warehouse)",
     "platinum":             "Veilstone City (found in warehouse)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Route 34",
   },
   // TM64 Explosion
   "explosion": {
@@ -758,43 +758,43 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   "recycle": {
     "diamond-pearl":        "Veilstone City Game Corner (1,000 coins)",
     "platinum":             "Veilstone City Game Corner (1,000 coins)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Celadon City",
   },
   // TM68 Giga Impact
   "giga-impact": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥7,500)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥7,500)",
+    "platinum":             "Veilstone City Game Corner (exchange)",
     "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥7,500)",
   },
   // TM69 Rock Polish
   "rock-polish": {
     "diamond-pearl":        "Mt. Coronet (found in cave)",
     "platinum":             "Mt. Coronet (found in cave)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,500)",
+    "heartgold-soulsilver": "Route 10",
   },
   // TM70 Flash
   "flash": {
     "diamond-pearl":        "Oreburgh Gate 1F (given by a character)",
     "platinum":             "Oreburgh Gate 1F (given by a character)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥1,000)",
   },
   // TM71 Stone Edge
   "stone-edge": {
-    "diamond-pearl":        "Oreburgh City Gym (reward from Roark — post-National Dex) / Victory Road",
-    "platinum":             "Victory Road (found in cave)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥5,500)",
+    "diamond-pearl":        "Victory Road (found in cave)",
+    "platinum":             "Battle Frontier (80 BP)",
+    "heartgold-soulsilver": "Battle Frontier (80 BP)",
   },
   // TM72 Avalanche
   "avalanche": {
     "diamond-pearl":        "Snowpoint City Gym (reward from Candice)",
     "platinum":             "Snowpoint City Gym (reward from Candice)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Ice Path / Celadon City Dept. Store (¥3,000)",
   },
   // TM73 Thunder Wave
   "thunder-wave": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥1,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥1,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "platinum":             "Battle Frontier (32 BP)",
+    "heartgold-soulsilver": "Battle Frontier (32 BP)",
   },
   // TM74 Gyro Ball
   "gyro-ball": {
@@ -805,26 +805,26 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   // TM75 Swords Dance
   "swords-dance": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,500)",
+    "platinum":             "Veilstone City Game Corner (exchange)",
+    "heartgold-soulsilver": "Goldenrod City Game Corner (4,000 coins)",
   },
   // TM76 Stealth Rock
   "stealth-rock": {
     "diamond-pearl":        "Oreburgh City Gym (reward from Roark)",
     "platinum":             "Oreburgh City Gym (reward from Roark)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Mt. Silver / Celadon City Dept. Store (¥2,000)",
   },
   // TM77 Psych Up
   "psych-up": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥3,000)",
     "platinum":             "Veilstone Dept. Store 3F (purchase, ¥3,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Viridian Forest",
   },
   // TM78 Captivate
   "captivate": {
     "diamond-pearl":        "Route 213 (found on ground)",
     "platinum":             "Route 213 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Goldenrod City Game Corner (free) / Celadon City Dept. Store (¥1,500)",
   },
   // TM79 Dark Pulse
   "dark-pulse": {
@@ -836,31 +836,31 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   "rock-slide": {
     "diamond-pearl":        "Mt. Coronet (found in cave)",
     "platinum":             "Mt. Coronet (found in cave)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Pewter City Gym (reward from Brock)",
   },
   // TM81 X-Scissor
   "x-scissor": {
     "diamond-pearl":        "Route 221 (found on ground)",
-    "platinum":             "Route 221 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "platinum":             "Battle Frontier (64 BP)",
+    "heartgold-soulsilver": "Battle Frontier (64 BP)",
   },
   // TM82 Sleep Talk
   "sleep-talk": {
     "diamond-pearl":        "Veilstone City Game Corner (4,000 coins)",
     "platinum":             "Veilstone City Game Corner (4,000 coins)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Goldenrod City Dept. Store Basement",
   },
   // TM83 Natural Gift
   "natural-gift": {
     "diamond-pearl":        "Veilstone Dept. Store 3F (purchase, ¥2,000)",
     "platinum":             "Veilstone Dept. Store 3F (purchase, ¥2,000)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Goldenrod Dept. Store 5F (purchase, ¥2,000)",
   },
   // TM84 Poison Jab
   "poison-jab": {
     "diamond-pearl":        "Route 212 (found on ground)",
     "platinum":             "Route 212 (found on ground)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Fuchsia City Gym (reward from Janine)",
   },
   // TM85 Dream Eater
   "dream-eater": {
@@ -878,25 +878,25 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   "swagger": {
     "diamond-pearl":        "Canalave City (found in building)",
     "platinum":             "Canalave City (found in building)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Shining Lighthouse / Celadon City Dept. Store (¥1,500)",
   },
   // TM88 Pluck
   "pluck": {
     "diamond-pearl":        "Floaroma Town (given by a character)",
     "platinum":             "Floaroma Town (given by a character)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥2,000)",
+    "heartgold-soulsilver": "Route 40",
   },
   // TM89 U-turn
   "u-turn": {
-    "diamond-pearl":        "Canalave City Gym (reward from Byron)",
-    "platinum":             "Canalave City Gym (reward from Byron)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "diamond-pearl":        "Veilstone City Game Corner (exchange)",
+    "platinum":             "Veilstone City Game Corner (exchange)",
+    "heartgold-soulsilver": "Azalea Town Gym (reward from Bugsy) / Battle Frontier (40 BP)",
   },
   // TM90 Substitute
   "substitute": {
     "diamond-pearl":        "Veilstone City Game Corner (2,000 coins)",
     "platinum":             "Veilstone City Game Corner (2,000 coins)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥3,000)",
+    "heartgold-soulsilver": "Goldenrod City Game Corner (2,000 coins)",
   },
   // TM91 Flash Cannon
   "flash-cannon": {
@@ -908,7 +908,7 @@ export const GEN4_TM_LOCATIONS: TmLocationMap = {
   "trick-room": {
     "diamond-pearl":        "Pokémon Mansion on Route 212 (given by Mr. Backlot)",
     "platinum":             "Pokémon Mansion on Route 212 (given by Mr. Backlot)",
-    "heartgold-soulsilver": "Goldenrod Dept. Store 3F (purchase, ¥1,000)",
+    "heartgold-soulsilver": "Viridian City Gym (reward from Blue)",
   },
   // HM01 Cut
   "cut": {
