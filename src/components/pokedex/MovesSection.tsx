@@ -10,9 +10,10 @@ interface Props {
   loading: boolean;
   error: string | null;
   versionGroup: VersionGroup;
+  onMoveClick?: (slug: string) => void;
 }
 
-export function MovesSection({ learnset, moveDetails, loading, error, versionGroup }: Props) {
+export function MovesSection({ learnset, moveDetails, loading, error, versionGroup, onMoveClick }: Props) {
   const { levelUpRows, machineRows, eggRows, tutorRows } = useMemo(() => {
     if (!learnset || moveDetails.size === 0) {
       return { levelUpRows: [], machineRows: [], eggRows: [], tutorRows: [] };
@@ -99,25 +100,25 @@ export function MovesSection({ learnset, moveDetails, loading, error, versionGro
           {levelUpRows.length > 0 && (
             <div>
               <SectionHeading>Level-Up Moves</SectionHeading>
-              <MoveTable rows={levelUpRows} showLabel labelHeader="Lv" useGen3Split={useGen3Split} />
+              <MoveTable rows={levelUpRows} showLabel labelHeader="Lv" useGen3Split={useGen3Split} onMoveClick={onMoveClick} />
             </div>
           )}
           {machineRows.length > 0 && (
             <div>
               <SectionHeading>TM / HM Moves</SectionHeading>
-              <MoveTable rows={machineRows} showLabel labelHeader="TM/HM" useGen3Split={useGen3Split} />
+              <MoveTable rows={machineRows} showLabel labelHeader="TM/HM" useGen3Split={useGen3Split} onMoveClick={onMoveClick} />
             </div>
           )}
           {eggRows.length > 0 && (
             <div>
               <SectionHeading>Egg Moves</SectionHeading>
-              <MoveTable rows={eggRows} showLabel={false} labelHeader="" useGen3Split={useGen3Split} />
+              <MoveTable rows={eggRows} showLabel={false} labelHeader="" useGen3Split={useGen3Split} onMoveClick={onMoveClick} />
             </div>
           )}
           {tutorRows.length > 0 && (
             <div>
               <SectionHeading>Move Tutor</SectionHeading>
-              <MoveTable rows={tutorRows} showLabel={false} labelHeader="" useGen3Split={useGen3Split} />
+              <MoveTable rows={tutorRows} showLabel={false} labelHeader="" useGen3Split={useGen3Split} onMoveClick={onMoveClick} />
             </div>
           )}
         </>
