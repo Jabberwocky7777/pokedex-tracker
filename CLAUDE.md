@@ -1,5 +1,9 @@
 # Pokédex Tracker — Codebase Guide
 
+## Git Workflow
+
+Always commit directly to `main`. Never create feature branches or worktree branches — just stage and push to `main`.
+
 ## Tech Stack
 
 | Layer | Tool | Version |
