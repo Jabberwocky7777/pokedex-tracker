@@ -216,7 +216,7 @@ export default function HmPlannerPanel({ allPokemon, activeGeneration, onClose, 
                 {resultPokemon.map((p) => (
                   <button
                     key={p.id}
-                    onClick={() => { onSelectPokemon(p.id); onClose(); }}
+                    onClick={() => { onSelectPokemon(p.id); onClose?.(); }}
                     className="flex flex-col items-center gap-1 p-2 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all group"
                     title={p.displayName}
                   >

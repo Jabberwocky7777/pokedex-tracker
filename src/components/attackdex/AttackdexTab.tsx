@@ -23,7 +23,7 @@ interface Props {
 }
 
 export default function AttackdexTab({ allPokemon, meta }: Props) {
-  const { activeGeneration, setActiveTab, setActivePokedexId } = useSettingsStore();
+  const { activeGeneration, setActiveTab, setActivePokedexId, activeAttackdexSlug, setActiveAttackdexSlug } = useSettingsStore();
 
   const [mode, setMode] = useState<Mode>("single");
 
@@ -37,6 +37,16 @@ export default function AttackdexTab({ allPokemon, meta }: Props) {
 
   const [selectedMoveSlug, setSelectedMoveSlug] = useState<string | null>(null);
   const [moveQuery, setMoveQuery] = useState("");
+
+  // When navigated here from another tab with a pre-selected move, apply it once.
+  useEffect(() => {
+    if (activeAttackdexSlug) {
+      setSelectedMoveSlug(activeAttackdexSlug);
+      setMoveQuery(slugToDisplayName(activeAttackdexSlug));
+      setActiveAttackdexSlug(null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeAttackdexSlug]);
   const [showMoveDropdown, setShowMoveDropdown] = useState(false);
   const [moveSuggestions, setMoveSuggestions] = useState<MoveSummary[]>([]);
   const [moveList, setMoveList] = useState<MoveSummary[]>([]);

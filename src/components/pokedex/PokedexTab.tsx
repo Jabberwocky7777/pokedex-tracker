@@ -59,7 +59,7 @@ function buildEvSuggestions(
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function PokedexTab({ allPokemon, meta }: Props) {
-  const { activePokedexId, setActivePokedexId, activeGeneration, setActiveTab, setActiveRoute } = useSettingsStore();
+  const { activePokedexId, setActivePokedexId, activeGeneration, setActiveTab, setActiveRoute, setActiveAttackdexSlug } = useSettingsStore();
 
   // Slot A (primary — synced with store so "More Detail" from tracker still works)
   const [queryA, setQueryA] = useState("");
@@ -292,8 +292,8 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                     error={activeMoves.error}
                     versionGroup={versionGroup}
                     onMoveClick={(slug) => {
-                      setSelectedMoveSlug(slug);
-                      setMoveQuery(activeMoves.moveDetails.get(slug)?.displayName ?? slug);
+                      setActiveAttackdexSlug(slug);
+                      setActiveTab("attackdex");
                     }}
                   />
                 </div>
@@ -391,8 +391,8 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                       error={movesA.error}
                       versionGroup={versionGroup}
                       onMoveClick={(slug) => {
-                        setSelectedMoveSlug(slug);
-                        setMoveQuery(movesA.moveDetails.get(slug)?.displayName ?? slug);
+                        setActiveAttackdexSlug(slug);
+                        setActiveTab("attackdex");
                       }}
                     />
                   </div>
