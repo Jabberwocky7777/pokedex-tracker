@@ -129,6 +129,8 @@ export const useSettingsStore = create<SettingsStore>()(
       merge: (persisted, current) => {
         const p = persisted as Partial<typeof current>;
         if ((p.activeTab as string) === "iv-checker") p.activeTab = "designer";
+        const validTabs = ["tracker", "catch-calc", "designer", "routes", "pokedex", "attackdex"];
+        if (p.activeTab && !validTabs.includes(p.activeTab)) p.activeTab = "tracker";
         if (p.viewMode && !["box", "list", "slots"].includes(p.viewMode)) p.viewMode = "box";
         return { ...current, ...p };
       },
