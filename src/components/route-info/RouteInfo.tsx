@@ -164,6 +164,8 @@ function RouteDetail({
   route: RouteData;
   orderedGames: GameVersion[];
 }) {
+  const { setActiveTab, setActivePokedexId } = useSettingsStore();
+
   const methodsPresent = useMemo(() => {
     const seen = new Set<EncounterMethod>();
     for (const [version, methodMap] of route.games) {
@@ -379,7 +381,8 @@ function RouteDetail({
                       return (
                         <tr
                           key={row.pokemonId}
-                          className={`border-t border-gray-700/30 hover:bg-gray-800/30 transition-colors ${i % 2 === 0 ? "" : "bg-gray-900/30"}`}
+                          onClick={() => { setActiveTab("pokedex"); setActivePokedexId(row.pokemonId); }}
+                          className={`border-t border-gray-700/30 hover:bg-indigo-900/20 cursor-pointer transition-colors ${i % 2 === 0 ? "" : "bg-gray-900/30"}`}
                         >
                           <td className="py-1.5 pl-3 pr-1">
                             <img

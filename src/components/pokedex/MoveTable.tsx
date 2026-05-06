@@ -8,11 +8,12 @@ export interface MoveRow {
   detail: MoveDetail;
 }
 
-export function MoveTable({ rows, showLabel, labelHeader, useGen3Split }: {
+export function MoveTable({ rows, showLabel, labelHeader, useGen3Split, onMoveClick }: {
   rows: MoveRow[];
   showLabel: boolean;
   labelHeader: string;
   useGen3Split: boolean;
+  onMoveClick?: (slug: string) => void;
 }) {
   if (rows.length === 0) return (
     <div className="text-sm text-gray-500 italic py-2">None in this version group.</div>
@@ -40,7 +41,18 @@ export function MoveTable({ rows, showLabel, labelHeader, useGen3Split }: {
               {showLabel && (
                 <td className="py-1.5 pr-3 font-mono text-xs text-gray-400 whitespace-nowrap">{row.label}</td>
               )}
-              <td className="py-1.5 pr-3 text-gray-200 font-medium whitespace-nowrap">{row.detail.displayName}</td>
+              <td className="py-1.5 pr-3">
+                {onMoveClick ? (
+                  <button
+                    onClick={() => onMoveClick(row.move)}
+                    className="text-gray-200 font-medium whitespace-nowrap hover:text-indigo-400 hover:underline transition-colors text-left"
+                  >
+                    {row.detail.displayName}
+                  </button>
+                ) : (
+                  <span className="text-gray-200 font-medium whitespace-nowrap">{row.detail.displayName}</span>
+                )}
+              </td>
               <td className="py-1.5 pr-3"><TypeBadge type={row.detail.type} /></td>
               <td className="py-1.5 pr-3"><CategoryBadge cat={useGen3Split ? row.detail.gen3Category : row.detail.category} /></td>
               <td className="py-1.5 pr-3 text-right font-mono text-xs text-gray-300">{row.detail.power ?? "—"}</td>

@@ -18,6 +18,7 @@ import { StatBars } from "./StatBars";
 import { StatComparison } from "./StatComparison";
 import { SectionHeading } from "./SectionHeading";
 import { MovesSection } from "./MovesSection";
+import { EvolutionChain } from "./EvolutionChain";
 import { usePokemonMoves } from "./usePokemonMoves";
 import LocationTable from "../detail-panel/LocationTable";
 import PokemonSearchBar from "./PokemonSearchBar";
@@ -290,6 +291,10 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                     loading={activeMoves.loading}
                     error={activeMoves.error}
                     versionGroup={versionGroup}
+                    onMoveClick={(slug) => {
+                      setSelectedMoveSlug(slug);
+                      setMoveQuery(activeMoves.moveDetails.get(slug)?.displayName ?? slug);
+                    }}
                   />
                 </div>
               )}
@@ -353,6 +358,22 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
 
                   <StatBars pokemon={pokemonA} />
 
+                  {/* Evolution Chain */}
+                  {(pokemonA.evolvesFrom != null || pokemonA.evolvesTo.length > 0) && (
+                    <div className="bg-gray-900 rounded-xl p-5 flex flex-col gap-3">
+                      <SectionHeading>Evolution</SectionHeading>
+                      <EvolutionChain
+                        pokemon={pokemonA}
+                        allPokemonMap={allPokemonMap}
+                        onSelect={(id) => {
+                          setActivePokedexId(id);
+                          setQueryA(allPokemon.find((p) => p.id === id)?.displayName ?? "");
+                        }}
+                        activeGeneration={activeGeneration}
+                      />
+                    </div>
+                  )}
+
                   {/* Moves */}
                   <div className="bg-gray-900 rounded-xl p-5 flex flex-col gap-5">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 justify-between">
@@ -369,6 +390,10 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                       loading={movesA.loading}
                       error={movesA.error}
                       versionGroup={versionGroup}
+                      onMoveClick={(slug) => {
+                        setSelectedMoveSlug(slug);
+                        setMoveQuery(movesA.moveDetails.get(slug)?.displayName ?? slug);
+                      }}
                     />
                   </div>
 
