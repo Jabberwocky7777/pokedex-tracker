@@ -255,7 +255,7 @@ export type DexMode = "national" | string; // "national" or a regionalDexId like
 
 export type AvailabilityMode = "all" | "obtainable" | "catchable" | "needs-attention";
 
-export type AppTab = "tracker" | "catch-calc" | "designer" | "routes" | "pokedex";
+export type AppTab = "tracker" | "catch-calc" | "designer" | "routes" | "pokedex" | "attackdex";
 
 // ─── Base Stats ─────────────────────────────────────────────────────────────
 

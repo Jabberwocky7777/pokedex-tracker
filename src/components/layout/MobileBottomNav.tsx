@@ -1,10 +1,11 @@
-import { LayoutGrid, BookOpen, Map, Calculator, Wand2 } from "lucide-react";
+import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords } from "lucide-react";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import type { AppTab } from "../../types";
 
 const TABS: { id: AppTab; label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
   { id: "tracker",    label: "Tracker",   Icon: LayoutGrid },
   { id: "pokedex",    label: "Pokédex",   Icon: BookOpen   },
+  { id: "attackdex",  label: "Attacks",   Icon: Swords     },
   { id: "routes",     label: "Routes",    Icon: Map        },
   { id: "catch-calc", label: "Catch",     Icon: Calculator },
   { id: "designer",   label: "Designer",  Icon: Wand2      },

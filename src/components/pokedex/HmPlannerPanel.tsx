@@ -47,7 +47,7 @@ const GEN4_HMS_HGSS: HmEntry[] = [
 interface Props {
   allPokemon: Pokemon[];
   activeGeneration: number;
-  onClose: () => void;
+  onClose?: () => void;
   onSelectPokemon: (id: number) => void;
 }
 
@@ -125,22 +125,24 @@ export default function HmPlannerPanel({ allPokemon, activeGeneration, onClose, 
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onClose}
-          className="w-8 h-8 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white flex items-center justify-center transition-all flex-shrink-0"
-          title="Back"
-        >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <div>
-          <h3 className="text-lg font-bold text-white">HM Planner</h3>
-          <p className="text-xs text-gray-400">Select HMs to find Pokémon that can learn all of them</p>
+      {/* Header — only shown when rendered standalone (with a back action) */}
+      {onClose && (
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white flex items-center justify-center transition-all flex-shrink-0"
+            title="Back"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <div>
+            <h3 className="text-lg font-bold text-white">HM Planner</h3>
+            <p className="text-xs text-gray-400">Select HMs to find Pokémon that can learn all of them</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Version group selector — Gen 4 only */}
       {activeGeneration === 4 && (

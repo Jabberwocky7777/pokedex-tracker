@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LayoutGrid, BookOpen, Map, Calculator, Wand2, LogOut, FileJson, FileSpreadsheet, Upload, RefreshCw } from "lucide-react";
+import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords, LogOut, FileJson, FileSpreadsheet, Upload, RefreshCw } from "lucide-react";
 import GenerationSelector from "../controls/GenerationSelector";
 import DarkModeToggle from "../controls/DarkModeToggle";
 import SyncDot from "./SyncDot";
@@ -19,6 +19,7 @@ interface Props {
 const TABS: { id: AppTab; label: string; Icon: React.ComponentType<{ size?: number }> }[] = [
   { id: "tracker",    label: "Tracker",   Icon: LayoutGrid },
   { id: "pokedex",    label: "Pokédex",   Icon: BookOpen   },
+  { id: "attackdex",  label: "Attackdex", Icon: Swords     },
   { id: "routes",     label: "Routes",    Icon: Map        },
   { id: "catch-calc", label: "Catch Calc",Icon: Calculator },
   { id: "designer",   label: "Designer",  Icon: Wand2      },

@@ -12,18 +12,13 @@ import {
   GEN3_VERSION_GROUPS,
   GEN4_VERSION_GROUPS,
   type VersionGroup,
-  slugToDisplayName,
 } from "../../lib/move-fetch";
-import { fetchMoveList, type MoveSummary } from "../../lib/move-list-fetch";
 import { PokemonHeroCard } from "./PokemonHeroCard";
 import { StatBars } from "./StatBars";
 import { StatComparison } from "./StatComparison";
 import { SectionHeading } from "./SectionHeading";
 import { MovesSection } from "./MovesSection";
 import { usePokemonMoves } from "./usePokemonMoves";
-import MoveSearchBar from "./MoveSearchBar";
-import { AttackdexPanel } from "./AttackdexPanel";
-import HmPlannerPanel from "./HmPlannerPanel";
 import LocationTable from "../detail-panel/LocationTable";
 import PokemonSearchBar from "./PokemonSearchBar";
 import type { PokemonSuggestion } from "./PokemonSearchBar";
@@ -78,16 +73,6 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
   // Which Pokémon's moves to show in compare mode
   const [moveTab, setMoveTab] = useState<"a" | "b">("a");
 
-  // Move search (Attackdex)
-  const [selectedMoveSlug, setSelectedMoveSlug] = useState<string | null>(null);
-  const [moveQuery, setMoveQuery] = useState("");
-  const [showMoveDropdown, setShowMoveDropdown] = useState(false);
-  const [moveSuggestions, setMoveSuggestions] = useState<MoveSummary[]>([]);
-  const [moveList, setMoveList] = useState<MoveSummary[]>([]);
-
-  // HM Planner
-  const [showHmPlanner, setShowHmPlanner] = useState(false);
-
   // Version group — driven by activeGeneration
   const activeVersionGroups = activeGeneration === 4 ? GEN4_VERSION_GROUPS : GEN3_VERSION_GROUPS;
   const [versionGroup, setVersionGroup] = useState<VersionGroup>(activeVersionGroups[0].id);
@@ -99,22 +84,6 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setVersionGroup(groups[0].id);
   }, [activeGeneration]);
-
-  // Fetch the move list once for autocomplete
-  useEffect(() => {
-    fetchMoveList().then((list) => setMoveList(list)).catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Filter move suggestions as the user types (also re-runs when list finishes loading)
-  useEffect(() => {
-    const q = moveQuery.trim().toLowerCase();
-    if (!q) { setMoveSuggestions([]); return; }
-    const results = moveList
-      .filter((m) => m.displayName.toLowerCase().includes(q) || m.slug.includes(q))
-      .slice(0, 10);
-    setMoveSuggestions(results);
-  }, [moveQuery, moveList]);
 
   const pokemonA = activePokedexId ? allPokemon.find((p) => p.id === activePokedexId) ?? null : null;
   const pokemonB = compareId ? allPokemon.find((p) => p.id === compareId) ?? null : null;
@@ -251,44 +220,7 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
             </div>
           </div>
 
-          {/* Move search row */}
-          <div className="bg-gray-900 rounded-xl p-4 flex items-center gap-2">
-            <div className="flex-1">
-              <MoveSearchBar
-                query={moveQuery}
-                setQuery={setMoveQuery}
-                showDropdown={showMoveDropdown}
-                setShowDropdown={setShowMoveDropdown}
-                suggestions={moveSuggestions}
-                onSelect={(slug) => {
-                  setSelectedMoveSlug(slug);
-                  setMoveQuery(slugToDisplayName(slug));
-                }}
-                onClear={() => setSelectedMoveSlug(null)}
-              />
-            </div>
-            <button
-              onClick={() => setShowHmPlanner(true)}
-              title="HM Planner"
-              className="flex-shrink-0 px-2.5 h-9 rounded-lg bg-gray-700 hover:bg-indigo-600 text-gray-300 hover:text-white text-xs font-bold transition-all"
-            >
-              HM
-            </button>
-          </div>
-
-          {/* ── HM PLANNER ───────────────────────────────────────────────── */}
-          {showHmPlanner ? (
-            <HmPlannerPanel
-              allPokemon={allPokemon}
-              activeGeneration={activeGeneration}
-              onClose={() => setShowHmPlanner(false)}
-              onSelectPokemon={(id) => {
-                setActivePokedexId(id);
-                setQueryA(allPokemon.find((p) => p.id === id)?.displayName ?? "");
-                setShowHmPlanner(false);
-              }}
-            />
-          ) : compareMode ? (
+          {compareMode ? (
             <>
               {(pokemonA || pokemonB) && (
                 <div className="grid grid-cols-2 gap-4">
@@ -362,16 +294,6 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                 </div>
               )}
 
-              {selectedMoveSlug && (
-                <AttackdexPanel
-                  slug={selectedMoveSlug}
-                  allPokemon={allPokemon}
-                  activeGeneration={activeGeneration}
-                  versionGroup={versionGroup}
-                  onVersionGroupChange={setVersionGroup}
-                  onSelectPokemon={(id) => { setActivePokedexId(id); setQueryA(allPokemon.find((p) => p.id === id)?.displayName ?? ""); }}
-                />
-              )}
             </>
           ) : (
           /* ── SINGLE MODE ─────────────────────────────────────────────── */
@@ -492,16 +414,6 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                 </div>
               )}
 
-              {selectedMoveSlug && (
-                <AttackdexPanel
-                  slug={selectedMoveSlug}
-                  allPokemon={allPokemon}
-                  activeGeneration={activeGeneration}
-                  versionGroup={versionGroup}
-                  onVersionGroupChange={setVersionGroup}
-                  onSelectPokemon={(id) => { setActivePokedexId(id); setQueryA(allPokemon.find((p) => p.id === id)?.displayName ?? ""); }}
-                />
-              )}
             </>
           )}
 
