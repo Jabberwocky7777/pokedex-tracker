@@ -53,6 +53,22 @@ export function PokemonHeroCard({ pokemon, activeGeneration, compact = false }: 
               </span>
             </div>
           )}
+          {pokemon.abilities && pokemon.abilities.length > 0 && (
+            <div className="flex flex-wrap gap-1 justify-center mt-0.5">
+              {pokemon.abilities.map((a) => (
+                <span
+                  key={a.name}
+                  className={`px-2 py-0.5 rounded-full text-xs font-medium border ${
+                    a.isHidden
+                      ? "bg-gray-800 text-gray-400 border-gray-600/50"
+                      : "bg-indigo-900/50 text-indigo-300 border-indigo-700/50"
+                  }`}
+                >
+                  {a.displayName}{a.isHidden ? " (H)" : ""}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

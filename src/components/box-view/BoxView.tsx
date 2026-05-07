@@ -13,6 +13,7 @@ interface Props {
   onSelectPokemon: (id: number) => void;
   onToggleCaught: (id: number) => void;
   onTogglePending: (id: number) => void;
+  searchActive?: boolean;
 }
 
 export default function BoxView({
@@ -26,14 +27,16 @@ export default function BoxView({
   onSelectPokemon,
   onToggleCaught,
   onTogglePending,
+  searchActive = false,
 }: Props) {
   const caughtSet = new Set(caughtIds);
   const pendingSet = new Set(pendingIds);
   const filteredSet = new Map(filteredPokemon.map((p) => [p.id, p]));
 
-  // For regional dex mode, build synthetic boxes from the filtered list
+  // For regional dex mode or active search, build synthetic compact boxes from the filtered list
+  // so only matching Pokémon are shown without empty placeholder slots.
   const displayBoxes: DexBox[] =
-    dexMode !== "national"
+    dexMode !== "national" || searchActive
       ? buildRegionalBoxes(filteredPokemon)
       : boxes;
 
@@ -56,6 +59,7 @@ export default function BoxView({
             onSelectPokemon={onSelectPokemon}
             onToggleCaught={onToggleCaught}
             onTogglePending={onTogglePending}
+            noPad={searchActive}
           />
         ))}
       </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, Fragment } from "react";
+import { useState, useMemo, useEffect, useRef, Fragment } from "react";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import { useRouteIndex, METHOD_ORDER, METHOD_LABELS, METHOD_ICONS } from "../../hooks/useRouteIndex";
 import type { RouteData, RouteEntry } from "../../hooks/useRouteIndex";
@@ -24,9 +24,15 @@ export default function RouteInfo({ allPokemon, meta }: Props) {
   const { activeGames, activeGeneration, activeRoute, setActiveRoute } = useSettingsStore();
   const [search, setSearch] = useState("");
 
-  // Clear selected route when switching generations so stale slugs don't persist
+  // Clear selected route when activeGeneration actually changes (not on initial mount).
+  // Tracks the previous generation so we only clear when it genuinely flips,
+  // which also survives React Strict Mode's double-invoke of effects.
+  const prevGenRef = useRef<number | null>(null);
   useEffect(() => {
-    setActiveRoute(null);
+    if (prevGenRef.current !== null && prevGenRef.current !== activeGeneration) {
+      setActiveRoute(null);
+    }
+    prevGenRef.current = activeGeneration;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeGeneration]);
 

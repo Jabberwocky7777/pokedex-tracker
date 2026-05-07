@@ -12,6 +12,7 @@ interface Props {
   onSelectPokemon: (id: number) => void;
   onToggleCaught: (id: number) => void;
   onTogglePending: (id: number) => void;
+  noPad?: boolean;
 }
 
 export default function Box({
@@ -24,6 +25,7 @@ export default function Box({
   onSelectPokemon,
   onToggleCaught,
   onTogglePending,
+  noPad = false,
 }: Props) {
   return (
     <div className="mb-2">
@@ -59,8 +61,8 @@ export default function Box({
             />
           );
         })}
-        {/* Pad to full 30 if box has fewer entries */}
-        {Array.from({ length: Math.max(0, 30 - box.pokemonIds.length) }).map(
+        {/* Pad to full 30 if box has fewer entries (skip when search is active) */}
+        {!noPad && Array.from({ length: Math.max(0, 30 - box.pokemonIds.length) }).map(
           (_, i) => (
             <div
               key={`empty-${i}`}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import type { Pokemon, MetaData, GameVersion } from "../../types";
 import { GEN3_VERSIONS, GEN4_VERSIONS } from "../../types";
 import Header from "../layout/Header";
@@ -64,6 +64,33 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
   // Slot A (primary — synced with store so "More Detail" from tracker still works)
   const [queryA, setQueryA] = useState("");
   const [showDropA, setShowDropA] = useState(false);
+
+  // Advanced search state
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [abilityFilter, setAbilityFilter] = useState("");
+  const [minStats, setMinStats] = useState({ hp: 0, atk: 0, def: 0, spAtk: 0, spDef: 0, spe: 0 });
+
+  const hasActiveFilters = abilityFilter.trim().length > 0 || Object.values(minStats).some((v) => v > 0);
+
+  const advancedFilteredPokemon = useMemo(() => {
+    if (!hasActiveFilters) return [];
+    const q = abilityFilter.trim().toLowerCase();
+    return allPokemon.filter((p) => {
+      if (q && !p.abilities?.some((a) => a.name.includes(q) || a.displayName.toLowerCase().includes(q))) return false;
+      if (p.baseStats.hp    < minStats.hp)    return false;
+      if (p.baseStats.atk   < minStats.atk)   return false;
+      if (p.baseStats.def   < minStats.def)   return false;
+      if (p.baseStats.spAtk < minStats.spAtk) return false;
+      if (p.baseStats.spDef < minStats.spDef) return false;
+      if (p.baseStats.spe   < minStats.spe)   return false;
+      return true;
+    });
+  }, [allPokemon, abilityFilter, minStats, hasActiveFilters]);
+
+  const clearFilters = useCallback(() => {
+    setAbilityFilter("");
+    setMinStats({ hp: 0, atk: 0, def: 0, spAtk: 0, spDef: 0, spe: 0 });
+  }, []);
 
   // Slot B (compare)
   const [compareId, setCompareId] = useState<number | null>(null);
@@ -183,13 +210,31 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
               />
 
               {!compareMode ? (
-                <button
-                  onClick={() => setCompareMode(true)}
-                  title="Compare with another Pokémon"
-                  className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-700 hover:bg-indigo-600 text-gray-300 hover:text-white flex items-center justify-center transition-all text-lg font-light leading-none"
-                >
-                  +
-                </button>
+                <>
+                  <button
+                    onClick={() => setShowAdvancedSearch((v) => !v)}
+                    title="Advanced search / filter"
+                    className={`relative flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                      showAdvancedSearch || hasActiveFilters
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                    </svg>
+                    {hasActiveFilters && !showAdvancedSearch && (
+                      <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-indigo-400" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setCompareMode(true)}
+                    title="Compare with another Pokémon"
+                    className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-700 hover:bg-indigo-600 text-gray-300 hover:text-white flex items-center justify-center transition-all text-lg font-light leading-none"
+                  >
+                    +
+                  </button>
+                </>
               ) : (
                 <>
                   <span className="text-xs font-semibold text-pink-400 shrink-0 w-5 text-center">B</span>
@@ -220,6 +265,98 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
               )}
             </div>
           </div>
+
+          {/* Advanced search filter panel */}
+          {showAdvancedSearch && !compareMode && (
+            <div className="bg-gray-900 rounded-xl p-4 flex flex-col gap-4">
+              {/* Ability search */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-400 uppercase tracking-wide">Ability</label>
+                <input
+                  type="text"
+                  value={abilityFilter}
+                  onChange={(e) => setAbilityFilter(e.target.value)}
+                  placeholder="e.g. Overgrow, Swift Swim…"
+                  className="w-full bg-gray-800 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 border border-gray-700 focus:border-indigo-500 focus:outline-none transition-colors"
+                />
+              </div>
+
+              {/* Stat sliders */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-gray-400 uppercase tracking-wide">Min Base Stats</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3 mt-1">
+                  {([ ["hp", "HP"], ["atk", "Attack"], ["def", "Defense"], ["spAtk", "Sp. Atk"], ["spDef", "Sp. Def"], ["spe", "Speed"] ] as [keyof typeof minStats, string][]).map(([key, label]) => (
+                    <div key={key} className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-gray-400">{label}</span>
+                        <span className={minStats[key] > 0 ? "text-indigo-400 font-semibold" : "text-gray-600"}>
+                          {minStats[key] > 0 ? `≥${minStats[key]}` : "Any"}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={255}
+                        step={1}
+                        value={minStats[key]}
+                        onChange={(e) => setMinStats((prev) => ({ ...prev, [key]: Number(e.target.value) }))}
+                        className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-indigo-500"
+                        style={{ background: `linear-gradient(to right, #6366f1 ${(minStats[key] / 255) * 100}%, #374151 ${(minStats[key] / 255) * 100}%)` }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="self-start text-xs text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-2"
+                >
+                  Clear all filters
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Advanced search results */}
+          {hasActiveFilters && !compareMode && (
+            <div className="bg-gray-900 rounded-xl p-4 flex flex-col gap-3">
+              <div className="text-xs text-gray-500">
+                {advancedFilteredPokemon.length === 0
+                  ? "No Pokémon match these filters"
+                  : `${advancedFilteredPokemon.length} Pokémon match`}
+              </div>
+              {advancedFilteredPokemon.length > 0 && (
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-72 overflow-y-auto pr-1">
+                  {advancedFilteredPokemon.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        setActivePokedexId(p.id);
+                        setQueryA(p.displayName);
+                        setShowAdvancedSearch(false);
+                      }}
+                      className="flex flex-col items-center gap-1 p-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 hover:ring-1 hover:ring-indigo-500 transition-all group"
+                    >
+                      <img
+                        src={getGenSprite(p, activeGeneration)}
+                        alt={p.displayName}
+                        className="w-12 h-12 object-contain"
+                        style={{ imageRendering: "pixelated" }}
+                      />
+                      <span className="text-xs text-gray-300 group-hover:text-white text-center leading-tight truncate w-full">
+                        {p.displayName}
+                      </span>
+                      <div className="flex gap-0.5 flex-wrap justify-center">
+                        {p.types.map((t) => <TypeBadge key={t} type={t} size="sm" />)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {compareMode ? (
             <>
@@ -352,6 +489,22 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                             </span>
                           )}
                         </div>
+                        {pokemonA.abilities && pokemonA.abilities.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {pokemonA.abilities.map((a) => (
+                              <span
+                                key={a.name}
+                                className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                                  a.isHidden
+                                    ? "bg-gray-800 text-gray-400 border-gray-600/50"
+                                    : "bg-indigo-900/50 text-indigo-300 border-indigo-700/50"
+                                }`}
+                              >
+                                {a.displayName}{a.isHidden ? " (H)" : ""}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

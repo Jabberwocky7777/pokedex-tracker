@@ -201,6 +201,7 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
                 onSelectPokemon={handleSelectPokemon}
                 onToggleCaught={toggleCaught}
                 onTogglePending={togglePending}
+                searchActive={!!searchQuery}
               />
             ) : viewMode === "slots" ? (
               <PcBoxLayout allPokemon={allPokemon} meta={meta} />
