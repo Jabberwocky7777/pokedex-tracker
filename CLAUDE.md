@@ -22,16 +22,19 @@ src/
 ├── App.tsx                  # Root: loads pokemon.json, mounts sync engine, renders layout
 ├── main.tsx                 # Vite entry point
 ├── types/                   # Shared TypeScript interfaces (Pokemon, MetaData, AppTab, …)
+├── themes/                  # Theme registry (AppTheme interface, dark + burnished themes)
 ├── store/                   # Zustand stores (see below)
 ├── hooks/                   # Custom React hooks
-├── lib/                     # Pure utility modules (no React)
+├── lib/                     # Pure utility modules (no React); includes applyTheme.ts
 ├── data/                    # Static JSON (genMeta, npc-trades — committed)
 ├── styles/                  # Tailwind CSS entry (index.css)
 └── components/
+    ├── ThemeSelector.tsx    # Theme dropdown — wired to useSettingsStore
     ├── layout/              # Header, FilterSubbar, SyncDot, SyncToast, MobileBottomNav, Layout
     ├── auth/                # LoginScreen
     ├── controls/            # Shared input components (SearchBar, …)
-    ├── tracker/             # TrackerTab, BoxView, ListView, PokemonCell, FilterPanel
+    ├── box-view/            # BoxView, PokemonCell — grid view for the tracker tab
+    ├── list-view/           # ListView — list view for the tracker tab
     ├── pokedex/             # PokedexTab, StatPanel, MovesSection, MoveTable, SectionHeading, …
     ├── attackdex/           # AttackdexPanel, MoveSearchBar, MoveDetailPanel
     ├── detail-panel/        # DetailPanel, LocationTable (encounter locations for a Pokémon)
@@ -141,11 +144,14 @@ window.__ENV__ = { SYNC_TOKEN: "dev-token" };
 
 ## Design System Notes
 
-- **Dark mode only.** Background: `gray-950` / `gray-900`. Text: `gray-100` (primary), `gray-400` (secondary).
+- **Theme system.** All themes are dark-palette based. The active theme is stored in `useSettingsStore` under `theme` (persisted to `localStorage` key `pdx-theme`). `applyTheme()` in `src/lib/applyTheme.ts` sets `data-theme` on `<html>` and injects a `<style id="pdx-theme-vars">` block with scoped CSS variable overrides. Add new themes by extending `src/themes/index.ts`.
+- **Tailwind v4 variable remapping.** Themes override Tailwind's internal CSS variables (`--color-gray-*`, `--color-indigo-*`) under `:root[data-theme="x"]`, so every utility class picks up the new palette automatically — no per-component changes needed.
+- **Display font.** Heading elements use `style={{ fontFamily: 'var(--theme-font-display)' }}` inline. Each theme sets `--theme-font-display` in its `vars`. Do not hardcode font families in component styles.
+- **Background: `gray-950` / `gray-900`.** Text: `gray-100` (primary), `gray-400` (secondary).
 - **Accent color:** `indigo-500/600` for primary actions; `pink-500/600` for Pokédex compare slot B.
 - **Type badges:** Use `TYPE_BG_COLORS` from `lib/type-colors.ts` — full Tailwind class strings, correctly scanned by Tailwind v4.
 - **Gen III battle screen** in `CatchCalculator` uses intentional hardcoded hex colors for retro aesthetic — do not "fix" these.
-- **Stat bar colors** in `pokedexHelpers.ts` use hex values for game-accurate stat tiers — also intentional.
+- **Stat bar colors** use CSS vars `var(--theme-stat-low/mid/high)` in `pokedexHelpers.ts` — thresholds: <65 low, ≤90 mid, >90 high.
 
 ## Deployment
 

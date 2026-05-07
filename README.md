@@ -17,7 +17,7 @@ A Gen III–IV Pokémon collection tracker with cross-device sync, a catch rate 
 - **Route info** — Browse encounter tables by location, version, and method, including time-of-day encounter differences (morning/day/night) for HGSS
 - **Cross-device sync** — Optional self-hosted sync server (included in the Docker image) keeps progress in sync between PC and phone; polls every 30 s so changes appear automatically without a page reload
 - **Mobile & tablet ready** — Hamburger drawer navigation, horizontally-scrollable filter controls, and touch-friendly tap targets for iPhone and iPad
-- **Dark mode** — Enabled by default, no flash on load
+- **Theme selector** — Switch between Dark and Burnished (warm sepia/gold) themes; selection persists across reloads with no flash on load
 
 ---
 

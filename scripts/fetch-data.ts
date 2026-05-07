@@ -946,7 +946,7 @@ function buildPokemonEntry(
     ?? null;
 
   // Encounters - filter to all supported versions, inject manual data, then strip unreachable event locations
-  const allEncounters = sanitizeAlteringCave(id, injectManualEncounters(id, normalizeEncounters(encounters)));
+  const allEncounters = sanitizeKnownErrors(id, sanitizeAlteringCave(id, injectManualEncounters(id, normalizeEncounters(encounters))));
 
   // Available in games
   const availableInGames = [...new Set(allEncounters.map((e) => e.version))];
@@ -1021,6 +1021,32 @@ function buildPokemonEntry(
     hasStaticEncounter,
     regionalDexEntries,
   };
+}
+
+/**
+ * PokéAPI contains confirmed encounter data errors. These are Pokémon/version
+ * combinations that appear in PokéAPI's database but have been verified incorrect
+ * against Bulbapedia. Strip them before the data reaches the JSON output.
+ *
+ * Confirmed errors (verified against Bulbapedia):
+ *  - Bulbasaur (#1):   no wild encounters in D/P/Pt (PokéAPI lists swarm on Route 229)
+ *  - Charmander (#4):  no wild encounters in D/P/Pt (PokéAPI lists swarm on Route 227)
+ *  - Squirtle (#7):    no wild encounters in D/P/Pt (PokéAPI lists swarm on Route 229)
+ * All three are only obtainable in D/P via in-game trade or event.
+ */
+const ENCOUNTER_DENYLIST: Record<number, { versions: string[] }> = {
+  1: { versions: ["diamond", "pearl", "platinum"] },
+  4: { versions: ["diamond", "pearl", "platinum"] },
+  7: { versions: ["diamond", "pearl", "platinum"] },
+};
+
+function sanitizeKnownErrors(
+  pokemonId: number,
+  encounters: ReturnType<typeof normalizeEncounters>
+): ReturnType<typeof normalizeEncounters> {
+  const denyEntry = ENCOUNTER_DENYLIST[pokemonId];
+  if (!denyEntry) return encounters;
+  return encounters.filter((enc) => !denyEntry.versions.includes(enc.version));
 }
 
 /**
