@@ -14,11 +14,9 @@ export const STAT_CONFIG = [
 ] as const;
 
 export function statBarColor(val: number): string {
-  if (val < 50)  return "#e53e3e";
-  if (val < 80)  return "#dd6b20";
-  if (val < 110) return "#d69e2e";
-  if (val < 150) return "#38a169";
-  return "#00b5d8";
+  if (val < 65)  return "var(--theme-stat-low)";
+  if (val <= 90) return "var(--theme-stat-mid)";
+  return "var(--theme-stat-high)";
 }
 
 // ── Version groups that use the Gen III physical/special type split ───────────

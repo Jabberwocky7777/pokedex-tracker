@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { ViewMode, DexMode, GameVersion, AvailabilityMode, AppTab } from "../types";
+import { applyTheme } from "../lib/applyTheme";
+import { DEFAULT_THEME } from "../themes";
 
 interface SettingsStore {
   viewMode: ViewMode;
@@ -20,9 +22,8 @@ interface SettingsStore {
   selectedPokemonId: number | null;
   setSelectedPokemonId: (id: number | null) => void;
 
-  darkMode: boolean;
-  toggleDarkMode: () => void;
-  setDarkMode: (value: boolean) => void;
+  theme: string;
+  setTheme: (id: string) => void;
 
   // Search
   searchQuery: string;
@@ -86,16 +87,10 @@ export const useSettingsStore = create<SettingsStore>()(
       selectedPokemonId: null,
       setSelectedPokemonId: (id) => set({ selectedPokemonId: id }),
 
-      darkMode: true,
-      toggleDarkMode: () =>
-        set((state) => {
-          const next = !state.darkMode;
-          applyDarkMode(next);
-          return { darkMode: next };
-        }),
-      setDarkMode: (value) => {
-        applyDarkMode(value);
-        set({ darkMode: value });
+      theme: DEFAULT_THEME,
+      setTheme: (id) => {
+        applyTheme(id);
+        set({ theme: id });
       },
 
       searchQuery: "",
@@ -141,14 +136,9 @@ export const useSettingsStore = create<SettingsStore>()(
         if (p.viewMode && !["box", "list", "slots"].includes(p.viewMode)) p.viewMode = "box";
         return { ...current, ...p };
       },
+      onRehydrateStorage: () => (state) => {
+        applyTheme(state?.theme ?? DEFAULT_THEME);
+      },
     }
   )
 );
-
-function applyDarkMode(dark: boolean) {
-  if (dark) {
-    document.documentElement.classList.add("dark");
-  } else {
-    document.documentElement.classList.remove("dark");
-  }
-}

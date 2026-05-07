@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords, LogOut, FileJson, FileSpreadsheet, Upload, RefreshCw } from "lucide-react";
 import GenerationSelector from "../controls/GenerationSelector";
-import DarkModeToggle from "../controls/DarkModeToggle";
+import ThemeSelector from "../ThemeSelector";
 import SyncDot from "./SyncDot";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import { getToken } from "../../lib/sync";
@@ -92,7 +92,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
         {/* Right: gen selector + dark mode */}
         <div className="flex items-center gap-1 flex-shrink-0">
           <GenerationSelector meta={meta} />
-          <DarkModeToggle />
+          <ThemeSelector />
         </div>
       </div>
 
@@ -107,7 +107,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
             aria-label="Go to Tracker"
           >
             <PokeBall />
-            <span className="text-sm font-bold text-white whitespace-nowrap tracking-tight">
+            <span className="text-sm font-bold text-white whitespace-nowrap tracking-tight" style={{ fontFamily: 'var(--theme-font-display)' }}>
               Pokédex Tracker
             </span>
           </button>
@@ -140,7 +140,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
           <GenerationSelector meta={meta} />
           <SyncDot />
           <RestartButton />
-          <DarkModeToggle />
+          <ThemeSelector />
           {(onExportJSON ?? onExport) && (
             <button
               onClick={onExportJSON ?? onExport}

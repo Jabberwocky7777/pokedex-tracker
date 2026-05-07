@@ -3,6 +3,17 @@
 /* Tailwind v4: enable class-based dark mode */
 @custom-variant dark (&:is(.dark *));
 
+/* Font and stat-bar custom properties — defaults for the dark theme.
+   Burnished (and future themes) override these via applyTheme's injected <style> block. */
+:root {
+  --theme-font-display: system-ui, sans-serif;
+  --theme-font-body:    system-ui, sans-serif;
+  --theme-font-mono:    'Courier New', monospace;
+  --theme-stat-low:     #7f1d1d;
+  --theme-stat-mid:     #78350f;
+  --theme-stat-high:    #14532d;
+}
+
 @theme {
   --color-caught: #22c55e;
   --color-caught-bg: rgba(34, 197, 94, 0.15);

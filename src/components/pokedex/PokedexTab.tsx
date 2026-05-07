@@ -183,7 +183,7 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
 
           {/* Title */}
           <div>
-            <h2 className="text-xl font-bold text-white mb-1">Pokédex</h2>
+            <h2 className="text-xl font-bold text-white mb-1" style={{ fontFamily: 'var(--theme-font-display)' }}>Pokédex</h2>
             <p className="text-sm text-gray-400">
               Moves shown for {genLabel}.
             </p>
@@ -459,7 +459,7 @@ export default function PokedexTab({ allPokemon, meta }: Props) {
                       <div className="flex-1 flex flex-col gap-3 items-center sm:items-start">
                         <div>
                           <div className="text-sm text-gray-500 font-mono">#{formatDexNumber(pokemonA.id)}</div>
-                          <h3 className="text-3xl font-bold text-white mt-0.5">{pokemonA.displayName}</h3>
+                          <h3 className="text-3xl font-bold text-white mt-0.5" style={{ fontFamily: 'var(--theme-font-display)' }}>{pokemonA.displayName}</h3>
                         </div>
                         <div className="flex gap-2">
                           {pokemonA.types.map((t) => <TypeBadge key={t} type={t} />)}

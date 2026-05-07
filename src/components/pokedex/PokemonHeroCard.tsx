@@ -24,7 +24,7 @@ export function PokemonHeroCard({ pokemon, activeGeneration, compact = false }: 
         />
         <div className="flex flex-col items-center gap-1.5 text-center">
           <div className="text-xs text-gray-500 font-mono">#{formatDexNumber(pokemon.id)}</div>
-          <h3 className={`${compact ? "text-xl" : "text-2xl"} font-bold text-white`}>{pokemon.displayName}</h3>
+          <h3 className={`${compact ? "text-xl" : "text-2xl"} font-bold text-white`} style={{ fontFamily: 'var(--theme-font-display)' }}>{pokemon.displayName}</h3>
           <div className="flex gap-1.5 flex-wrap justify-center">
             {pokemon.types.map((t) => <TypeBadge key={t} type={t} />)}
           </div>
