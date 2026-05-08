@@ -1,1 +1,680 @@
-[]
+[
+  {
+    "id": "ice-type-open",
+    "description": "Ice Type, Open Round — Abomasnow 1–2, Cloyster 1–2, Dewgong 1–2, Froslass 1–2, Glaceon 1–2, Jynx 1–2, Lapras 1–2, Mamoswine 1–2, Piloswine 1–2, Weavile 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Abomasnow", "sets": [1, 2] },
+      { "species": "Cloyster", "sets": [1, 2] },
+      { "species": "Dewgong", "sets": [1, 2] },
+      { "species": "Froslass", "sets": [1, 2] },
+      { "species": "Glaceon", "sets": [1, 2] },
+      { "species": "Jynx", "sets": [1, 2] },
+      { "species": "Lapras", "sets": [1, 2] },
+      { "species": "Mamoswine", "sets": [1, 2] },
+      { "species": "Piloswine", "sets": [1, 2] },
+      { "species": "Weavile", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "F", "name": "Loda" },
+      { "class": "Lass", "gender": "F", "name": "June" },
+      { "class": "Cowgirl", "gender": "F", "name": "Rose" },
+      { "class": "Pokéfan", "gender": "F", "name": "Amy" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Cole" }
+    ]
+  },
+  {
+    "id": "ice-type-super",
+    "description": "Ice Type, Super Round — Abomasnow 3–4, Cloyster 3–4, Dewgong 3–4, Froslass 3–4, Glaceon 3–4, Jynx 3–4, Lapras 3–4, Mamoswine 3–4, Weavile 3–4",
+    "ivTier": 31,
+    "game": "both",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Abomasnow", "sets": [3, 4] },
+      { "species": "Cloyster", "sets": [3, 4] },
+      { "species": "Dewgong", "sets": [3, 4] },
+      { "species": "Froslass", "sets": [3, 4] },
+      { "species": "Glaceon", "sets": [3, 4] },
+      { "species": "Jynx", "sets": [3, 4] },
+      { "species": "Lapras", "sets": [3, 4] },
+      { "species": "Mamoswine", "sets": [3, 4] },
+      { "species": "Weavile", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "Drake" },
+      { "class": "Veteran", "gender": "F", "name": "Maya" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Will" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Iris" }
+    ]
+  },
+  {
+    "id": "fire-type-open",
+    "description": "Fire Type, Open Round — Arcanine 1–2, Blaziken 1–2, Charizard 1–2, Flareon 1–2, Houndoom 1–2, Infernape 1–2, Magmortar 1–2, Ninetales 1–2, Rapidash 1–2, Torkoal 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Arcanine", "sets": [1, 2] },
+      { "species": "Blaziken", "sets": [1, 2] },
+      { "species": "Charizard", "sets": [1, 2] },
+      { "species": "Flareon", "sets": [1, 2] },
+      { "species": "Houndoom", "sets": [1, 2] },
+      { "species": "Infernape", "sets": [1, 2] },
+      { "species": "Magmortar", "sets": [1, 2] },
+      { "species": "Ninetales", "sets": [1, 2] },
+      { "species": "Rapidash", "sets": [1, 2] },
+      { "species": "Torkoal", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "M", "name": "Leo" },
+      { "class": "Roughneck", "gender": "M", "name": "Roy" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Fay" },
+      { "class": "Gentleman", "gender": "M", "name": "Larry" },
+      { "class": "Lass", "gender": "F", "name": "Betty" }
+    ]
+  },
+  {
+    "id": "fire-type-super",
+    "description": "Fire Type, Super Round — Arcanine 3–4, Blaziken 3–4, Charizard 3–4, Houndoom 3–4, Infernape 3–4, Magmortar 3–4, Ninetales 3–4, Rapidash 3–4",
+    "ivTier": 31,
+    "game": "both",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Arcanine", "sets": [3, 4] },
+      { "species": "Blaziken", "sets": [3, 4] },
+      { "species": "Charizard", "sets": [3, 4] },
+      { "species": "Houndoom", "sets": [3, 4] },
+      { "species": "Infernape", "sets": [3, 4] },
+      { "species": "Magmortar", "sets": [3, 4] },
+      { "species": "Ninetales", "sets": [3, 4] },
+      { "species": "Rapidash", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "Samuel" },
+      { "class": "Veteran", "gender": "M", "name": "Ben" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Kai" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Sara" }
+    ]
+  },
+  {
+    "id": "water-type-open",
+    "description": "Water Type, Open Round — Blastoise 1–2, Empoleon 1–2, Feraligatr 1–2, Floatzel 1–2, Gyarados 1–2, Kingdra 1–2, Lapras 1–2, Milotic 1–2, Slowbro 1–2, Starmie 1–2, Tentacruel 1–2, Vaporeon 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Blastoise", "sets": [1, 2] },
+      { "species": "Empoleon", "sets": [1, 2] },
+      { "species": "Feraligatr", "sets": [1, 2] },
+      { "species": "Floatzel", "sets": [1, 2] },
+      { "species": "Gyarados", "sets": [1, 2] },
+      { "species": "Kingdra", "sets": [1, 2] },
+      { "species": "Lapras", "sets": [1, 2] },
+      { "species": "Milotic", "sets": [1, 2] },
+      { "species": "Slowbro", "sets": [1, 2] },
+      { "species": "Starmie", "sets": [1, 2] },
+      { "species": "Tentacruel", "sets": [1, 2] },
+      { "species": "Vaporeon", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Lass", "gender": "F", "name": "Lisa" },
+      { "class": "Lady", "gender": "F", "name": "Belle" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Nita" },
+      { "class": "Pokéfan", "gender": "M", "name": "Don" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Perry" }
+    ]
+  },
+  {
+    "id": "water-type-super",
+    "description": "Water Type, Super Round — Blastoise 3–4, Empoleon 3–4, Feraligatr 3–4, Gyarados 3–4, Kingdra 3–4, Milotic 3–4, Slowbro 3–4, Starmie 3–4, Tentacruel 3–4, Vaporeon 3–4",
+    "ivTier": 31,
+    "game": "both",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Blastoise", "sets": [3, 4] },
+      { "species": "Empoleon", "sets": [3, 4] },
+      { "species": "Feraligatr", "sets": [3, 4] },
+      { "species": "Gyarados", "sets": [3, 4] },
+      { "species": "Kingdra", "sets": [3, 4] },
+      { "species": "Milotic", "sets": [3, 4] },
+      { "species": "Slowbro", "sets": [3, 4] },
+      { "species": "Starmie", "sets": [3, 4] },
+      { "species": "Tentacruel", "sets": [3, 4] },
+      { "species": "Vaporeon", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "John" },
+      { "class": "Veteran", "gender": "F", "name": "Nadia" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Maya" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Ray" }
+    ]
+  },
+  {
+    "id": "electric-type-open",
+    "description": "Electric Type, Open Round — Ampharos 1–2, Electrode 1–2, Electivire 1–2, Jolteon 1–2, Luxray 1–2, Magnezone 1–2, Manectric 1–2, Raichu 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Ampharos", "sets": [1, 2] },
+      { "species": "Electrode", "sets": [1, 2] },
+      { "species": "Electivire", "sets": [1, 2] },
+      { "species": "Jolteon", "sets": [1, 2] },
+      { "species": "Luxray", "sets": [1, 2] },
+      { "species": "Magnezone", "sets": [1, 2] },
+      { "species": "Manectric", "sets": [1, 2] },
+      { "species": "Raichu", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "M", "name": "Josh" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Robin" },
+      { "class": "Pokéfan", "gender": "F", "name": "Cindy" },
+      { "class": "Gentleman", "gender": "M", "name": "Bert" }
+    ]
+  },
+  {
+    "id": "electric-type-super",
+    "description": "Electric Type, Super Round — Ampharos 3–4, Electivire 3–4, Jolteon 3–4, Luxray 3–4, Magnezone 3–4, Manectric 3–4, Raichu 3–4",
+    "ivTier": 31,
+    "game": "both",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Ampharos", "sets": [3, 4] },
+      { "species": "Electivire", "sets": [3, 4] },
+      { "species": "Jolteon", "sets": [3, 4] },
+      { "species": "Luxray", "sets": [3, 4] },
+      { "species": "Magnezone", "sets": [3, 4] },
+      { "species": "Manectric", "sets": [3, 4] },
+      { "species": "Raichu", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "Max" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Hugh" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Anna" }
+    ]
+  },
+  {
+    "id": "psychic-type-open",
+    "description": "Psychic Type, Open Round — Alakazam 1–2, Bronzong 1–2, Espeon 1–2, Gallade 1–2, Gardevoir 1–2, Hypno 1–2, Jynx 1–2, Medicham 1–2, Slowbro 1–2, Slowking 1–2, Starmie 1–2, Xatu 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Alakazam", "sets": [1, 2] },
+      { "species": "Bronzong", "sets": [1, 2] },
+      { "species": "Espeon", "sets": [1, 2] },
+      { "species": "Gallade", "sets": [1, 2] },
+      { "species": "Gardevoir", "sets": [1, 2] },
+      { "species": "Hypno", "sets": [1, 2] },
+      { "species": "Jynx", "sets": [1, 2] },
+      { "species": "Medicham", "sets": [1, 2] },
+      { "species": "Slowbro", "sets": [1, 2] },
+      { "species": "Slowking", "sets": [1, 2] },
+      { "species": "Starmie", "sets": [1, 2] },
+      { "species": "Xatu", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "F", "name": "Lola" },
+      { "class": "Lady", "gender": "F", "name": "Nadia" },
+      { "class": "Lass", "gender": "F", "name": "Amy" },
+      { "class": "Socialite", "gender": "F", "name": "Cali" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Noel" }
+    ]
+  },
+  {
+    "id": "psychic-type-super",
+    "description": "Psychic Type, Super Round — Alakazam 3–4, Bronzong 3–4, Espeon 3–4, Gallade 3–4, Gardevoir 3–4, Medicham 3–4, Slowbro 3–4, Starmie 3–4, Xatu 3–4",
+    "ivTier": 31,
+    "game": "both",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Alakazam", "sets": [3, 4] },
+      { "species": "Bronzong", "sets": [3, 4] },
+      { "species": "Espeon", "sets": [3, 4] },
+      { "species": "Gallade", "sets": [3, 4] },
+      { "species": "Gardevoir", "sets": [3, 4] },
+      { "species": "Medicham", "sets": [3, 4] },
+      { "species": "Slowbro", "sets": [3, 4] },
+      { "species": "Starmie", "sets": [3, 4] },
+      { "species": "Xatu", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "Drake" },
+      { "class": "Veteran", "gender": "F", "name": "Sara" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Iris" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Will" }
+    ]
+  },
+  {
+    "id": "dragon-type-open",
+    "description": "Dragon Type, Open Round — Altaria 1–2, Dragonite 1–2, Flygon 1–2, Garchomp 1–2, Kingdra 1–2, Salamence 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Altaria", "sets": [1, 2] },
+      { "species": "Dragonite", "sets": [1, 2] },
+      { "species": "Flygon", "sets": [1, 2] },
+      { "species": "Garchomp", "sets": [1, 2] },
+      { "species": "Kingdra", "sets": [1, 2] },
+      { "species": "Salamence", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "M", "name": "Ben" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Maya" },
+      { "class": "Gentleman", "gender": "M", "name": "Henry" },
+      { "class": "Roughneck", "gender": "M", "name": "Jake" }
+    ]
+  },
+  {
+    "id": "dragon-type-super",
+    "description": "Dragon Type, Super Round — Altaria 3–4, Dragonite 3–4, Flygon 3–4, Garchomp 3–4, Kingdra 3–4, Salamence 3–4",
+    "ivTier": 31,
+    "game": "both",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Altaria", "sets": [3, 4] },
+      { "species": "Dragonite", "sets": [3, 4] },
+      { "species": "Flygon", "sets": [3, 4] },
+      { "species": "Garchomp", "sets": [3, 4] },
+      { "species": "Kingdra", "sets": [3, 4] },
+      { "species": "Salamence", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "Samuel" },
+      { "class": "Veteran", "gender": "M", "name": "Noel" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Kai" }
+    ]
+  },
+  {
+    "id": "dark-type-open",
+    "description": "Dark Type, Open Round — Absol 1–2, Cacturne 1–2, Drapion 1–2, Honchkrow 1–2, Houndoom 1–2, Sharpedo 1–2, Umbreon 1–2, Weavile 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Absol", "sets": [1, 2] },
+      { "species": "Cacturne", "sets": [1, 2] },
+      { "species": "Drapion", "sets": [1, 2] },
+      { "species": "Honchkrow", "sets": [1, 2] },
+      { "species": "Houndoom", "sets": [1, 2] },
+      { "species": "Sharpedo", "sets": [1, 2] },
+      { "species": "Umbreon", "sets": [1, 2] },
+      { "species": "Weavile", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "M", "name": "Ross" },
+      { "class": "Roughneck", "gender": "M", "name": "Buck" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Robin" },
+      { "class": "Gentleman", "gender": "M", "name": "Sam" }
+    ]
+  },
+  {
+    "id": "steel-type-open",
+    "description": "Steel Type, Open Round — Aggron 1–2, Bronzong 1–2, Empoleon 1–2, Lucario 1–2, Magnezone 1–2, Metagross 1–2, Scizor 1–2, Steelix 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Aggron", "sets": [1, 2] },
+      { "species": "Bronzong", "sets": [1, 2] },
+      { "species": "Empoleon", "sets": [1, 2] },
+      { "species": "Lucario", "sets": [1, 2] },
+      { "species": "Magnezone", "sets": [1, 2] },
+      { "species": "Metagross", "sets": [1, 2] },
+      { "species": "Scizor", "sets": [1, 2] },
+      { "species": "Steelix", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "M", "name": "Keith" },
+      { "class": "Black Belt", "gender": "M", "name": "Jin" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Fay" },
+      { "class": "Hiker", "gender": "M", "name": "Roy" }
+    ]
+  },
+  {
+    "id": "steel-type-super",
+    "description": "Steel Type, Super Round — Aggron 3–4, Bronzong 3–4, Empoleon 3–4, Lucario 3–4, Magnezone 3–4, Metagross 3–4, Scizor 3–4, Steelix 3–4",
+    "ivTier": 31,
+    "game": "both",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Aggron", "sets": [3, 4] },
+      { "species": "Bronzong", "sets": [3, 4] },
+      { "species": "Empoleon", "sets": [3, 4] },
+      { "species": "Lucario", "sets": [3, 4] },
+      { "species": "Magnezone", "sets": [3, 4] },
+      { "species": "Metagross", "sets": [3, 4] },
+      { "species": "Scizor", "sets": [3, 4] },
+      { "species": "Steelix", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "Max" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Josh" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Lola" }
+    ]
+  },
+  {
+    "id": "ground-type-open",
+    "description": "Ground Type, Open Round — Donphan 1–2, Dugtrio 1–2, Flygon 1–2, Garchomp 1–2, Gliscor 1–2, Hippowdon 1–2, Mamoswine 1–2, Nidoking 1–2, Nidoqueen 1–2, Rhyperior 1–2, Sandslash 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Donphan", "sets": [1, 2] },
+      { "species": "Dugtrio", "sets": [1, 2] },
+      { "species": "Flygon", "sets": [1, 2] },
+      { "species": "Garchomp", "sets": [1, 2] },
+      { "species": "Gliscor", "sets": [1, 2] },
+      { "species": "Hippowdon", "sets": [1, 2] },
+      { "species": "Mamoswine", "sets": [1, 2] },
+      { "species": "Nidoking", "sets": [1, 2] },
+      { "species": "Nidoqueen", "sets": [1, 2] },
+      { "species": "Rhyperior", "sets": [1, 2] },
+      { "species": "Sandslash", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Hiker", "gender": "M", "name": "Don" },
+      { "class": "Roughneck", "gender": "M", "name": "Jake" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Ray" },
+      { "class": "Cowgirl", "gender": "F", "name": "Tess" },
+      { "class": "Ace Trainer", "gender": "F", "name": "June" }
+    ]
+  },
+  {
+    "id": "fighting-type-open",
+    "description": "Fighting Type, Open Round — Breloom 1–2, Gallade 1–2, Hariyama 1–2, Heracross 1–2, Infernape 1–2, Lucario 1–2, Machamp 1–2, Medicham 1–2, Primeape 1–2, Toxicroak 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Breloom", "sets": [1, 2] },
+      { "species": "Gallade", "sets": [1, 2] },
+      { "species": "Hariyama", "sets": [1, 2] },
+      { "species": "Heracross", "sets": [1, 2] },
+      { "species": "Infernape", "sets": [1, 2] },
+      { "species": "Lucario", "sets": [1, 2] },
+      { "species": "Machamp", "sets": [1, 2] },
+      { "species": "Medicham", "sets": [1, 2] },
+      { "species": "Primeape", "sets": [1, 2] },
+      { "species": "Toxicroak", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Black Belt", "gender": "M", "name": "Hugh" },
+      { "class": "Black Belt", "gender": "M", "name": "Rio" },
+      { "class": "Black Belt", "gender": "M", "name": "Ken" },
+      { "class": "Battle Girl", "gender": "F", "name": "Molly" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Leo" }
+    ]
+  },
+  {
+    "id": "fighting-type-super",
+    "description": "Fighting Type, Super Round — Breloom 3–4, Gallade 3–4, Hariyama 3–4, Heracross 3–4, Infernape 3–4, Lucario 3–4, Machamp 3–4, Medicham 3–4",
+    "ivTier": 31,
+    "game": "both",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Breloom", "sets": [3, 4] },
+      { "species": "Gallade", "sets": [3, 4] },
+      { "species": "Hariyama", "sets": [3, 4] },
+      { "species": "Heracross", "sets": [3, 4] },
+      { "species": "Infernape", "sets": [3, 4] },
+      { "species": "Lucario", "sets": [3, 4] },
+      { "species": "Machamp", "sets": [3, 4] },
+      { "species": "Medicham", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "John" },
+      { "class": "Black Belt", "gender": "M", "name": "Rio" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Will" }
+    ]
+  },
+  {
+    "id": "rock-flying-type-open",
+    "description": "Rock & Flying Type, Open Round — Aerodactyl 1–2, Armaldo 1–2, Camerupt 1–2, Dodrio 1–2, Drifblim 1–2, Golem 1–2, Kabutops 1–2, Omastar 1–2, Pidgeot 1–2, Probopass 1–2, Rampardos 1–2, Staraptor 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Aerodactyl", "sets": [1, 2] },
+      { "species": "Armaldo", "sets": [1, 2] },
+      { "species": "Camerupt", "sets": [1, 2] },
+      { "species": "Dodrio", "sets": [1, 2] },
+      { "species": "Drifblim", "sets": [1, 2] },
+      { "species": "Golem", "sets": [1, 2] },
+      { "species": "Kabutops", "sets": [1, 2] },
+      { "species": "Omastar", "sets": [1, 2] },
+      { "species": "Pidgeot", "sets": [1, 2] },
+      { "species": "Probopass", "sets": [1, 2] },
+      { "species": "Rampardos", "sets": [1, 2] },
+      { "species": "Staraptor", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Bird Keeper", "gender": "M", "name": "Aaron" },
+      { "class": "Bird Keeper", "gender": "M", "name": "Perry" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Sara" },
+      { "class": "Hiker", "gender": "M", "name": "Ben" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Don" }
+    ]
+  },
+  {
+    "id": "poison-ghost-type-open",
+    "description": "Poison & Ghost Type, Open Round — Crobat 1–2, Drapion 1–2, Gengar 1–2, Haunter 1–2, Mismagius 1–2, Nidoking 1–2, Nidoqueen 1–2, Rotom 1–2, Sableye 1–2, Tentacruel 1–2, Toxicroak 1–2, Weezing 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Crobat", "sets": [1, 2] },
+      { "species": "Drapion", "sets": [1, 2] },
+      { "species": "Gengar", "sets": [1, 2] },
+      { "species": "Haunter", "sets": [1, 2] },
+      { "species": "Mismagius", "sets": [1, 2] },
+      { "species": "Nidoking", "sets": [1, 2] },
+      { "species": "Nidoqueen", "sets": [1, 2] },
+      { "species": "Rotom", "sets": [1, 2] },
+      { "species": "Sableye", "sets": [1, 2] },
+      { "species": "Tentacruel", "sets": [1, 2] },
+      { "species": "Toxicroak", "sets": [1, 2] },
+      { "species": "Weezing", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "M", "name": "Josh" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Robin" },
+      { "class": "Hex Maniac", "gender": "F", "name": "Lyra" },
+      { "class": "Pokéfan", "gender": "M", "name": "Kent" }
+    ]
+  },
+  {
+    "id": "normal-type-open",
+    "description": "Normal Type, Open Round — Ambipom 1–2, Blissey 1–2, Dodrio 1–2, Kangaskhan 1–2, Lickilicky 1–2, Persian 1–2, Porygon-Z 1–2, Snorlax 1–2, Togekiss 1–2, Ursaring 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Ambipom", "sets": [1, 2] },
+      { "species": "Blissey", "sets": [1, 2] },
+      { "species": "Dodrio", "sets": [1, 2] },
+      { "species": "Kangaskhan", "sets": [1, 2] },
+      { "species": "Lickilicky", "sets": [1, 2] },
+      { "species": "Persian", "sets": [1, 2] },
+      { "species": "Porygon-Z", "sets": [1, 2] },
+      { "species": "Snorlax", "sets": [1, 2] },
+      { "species": "Togekiss", "sets": [1, 2] },
+      { "species": "Ursaring", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Lady", "gender": "F", "name": "Cindy" },
+      { "class": "Pokéfan", "gender": "F", "name": "Amy" },
+      { "class": "Lass", "gender": "F", "name": "Betty" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Nita" },
+      { "class": "Pokéfan", "gender": "M", "name": "Don" }
+    ]
+  },
+  {
+    "id": "grass-bug-type-open",
+    "description": "Grass & Bug Type, Open Round — Armaldo 1–2, Beedrill 1–2, Breloom 1–2, Cacturne 1–2, Exeggutor 1–2, Heracross 1–2, Leafeon 1–2, Meganium 1–2, Pinsir 1–2, Roserade 1–2, Tangrowth 1–2, Tropius 1–2, Venusaur 1–2, Vespiquen 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Armaldo", "sets": [1, 2] },
+      { "species": "Beedrill", "sets": [1, 2] },
+      { "species": "Breloom", "sets": [1, 2] },
+      { "species": "Cacturne", "sets": [1, 2] },
+      { "species": "Exeggutor", "sets": [1, 2] },
+      { "species": "Heracross", "sets": [1, 2] },
+      { "species": "Leafeon", "sets": [1, 2] },
+      { "species": "Meganium", "sets": [1, 2] },
+      { "species": "Pinsir", "sets": [1, 2] },
+      { "species": "Roserade", "sets": [1, 2] },
+      { "species": "Tangrowth", "sets": [1, 2] },
+      { "species": "Tropius", "sets": [1, 2] },
+      { "species": "Venusaur", "sets": [1, 2] },
+      { "species": "Vespiquen", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Bug Catcher", "gender": "M", "name": "Kent" },
+      { "class": "Bug Catcher", "gender": "M", "name": "John" },
+      { "class": "Picnicker", "gender": "F", "name": "Rose" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Lola" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Noel" }
+    ]
+  },
+  {
+    "id": "legendary-open",
+    "description": "Legendary Pokémon, Open Round — Azelf 1–2, Heatran 1–2, Latias 1–2, Latios 1–2, Regice 1–2, Regirock 1–2, Registeel 1–2, Suicune 1–2",
+    "ivTier": 21,
+    "game": "platinum",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Azelf", "sets": [1, 2] },
+      { "species": "Heatran", "sets": [1, 2] },
+      { "species": "Latias", "sets": [1, 2] },
+      { "species": "Latios", "sets": [1, 2] },
+      { "species": "Regice", "sets": [1, 2] },
+      { "species": "Regirock", "sets": [1, 2] },
+      { "species": "Registeel", "sets": [1, 2] },
+      { "species": "Suicune", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "M", "name": "Ben" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Iris" },
+      { "class": "Gentleman", "gender": "M", "name": "Henry" },
+      { "class": "Lady", "gender": "F", "name": "Belle" }
+    ]
+  },
+  {
+    "id": "legendary-super",
+    "description": "Legendary Pokémon, Super Round — Azelf 3–4, Heatran 3–4, Latias 3–4, Latios 3–4, Regice 3–4, Regirock 3–4, Registeel 3–4, Suicune 3–4",
+    "ivTier": 31,
+    "game": "platinum",
+    "round": "super",
+    "pokemonPool": [
+      { "species": "Azelf", "sets": [3, 4] },
+      { "species": "Heatran", "sets": [3, 4] },
+      { "species": "Latias", "sets": [3, 4] },
+      { "species": "Latios", "sets": [3, 4] },
+      { "species": "Regice", "sets": [3, 4] },
+      { "species": "Regirock", "sets": [3, 4] },
+      { "species": "Registeel", "sets": [3, 4] },
+      { "species": "Suicune", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Veteran", "gender": "M", "name": "Drake" },
+      { "class": "Veteran", "gender": "M", "name": "Max" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Maya" }
+    ]
+  },
+  {
+    "id": "status-stall-open",
+    "description": "Status & Stall Specialists, Open Round — Blissey 1–2, Bronzong 1–2, Hippowdon 1–2, Slowbro 1–2, Slowking 1–2, Snorlax 1–2, Togekiss 1–2, Umbreon 1–2, Wobbuffet 1–2, Xatu 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Blissey", "sets": [1, 2] },
+      { "species": "Bronzong", "sets": [1, 2] },
+      { "species": "Hippowdon", "sets": [1, 2] },
+      { "species": "Slowbro", "sets": [1, 2] },
+      { "species": "Slowking", "sets": [1, 2] },
+      { "species": "Snorlax", "sets": [1, 2] },
+      { "species": "Togekiss", "sets": [1, 2] },
+      { "species": "Umbreon", "sets": [1, 2] },
+      { "species": "Wobbuffet", "sets": [1, 2] },
+      { "species": "Xatu", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Lady", "gender": "F", "name": "Nadia" },
+      { "class": "Socialite", "gender": "F", "name": "Cali" },
+      { "class": "Ace Trainer", "gender": "F", "name": "Sara" },
+      { "class": "Pokéfan", "gender": "F", "name": "Cindy" }
+    ]
+  },
+  {
+    "id": "mixed-physical-open",
+    "description": "Physical Attackers, Open Round — Aerodactyl 1–2, Arcanine 1–2, Ursaring 1–2, Kangaskhan 1–2, Rhyperior 1–2, Rampardos 1–2, Hariyama 1–2, Donphan 1–2, Floatzel 1–2, Ambipom 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Aerodactyl", "sets": [1, 2] },
+      { "species": "Arcanine", "sets": [1, 2] },
+      { "species": "Ursaring", "sets": [1, 2] },
+      { "species": "Kangaskhan", "sets": [1, 2] },
+      { "species": "Rhyperior", "sets": [1, 2] },
+      { "species": "Rampardos", "sets": [1, 2] },
+      { "species": "Hariyama", "sets": [1, 2] },
+      { "species": "Donphan", "sets": [1, 2] },
+      { "species": "Floatzel", "sets": [1, 2] },
+      { "species": "Ambipom", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Roughneck", "gender": "M", "name": "Buck" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Keith" },
+      { "class": "Black Belt", "gender": "M", "name": "Hugh" },
+      { "class": "Cowgirl", "gender": "F", "name": "Tess" }
+    ]
+  },
+  {
+    "id": "mixed-special-open",
+    "description": "Special Attackers, Open Round — Alakazam 1–2, Ampharos 1–2, Espeon 1–2, Gengar 1–2, Porygon-Z 1–2, Roserade 1–2, Starmie 1–2, Togekiss 1–2, Weavile 1–2, Rotom 1–2",
+    "ivTier": 21,
+    "game": "both",
+    "round": "open",
+    "pokemonPool": [
+      { "species": "Alakazam", "sets": [1, 2] },
+      { "species": "Ampharos", "sets": [1, 2] },
+      { "species": "Espeon", "sets": [1, 2] },
+      { "species": "Gengar", "sets": [1, 2] },
+      { "species": "Porygon-Z", "sets": [1, 2] },
+      { "species": "Roserade", "sets": [1, 2] },
+      { "species": "Starmie", "sets": [1, 2] },
+      { "species": "Togekiss", "sets": [1, 2] },
+      { "species": "Weavile", "sets": [1, 2] },
+      { "species": "Rotom", "sets": [1, 2] }
+    ],
+    "trainers": [
+      { "class": "Ace Trainer", "gender": "F", "name": "Lola" },
+      { "class": "Lady", "gender": "F", "name": "Belle" },
+      { "class": "Socialite", "gender": "F", "name": "Cali" },
+      { "class": "Ace Trainer", "gender": "M", "name": "Noel" }
+    ]
+  },
+  {
+    "id": "palmer-battle-21",
+    "description": "Tower Tycoon Palmer (Battle 21 & 49), Both Rounds — Dragonite 3–4, Milotic 3–4, Rhyperior 3–4",
+    "ivTier": 31,
+    "game": "platinum",
+    "round": "both",
+    "pokemonPool": [
+      { "species": "Dragonite", "sets": [3, 4] },
+      { "species": "Milotic", "sets": [3, 4] },
+      { "species": "Rhyperior", "sets": [3, 4] }
+    ],
+    "trainers": [
+      { "class": "Tower Tycoon", "gender": null, "name": "Palmer" }
+    ]
+  }
+]
