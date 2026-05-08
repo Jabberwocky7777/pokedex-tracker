@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ChevronDown, ClipboardCopy, Copy, ArrowRight, X } from "lucide-react";
 import StatBlock from "./StatBlock";
 import MoveGrid from "./MoveGrid";
@@ -67,7 +67,7 @@ export default function DesignerPanel({
   const effectiveIndex = slotIndex ?? activeSlotIndex;
   const slot: DesignerSlot | null = effectiveIndex != null ? slots[effectiveIndex] : null;
 
-  const pokemonMap = new Map(allPokemon.map((p) => [p.id, p]));
+  const pokemonMap = useMemo(() => new Map(allPokemon.map((p) => [p.id, p])), [allPokemon]);
   const pokemon = slot?.pokemonId != null ? pokemonMap.get(slot.pokemonId) ?? null : null;
 
   const [copied, setCopied] = useState(false);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus, X, Copy, ClipboardPaste, ChevronDown, ChevronUp } from "lucide-react";
 import { useDesignerStore } from "../../store/useDesignerStore";
 import type { Pokemon } from "../../types";
@@ -33,7 +33,7 @@ export default function DesignerPcBox({
   const [menuSlot, setMenuSlot] = useState<number | null>(null);
   const [accordionOpen, setAccordionOpen] = useState(false);
 
-  const pokemonMap = new Map(allPokemon.map((p) => [p.id, p]));
+  const pokemonMap = useMemo(() => new Map(allPokemon.map((p) => [p.id, p])), [allPokemon]);
 
   const activeSlot = activeSlotIndex !== null ? slots[activeSlotIndex] : null;
   const activePokemon = activeSlot?.pokemonId != null ? pokemonMap.get(activeSlot.pokemonId) : null;
@@ -80,8 +80,8 @@ export default function DesignerPcBox({
           </div>
         )}
         <div
-          className="grid gap-1.5 bg-gray-800/30 rounded-xl p-3"
-          style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}
+          className="grid gap-1.5 bg-gray-800/30 rounded-xl p-3 w-fit mx-auto"
+          style={{ gridTemplateColumns: `repeat(${COLS}, ${fullScreen ? "3.5rem" : "3rem"})` }}
         >
           {visibleSlots.map((slot, localIdx) => {
             const index = boxStart + localIdx;

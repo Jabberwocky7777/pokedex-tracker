@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Columns2, X } from "lucide-react";
 import DesignerPcBox from "./DesignerPcBox";
 import DesignerPanel from "./DesignerPanel";
@@ -21,7 +21,7 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
   const [copiedSlotIndex, setCopiedSlotIndex] = useState<number | null>(null);
 
   const hasActiveSlot = activeSlotIndex !== null;
-  const pokemonMap = new Map(allPokemon.map((p) => [p.id, p]));
+  const pokemonMap = useMemo(() => new Map(allPokemon.map((p) => [p.id, p])), [allPokemon]);
 
   function handlePickPokemon(slotIndex: number) {
     setPickerSlot(slotIndex);

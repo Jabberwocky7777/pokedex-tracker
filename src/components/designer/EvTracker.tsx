@@ -38,7 +38,7 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
   const totalEVs = STAT_KEYS.reduce((sum, k) => sum + (slot.evAllocation[k] ?? 0), 0);
   const multiplier = (slot.machobraceActive ? 2 : 1) * (slot.pokerusActive ? 2 : 1);
 
-  const pokemonMap = new Map(allPokemon.map((p) => [p.id, p]));
+  const pokemonMap = useMemo(() => new Map(allPokemon.map((p) => [p.id, p])), [allPokemon]);
 
   function applyVitamin(stat: StatKey) {
     const current = slot.vitaminEVs[stat] ?? 0;

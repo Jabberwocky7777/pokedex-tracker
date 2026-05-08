@@ -1,8 +1,9 @@
 "use strict";
 
-const express = require("express");
-const fs      = require("fs");
-const path    = require("path");
+const express               = require("express");
+const fs                    = require("fs");
+const path                  = require("path");
+const { timingSafeEqual }   = require("crypto");
 
 const TOKEN         = process.env.SYNC_TOKEN   || "";
 const APP_USER      = process.env.APP_USER     || "";
@@ -47,9 +48,16 @@ function requireAuth(req, res, next) {
 const app = express();
 app.use(express.json({ limit: "4mb" }));
 
+// Constant-time string comparison to prevent timing-based credential enumeration.
+function safeCompare(a, b) {
+  const bufA = Buffer.from(String(a ?? "").padEnd(128, "\0").slice(0, 128));
+  const bufB = Buffer.from(String(b ?? "").padEnd(128, "\0").slice(0, 128));
+  return timingSafeEqual(bufA, bufB);
+}
+
 app.use((_req, res, next) => {
-  // If CORS_ORIGIN is set, restrict to that origin; otherwise allow all (dev / unconfigured).
-  res.header("Access-Control-Allow-Origin", CORS_ORIGIN || "*");
+  // If CORS_ORIGIN is set, restrict to that origin; otherwise default to localhost dev server.
+  res.header("Access-Control-Allow-Origin", CORS_ORIGIN || "http://localhost:5173");
   res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   next();
@@ -63,7 +71,7 @@ app.post("/api/login", (req, res) => {
   const { username, password } = req.body ?? {};
   if (!username || !password)
     return res.status(400).json({ error: "Username and password are required" });
-  if (username !== APP_USER || password !== APP_PASS)
+  if (!safeCompare(username, APP_USER) || !safeCompare(password, APP_PASS))
     return res.status(401).json({ error: "Invalid username or password" });
   res.json({ ok: true, token: TOKEN });
 });

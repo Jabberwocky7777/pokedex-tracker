@@ -58,6 +58,7 @@ function RestartButton() {
       onClick={handleRestart}
       disabled={state !== "idle"}
       title={state === "restarting" ? "Restarting…" : state === "done" ? "Reloading page…" : "Restart server"}
+      aria-label={state === "restarting" ? "Restarting…" : state === "done" ? "Reloading page…" : "Restart server"}
       className={`p-1.5 rounded-md transition-colors ${
         state !== "idle"
           ? "text-amber-400 cursor-not-allowed"
@@ -184,6 +185,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
             <button
               onClick={onExportJSON ?? onExport}
               title="Export JSON"
+              aria-label="Export JSON"
               className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
             >
               <FileJson size={16} />
@@ -193,6 +195,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
             <button
               onClick={onExportCSV}
               title="Export CSV"
+              aria-label="Export CSV"
               className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
             >
               <FileSpreadsheet size={16} />
@@ -202,6 +205,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
             <button
               onClick={onImport}
               title="Import backup (JSON)"
+              aria-label="Import backup"
               className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
             >
               <Upload size={16} />
@@ -211,6 +215,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
             <button
               onClick={onLogout}
               title="Sign out"
+              aria-label="Sign out"
               className="p-1.5 rounded-md text-gray-400 hover:text-gray-200 hover:bg-gray-800 transition-colors"
             >
               <LogOut size={16} />

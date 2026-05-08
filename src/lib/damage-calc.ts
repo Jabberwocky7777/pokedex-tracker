@@ -260,7 +260,7 @@ export function calcDamage(input: CalcInput): DamageResult {
 // ─── Stat computation helpers ─────────────────────────────────────────────────
 
 const STAT_KEYS = ["hp", "atk", "def", "spa", "spd", "spe"] as const;
-export type StatKey4 = typeof STAT_KEYS[number];
+type StatKey4 = typeof STAT_KEYS[number];
 
 /** Compute final stat from base stat + IV + EV + nature (Gen 4 formula) */
 export function computeStat(

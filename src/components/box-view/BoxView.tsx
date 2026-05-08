@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import Box from "./Box";
 import type { DexBox, Pokemon, DexMode } from "../../types";
 import type { FilteredPokemon } from "../../hooks/usePokemonFilter";
@@ -29,16 +30,22 @@ export default function BoxView({
   onTogglePending,
   searchActive = false,
 }: Props) {
-  const caughtSet = new Set(caughtIds);
-  const pendingSet = new Set(pendingIds);
-  const filteredSet = new Map(filteredPokemon.map((p) => [p.id, p]));
+  const caughtSet  = useMemo(() => new Set(caughtIds),  [caughtIds]);
+  const pendingSet = useMemo(() => new Set(pendingIds), [pendingIds]);
+  const filteredSet = useMemo(
+    () => new Map(filteredPokemon.map((p) => [p.id, p])),
+    [filteredPokemon]
+  );
 
   // For regional dex mode or active search, build synthetic compact boxes from the filtered list
   // so only matching Pokémon are shown without empty placeholder slots.
-  const displayBoxes: DexBox[] =
-    dexMode !== "national" || searchActive
-      ? buildRegionalBoxes(filteredPokemon)
-      : boxes;
+  const displayBoxes = useMemo<DexBox[]>(
+    () =>
+      dexMode !== "national" || searchActive
+        ? buildRegionalBoxes(filteredPokemon)
+        : boxes,
+    [dexMode, searchActive, filteredPokemon, boxes]
+  );
 
   return (
     <div className="p-4">
