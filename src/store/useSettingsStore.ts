@@ -56,6 +56,10 @@ interface SettingsStore {
   // Designer tab — second slot for split-screen compare (not persisted)
   compareSlotIndex: number | null;
   setCompareSlotIndex: (idx: number | null) => void;
+
+  // Daily events checklist panel
+  showDailyPanel: boolean;
+  setShowDailyPanel: (v: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -117,6 +121,9 @@ export const useSettingsStore = create<SettingsStore>()(
 
       compareSlotIndex: null,
       setCompareSlotIndex: (idx) => set({ compareSlotIndex: idx }),
+
+      showDailyPanel: false,
+      setShowDailyPanel: (v) => set({ showDailyPanel: v }),
     }),
     {
       name: "pokedex-settings-v1",

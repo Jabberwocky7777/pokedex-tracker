@@ -17,6 +17,7 @@ import type { Pokemon, MetaData, DexBox } from "../../types";
 import { exportFullJSON, exportFullCSV, restoreBackup } from "../../lib/backup";
 import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 import ShortcutModal from "../shared/ShortcutModal";
+import DailyChecklist from "../tracker/DailyChecklist";
 
 interface Props {
   allPokemon: Pokemon[];
@@ -39,6 +40,7 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
     setActiveTab,
     setActiveRoute,
     setActivePokedexId,
+    showDailyPanel,
   } = useSettingsStore();
 
   const caughtByGen = useDexStore((s) => s.caughtByGen);
@@ -182,6 +184,9 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
 
         {/* Filter sub-bar — sticky below top bar, tracker-specific */}
         <FilterSubbar meta={meta} caught={caughtCount} total={total} tab="tracker" />
+
+        {/* Daily events checklist — collapsible panel between filter bar and list */}
+        {showDailyPanel && <DailyChecklist allPokemon={allPokemon} />}
 
         {/*
           Content row: fills remaining height.
