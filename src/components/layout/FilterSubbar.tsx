@@ -6,7 +6,7 @@ import ViewToggle from "../controls/ViewToggle";
 import AvailabilityFilter from "../controls/AvailabilityFilter";
 import SearchBar from "../controls/SearchBar";
 import { useSettingsStore } from "../../store/useSettingsStore";
-import type { MetaData, ViewMode } from "../../types";
+import type { MetaData } from "../../types";
 
 interface Props {
   meta: MetaData;
