@@ -1032,12 +1032,14 @@ function buildPokemonEntry(
  *  - Bulbasaur (#1):   no wild encounters in D/P/Pt (PokéAPI lists swarm on Route 229)
  *  - Charmander (#4):  no wild encounters in D/P/Pt (PokéAPI lists swarm on Route 227)
  *  - Squirtle (#7):    no wild encounters in D/P/Pt (PokéAPI lists swarm on Route 229)
- * All three are only obtainable in D/P via in-game trade or event.
+ *  - Linoone (#264):   no wild encounters in any Gen IV game; PokéAPI misidentified the
+ *                      Route 202 Zigzagoon swarm (D/P) as Linoone
  */
 const ENCOUNTER_DENYLIST: Record<number, { versions: string[] }> = {
-  1: { versions: ["diamond", "pearl", "platinum"] },
-  4: { versions: ["diamond", "pearl", "platinum"] },
-  7: { versions: ["diamond", "pearl", "platinum"] },
+  1:   { versions: ["diamond", "pearl", "platinum"] },
+  4:   { versions: ["diamond", "pearl", "platinum"] },
+  7:   { versions: ["diamond", "pearl", "platinum"] },
+  264: { versions: ["diamond", "pearl"] },
 };
 
 function sanitizeKnownErrors(
