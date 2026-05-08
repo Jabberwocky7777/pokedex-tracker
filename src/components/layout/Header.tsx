@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords, LogOut, FileJson, FileSpreadsheet, Upload, RefreshCw } from "lucide-react";
+import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords, LogOut, FileJson, FileSpreadsheet, Upload, RefreshCw, Search, Zap, ChevronLeft, ChevronRight } from "lucide-react";
 import GenerationSelector from "../controls/GenerationSelector";
 import ThemeSelector from "../ThemeSelector";
 import SyncDot from "./SyncDot";
@@ -16,13 +16,20 @@ interface Props {
   onImport?: () => void;
 }
 
-const TABS: { id: AppTab; label: string; Icon: React.ComponentType<{ size?: number }> }[] = [
-  { id: "tracker",    label: "Tracker",   Icon: LayoutGrid },
-  { id: "pokedex",    label: "Pokédex",   Icon: BookOpen   },
-  { id: "attackdex",  label: "Attackdex", Icon: Swords     },
-  { id: "routes",     label: "Routes",    Icon: Map        },
-  { id: "catch-calc", label: "Catch Calc",Icon: Calculator },
-  { id: "designer",   label: "Designer",  Icon: Wand2      },
+type TabDef = { id: AppTab; label: string; Icon: React.ComponentType<{ size?: number }> };
+
+const TRACKER_TABS: TabDef[] = [
+  { id: "tracker",    label: "Tracker",    Icon: LayoutGrid },
+  { id: "pokedex",    label: "Pokédex",    Icon: BookOpen   },
+  { id: "attackdex",  label: "Attackdex",  Icon: Swords     },
+  { id: "routes",     label: "Routes",     Icon: Map        },
+  { id: "catch-calc", label: "Catch Calc", Icon: Calculator },
+];
+
+const FRONTIER_TABS: TabDef[] = [
+  { id: "designer",       label: "Designer",    Icon: Wand2   },
+  { id: "trainer-lookup", label: "Trainer",     Icon: Search  },
+  { id: "damage-calc",    label: "Damage Calc", Icon: Zap     },
 ];
 
 /** Restart button — calls /api/restart, Docker restart policy brings up the new image */
@@ -73,8 +80,10 @@ function PokeBall() {
 }
 
 export default function Header({ meta, onLogout, onExport, onExportJSON, onExportCSV, onImport }: Props) {
-  const { activeTab, setActiveTab } = useSettingsStore();
-  const currentLabel = TABS.find((t) => t.id === activeTab)?.label ?? "Pokédex Tracker";
+  const { activeTab, setActiveTab, tabGroup, setTabGroup } = useSettingsStore();
+  const allTabs = [...TRACKER_TABS, ...FRONTIER_TABS];
+  const currentLabel = allTabs.find((t) => t.id === activeTab)?.label ?? "Pokédex Tracker";
+  const activeTabs = tabGroup === "tracker" ? TRACKER_TABS : FRONTIER_TABS;
 
   return (
     <header className="sticky top-[3px] z-40 bg-gray-900/95 backdrop-blur border-b border-gray-800">
@@ -115,7 +124,22 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
 
         {/* Center zone: flex-shrink-0 so it never gets pushed around */}
         <nav className="flex items-center gap-1 flex-shrink-0" aria-label="Main navigation">
-          {TABS.map(({ id, label, Icon }) => {
+          {/* ← arrow to tracker group */}
+          <button
+            onClick={() => setTabGroup("tracker")}
+            disabled={tabGroup === "tracker"}
+            title="Tracker tools"
+            className={`p-1 rounded-md transition-colors ${
+              tabGroup === "tracker"
+                ? "text-gray-600 cursor-default"
+                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+            }`}
+            aria-label="Switch to Tracker tabs"
+          >
+            <ChevronLeft size={16} />
+          </button>
+
+          {activeTabs.map(({ id, label, Icon }) => {
             const isActive = activeTab === id;
             return (
               <button
@@ -133,6 +157,21 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
               </button>
             );
           })}
+
+          {/* → arrow to frontier group */}
+          <button
+            onClick={() => setTabGroup("frontier")}
+            disabled={tabGroup === "frontier"}
+            title="Battle Frontier tools"
+            className={`p-1 rounded-md transition-colors ${
+              tabGroup === "frontier"
+                ? "text-gray-600 cursor-default"
+                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+            }`}
+            aria-label="Switch to Battle Frontier tabs"
+          >
+            <ChevronRight size={16} />
+          </button>
         </nav>
 
         {/* Right zone: flex-1 + justify-end mirrors left zone width */}

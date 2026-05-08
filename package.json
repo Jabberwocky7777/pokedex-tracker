@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "generate-data": "tsx --tsconfig tsconfig.scripts.json scripts/fetch-data.ts",
     "merge-stats": "tsx --tsconfig tsconfig.scripts.json scripts/merge-stats.ts",
-    "patch-slot2": "tsx --tsconfig tsconfig.scripts.json scripts/patch-slot2.ts"
+    "patch-slot2": "tsx --tsconfig tsconfig.scripts.json scripts/patch-slot2.ts",
+    "fetch-battle-tower": "tsx --tsconfig tsconfig.scripts.json scripts/fetch-battle-tower.ts"
   },
   "dependencies": {
     "lucide-react": "^1.8.0",

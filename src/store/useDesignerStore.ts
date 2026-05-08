@@ -55,10 +55,16 @@ function emptySlot(slotIndex: number): DesignerSlot {
   };
 }
 
+const TOTAL_SLOTS = 90; // 3 boxes × 30 slots
+const SLOTS_PER_BOX = 30;
+
 interface DesignerStore {
   slots: DesignerSlot[];
   activeSlotIndex: number | null;
+  /** Which box (0–2) is currently visible. Not persisted — resets to 0 on refresh. */
+  activeBoxIndex: 0 | 1 | 2;
   setActiveSlot: (index: number | null) => void;
+  setActiveBox: (box: 0 | 1 | 2) => void;
   updateSlot: (index: number, patch: Partial<DesignerSlot>) => void;
   clearSlot: (index: number) => void;
   duplicateSlot: (fromIndex: number, toIndex: number) => void;
@@ -67,17 +73,26 @@ interface DesignerStore {
   /** Change only the pokemonId, preserving all IVs/EVs/nature/moves. */
   evolveSlot: (index: number, newPokemonId: number) => void;
   setSlots: (slots: DesignerSlot[]) => void;
+  /** Returns the 30 slots belonging to a given box (0–2). */
+  getSlotsForBox: (box: 0 | 1 | 2) => DesignerSlot[];
 }
 
-const EMPTY_SLOTS = Array.from({ length: 30 }, (_, i) => emptySlot(i));
+const EMPTY_SLOTS = Array.from({ length: TOTAL_SLOTS }, (_, i) => emptySlot(i));
 
 export const useDesignerStore = create<DesignerStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       slots: EMPTY_SLOTS,
       activeSlotIndex: null,
+      activeBoxIndex: 0,
 
       setActiveSlot: (index) => set({ activeSlotIndex: index }),
+      setActiveBox: (box) => set({ activeBoxIndex: box }),
+
+      getSlotsForBox: (box) => {
+        const { slots } = get();
+        return slots.slice(box * SLOTS_PER_BOX, (box + 1) * SLOTS_PER_BOX);
+      },
 
       updateSlot: (index, patch) =>
         set((state) => {
@@ -131,17 +146,20 @@ export const useDesignerStore = create<DesignerStore>()(
       setSlots: (slots) => set({ slots }),
     }),
     {
-      name: "designer-v1",
+      name: "designer-v2", // bumped from v1 because slot count changed 30→90
+      // activeBoxIndex intentionally excluded — always resets to box 0 on load
       partialize: (state) => ({ slots: state.slots, activeSlotIndex: state.activeSlotIndex }),
       merge: (persisted, current) => {
         const p = persisted as Partial<typeof current>;
-        // Deep-merge each slot so new fields added to emptySlot() get their defaults
+        // Deep-merge each slot so new fields get their defaults
+        // Old saves (30 slots) are treated as Box 1; boxes 2–3 start empty
         const rawSlots = p.slots ?? current.slots;
-        const padded = Array.from({ length: 30 }, (_, i) => ({
+        const padded = Array.from({ length: TOTAL_SLOTS }, (_, i) => ({
           ...emptySlot(i),
           ...(rawSlots[i] ?? {}),
+          slotIndex: i, // ensure slotIndex is always correct
         }));
-        return { ...current, ...p, slots: padded };
+        return { ...current, ...p, slots: padded, activeBoxIndex: 0 };
       },
     }
   )

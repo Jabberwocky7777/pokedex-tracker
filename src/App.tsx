@@ -6,6 +6,8 @@ import DesignerTab from "./components/designer/DesignerTab";
 import RouteInfo from "./components/route-info/RouteInfo";
 import PokedexTab from "./components/pokedex/PokedexTab";
 import AttackdexTab from "./components/attackdex/AttackdexTab";
+import TrainerLookupTab from "./components/trainer-lookup/TrainerLookupTab";
+import DamageCalcTab from "./components/damage-calc/DamageCalcTab";
 import LoginScreen from "./components/auth/LoginScreen";
 import MobileBottomNav from "./components/layout/MobileBottomNav";
 import SyncToast from "./components/layout/SyncToast";
@@ -107,6 +109,12 @@ function App() {
       )}
       {activeTab === "attackdex" && (
         <AttackdexTab allPokemon={allPokemon} meta={meta} />
+      )}
+      {activeTab === "trainer-lookup" && (
+        <TrainerLookupTab allPokemon={allPokemon} meta={meta} />
+      )}
+      {activeTab === "damage-calc" && (
+        <DamageCalcTab allPokemon={allPokemon} meta={meta} />
       )}
       {/* Global shell elements rendered for all non-tracker tabs.
           Layout already renders these for the tracker tab. */}

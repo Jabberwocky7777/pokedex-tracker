@@ -1,18 +1,26 @@
-import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords } from "lucide-react";
+import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords, Search, Zap, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import type { AppTab } from "../../types";
 
-const TABS: { id: AppTab; label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
-  { id: "tracker",    label: "Tracker",   Icon: LayoutGrid },
-  { id: "pokedex",    label: "Pokédex",   Icon: BookOpen   },
-  { id: "attackdex",  label: "Attacks",   Icon: Swords     },
-  { id: "routes",     label: "Routes",    Icon: Map        },
-  { id: "catch-calc", label: "Catch",     Icon: Calculator },
-  { id: "designer",   label: "Designer",  Icon: Wand2      },
+type TabDef = { id: AppTab; label: string; Icon: React.ComponentType<{ size?: number; className?: string }> };
+
+const TRACKER_TABS: TabDef[] = [
+  { id: "tracker",    label: "Tracker",  Icon: LayoutGrid },
+  { id: "pokedex",    label: "Pokédex",  Icon: BookOpen   },
+  { id: "attackdex",  label: "Attacks",  Icon: Swords     },
+  { id: "routes",     label: "Routes",   Icon: Map        },
+  { id: "catch-calc", label: "Catch",    Icon: Calculator },
+];
+
+const FRONTIER_TABS: TabDef[] = [
+  { id: "designer",       label: "Designer", Icon: Wand2   },
+  { id: "trainer-lookup", label: "Trainer",  Icon: Search  },
+  { id: "damage-calc",    label: "Damage",   Icon: Zap     },
 ];
 
 export default function MobileBottomNav() {
-  const { activeTab, setActiveTab } = useSettingsStore();
+  const { activeTab, setActiveTab, tabGroup, setTabGroup } = useSettingsStore();
+  const activeTabs = tabGroup === "tracker" ? TRACKER_TABS : FRONTIER_TABS;
 
   return (
     <nav
@@ -20,7 +28,19 @@ export default function MobileBottomNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="Main navigation"
     >
-      {TABS.map(({ id, label, Icon }) => {
+      {/* ← group toggle */}
+      <button
+        onClick={() => setTabGroup("tracker")}
+        disabled={tabGroup === "tracker"}
+        className={`flex flex-col items-center justify-center px-2 py-2 gap-0.5 text-xs transition-colors ${
+          tabGroup === "tracker" ? "text-gray-700" : "text-gray-500 hover:text-gray-300"
+        }`}
+        aria-label="Switch to Tracker tabs"
+      >
+        <ChevronLeft size={18} />
+      </button>
+
+      {activeTabs.map(({ id, label, Icon }) => {
         const isActive = activeTab === id;
         return (
           <button
@@ -38,6 +58,18 @@ export default function MobileBottomNav() {
           </button>
         );
       })}
+
+      {/* → group toggle */}
+      <button
+        onClick={() => setTabGroup("frontier")}
+        disabled={tabGroup === "frontier"}
+        className={`flex flex-col items-center justify-center px-2 py-2 gap-0.5 text-xs transition-colors ${
+          tabGroup === "frontier" ? "text-gray-700" : "text-gray-500 hover:text-gray-300"
+        }`}
+        aria-label="Switch to Battle Frontier tabs"
+      >
+        <ChevronRight size={18} />
+      </button>
     </nav>
   );
 }
