@@ -40,7 +40,6 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
     setActiveTab,
     setActiveRoute,
     setActivePokedexId,
-    showDailyPanel,
   } = useSettingsStore();
 
   const caughtByGen = useDexStore((s) => s.caughtByGen);
@@ -185,16 +184,15 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
         {/* Filter sub-bar — sticky below top bar, tracker-specific */}
         <FilterSubbar meta={meta} caught={caughtCount} total={total} tab="tracker" />
 
-        {/* Daily events checklist — collapsible panel between filter bar and list */}
-        {showDailyPanel && <DailyChecklist allPokemon={allPokemon} />}
-
         {/*
           Content row: fills remaining height.
           pb-[76px] on mobile leaves room for the bottom nav (60px + safe area).
         */}
         <div className="flex flex-1 overflow-hidden max-w-screen-2xl mx-auto w-full">
-          <main className="flex-1 min-w-0 overflow-y-auto pb-[76px] md:pb-0">
-            {viewMode === "box" ? (
+          <main className="flex-1 min-w-0 overflow-y-auto pb-[76px] md:pb-0 flex flex-col">
+            {viewMode === "daily" ? (
+              <DailyChecklist allPokemon={allPokemon} />
+            ) : viewMode === "box" ? (
               <BoxView
                 filteredPokemon={filteredPokemon}
                 pokemonMap={pokemonMap}

@@ -57,9 +57,6 @@ interface SettingsStore {
   compareSlotIndex: number | null;
   setCompareSlotIndex: (idx: number | null) => void;
 
-  // Daily events checklist panel
-  showDailyPanel: boolean;
-  setShowDailyPanel: (v: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -121,9 +118,6 @@ export const useSettingsStore = create<SettingsStore>()(
 
       compareSlotIndex: null,
       setCompareSlotIndex: (idx) => set({ compareSlotIndex: idx }),
-
-      showDailyPanel: false,
-      setShowDailyPanel: (v) => set({ showDailyPanel: v }),
     }),
     {
       name: "pokedex-settings-v1",
@@ -140,7 +134,7 @@ export const useSettingsStore = create<SettingsStore>()(
         if ((p.activeTab as string) === "iv-checker") p.activeTab = "designer";
         const validTabs = ["tracker", "catch-calc", "designer", "routes", "pokedex", "attackdex"];
         if (p.activeTab && !validTabs.includes(p.activeTab)) p.activeTab = "tracker";
-        if (p.viewMode && !["box", "list", "slots"].includes(p.viewMode)) p.viewMode = "box";
+        if (p.viewMode && !["box", "list", "slots", "daily"].includes(p.viewMode)) p.viewMode = "box";
         return { ...current, ...p };
       },
       onRehydrateStorage: () => (state) => {

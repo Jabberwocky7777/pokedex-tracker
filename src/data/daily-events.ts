@@ -9,9 +9,10 @@ export interface DailyPokemon {
 export interface DailyEventSection {
   id: string;
   title: string;
-  games: string;       // display label, e.g. "D/P/Pt"
-  genIds: number[];    // which app activeGeneration values show this section
-  how: string;         // one-line tip shown below the tab bar
+  games: string;          // display label, e.g. "D/P/Pt"
+  genIds: number[];       // which app activeGeneration values show this section
+  versions: string[];     // game version slugs that have this section (matches GameVersion values)
+  how: string;            // one-line tip shown below the tab bar
   pokemon: DailyPokemon[];
 }
 
@@ -21,6 +22,7 @@ export const DAILY_EVENT_SECTIONS: DailyEventSection[] = [
     title: 'Mass Outbreaks',
     games: 'D/P/Pt',
     genIds: [4],
+    versions: ['diamond', 'pearl', 'platinum'],
     how: 'Check the Pokétch Map app or your TV at home for today\'s swarm route.',
     pokemon: [
       { id: 16,  name: 'Pidgey',      location: 'Route 229',          games: 'D/P' },
@@ -83,6 +85,7 @@ export const DAILY_EVENT_SECTIONS: DailyEventSection[] = [
     title: 'Great Marsh',
     games: 'D/P/Pt',
     genIds: [4],
+    versions: ['diamond', 'pearl', 'platinum'],
     how: 'Use the binoculars at the entrance to see today\'s rotation before going in.',
     pokemon: [
       { id: 115, name: 'Kangaskhan', location: 'Great Marsh', games: 'D/P' },
@@ -100,6 +103,7 @@ export const DAILY_EVENT_SECTIONS: DailyEventSection[] = [
     title: 'Trophy Garden',
     games: 'D/P/Pt',
     genIds: [4],
+    versions: ['diamond', 'pearl', 'platinum'],
     how: 'Save before talking to Mr. Backlot in the Pokémon Mansion — reset until he mentions the one you need.',
     pokemon: [
       { id: 113, name: 'Chansey',     location: 'Trophy Garden', note: 'Daily via Backlot' },
@@ -124,6 +128,7 @@ export const DAILY_EVENT_SECTIONS: DailyEventSection[] = [
     title: 'Honey Trees',
     games: 'D/P/Pt',
     genIds: [4],
+    versions: ['diamond', 'pearl', 'platinum'],
     how: 'Slather honey on a tree and return in ~6 hours. Munchlax only appears on 4 specific trees per save file.',
     pokemon: [
       { id: 265, name: 'Wurmple',   location: 'Any honey tree', note: '40%' },
@@ -142,6 +147,7 @@ export const DAILY_EVENT_SECTIONS: DailyEventSection[] = [
     title: 'Mass Outbreaks',
     games: 'HG/SS',
     genIds: [4],
+    versions: ['heartgold', 'soulsilver'],
     how: 'Call trainers saved in your PokéGear to hear about today\'s swarm location.',
     pokemon: [
       { id: 113, name: 'Chansey',   location: 'Route 13' },

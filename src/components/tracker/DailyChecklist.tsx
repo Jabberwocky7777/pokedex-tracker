@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { X } from "lucide-react";
 import { DAILY_EVENT_SECTIONS } from "../../data/daily-events";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import { useDexStore } from "../../store/useDexStore";
@@ -11,7 +10,7 @@ interface Props {
 
 export default function DailyChecklist({ allPokemon }: Props) {
   const activeGeneration = useSettingsStore((s) => s.activeGeneration);
-  const setShowDailyPanel = useSettingsStore((s) => s.setShowDailyPanel);
+  const activeGames = useSettingsStore((s) => s.activeGames);
   const caughtByGen = useDexStore((s) => s.caughtByGen);
   const toggleCaughtRaw = useDexStore((s) => s.toggleCaught);
 
@@ -20,24 +19,24 @@ export default function DailyChecklist({ allPokemon }: Props) {
 
   const pokemonMap = useMemo(() => new Map(allPokemon.map((p) => [p.id, p])), [allPokemon]);
 
-  const sections = useMemo(
-    () => DAILY_EVENT_SECTIONS.filter((s) => s.genIds.includes(activeGeneration)),
-    [activeGeneration]
-  );
+  const sections = useMemo(() => {
+    const byGen = DAILY_EVENT_SECTIONS.filter((s) => s.genIds.includes(activeGeneration));
+    if (activeGames.length === 0) return byGen;
+    return byGen.filter((s) =>
+      s.versions.some((v) => activeGames.includes(v as never))
+    );
+  }, [activeGeneration, activeGames]);
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [uncaughtOnly, setUncaughtOnly] = useState(true);
 
-  const sectionIdx = Math.min(activeIdx, sections.length - 1);
+  const sectionIdx = Math.min(activeIdx, Math.max(0, sections.length - 1));
   const section = sections[sectionIdx];
 
   if (sections.length === 0) {
     return (
-      <div className="border-b border-gray-800 px-4 py-3 flex items-center justify-between text-sm text-gray-500">
-        <span>No daily events tracked for this generation.</span>
-        <button onClick={() => setShowDailyPanel(false)} className="p-1 hover:text-gray-300 transition-colors">
-          <X size={14} />
-        </button>
+      <div className="flex-1 flex items-center justify-center text-sm text-gray-500">
+        No daily events for the selected game(s).
       </div>
     );
   }
@@ -49,10 +48,10 @@ export default function DailyChecklist({ allPokemon }: Props) {
     : [];
 
   return (
-    <div className="bg-gray-950 border-b border-gray-800 flex flex-col" style={{ maxHeight: "260px" }}>
+    <div className="flex flex-col flex-1 overflow-hidden">
 
-      {/* Tab bar */}
-      <div className="flex items-center border-b border-gray-800/60 overflow-x-auto [&::-webkit-scrollbar]:hidden flex-shrink-0">
+      {/* Sticky tab bar */}
+      <div className="sticky top-0 z-10 flex items-center bg-gray-900/95 backdrop-blur border-b border-gray-800 overflow-x-auto [&::-webkit-scrollbar]:hidden flex-shrink-0">
         {sections.map((s, i) => {
           const uncaught = s.pokemon.filter((p) => !caught.includes(p.id)).length;
           const isActive = sectionIdx === i;
@@ -60,7 +59,7 @@ export default function DailyChecklist({ allPokemon }: Props) {
             <button
               key={s.id}
               onClick={() => setActiveIdx(i)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-medium whitespace-nowrap border-b-2 transition-colors flex-shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors flex-shrink-0 ${
                 isActive
                   ? "border-indigo-500 text-indigo-400"
                   : "border-transparent text-gray-500 hover:text-gray-300"
@@ -82,7 +81,6 @@ export default function DailyChecklist({ allPokemon }: Props) {
           );
         })}
 
-        {/* Right controls */}
         <div className="ml-auto flex items-center gap-3 px-3 flex-shrink-0">
           <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer select-none whitespace-nowrap">
             <input
@@ -93,38 +91,31 @@ export default function DailyChecklist({ allPokemon }: Props) {
             />
             Uncaught only
           </label>
-          <button
-            onClick={() => setShowDailyPanel(false)}
-            title="Close daily checklist"
-            className="p-1 text-gray-600 hover:text-gray-300 transition-colors"
-          >
-            <X size={14} />
-          </button>
         </div>
       </div>
 
       {/* How-to tip */}
       {section && (
-        <div className="px-4 py-1.5 text-xs text-gray-600 flex-shrink-0 border-b border-gray-800/40">
+        <div className="px-4 py-2 text-xs text-gray-600 border-b border-gray-800/40 flex-shrink-0">
           {section.how}
         </div>
       )}
 
       {/* Pokémon list */}
-      <div className="overflow-y-auto flex-1">
+      <div className="overflow-y-auto flex-1 pb-[76px] md:pb-0">
         {items.length === 0 ? (
-          <div className="px-4 py-5 text-center text-sm text-gray-500">
+          <div className="px-4 py-10 text-center text-sm text-gray-500">
             All caught! ✓
           </div>
         ) : (
-          <div className="divide-y divide-gray-800/40">
+          <div className="divide-y divide-gray-800/40 max-w-2xl">
             {items.map((dp) => {
               const pokemon = pokemonMap.get(dp.id);
               const isCaught = caught.includes(dp.id);
               return (
                 <label
                   key={`${dp.id}-${dp.note ?? ""}`}
-                  className={`flex items-center gap-3 px-4 py-1.5 cursor-pointer hover:bg-gray-800/40 transition-colors ${
+                  className={`flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-800/40 transition-colors ${
                     isCaught ? "opacity-40" : ""
                   }`}
                 >

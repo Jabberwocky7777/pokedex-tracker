@@ -6,7 +6,7 @@ import ViewToggle from "../controls/ViewToggle";
 import AvailabilityFilter from "../controls/AvailabilityFilter";
 import SearchBar from "../controls/SearchBar";
 import { useSettingsStore } from "../../store/useSettingsStore";
-import type { MetaData } from "../../types";
+import type { MetaData, ViewMode } from "../../types";
 
 interface Props {
   meta: MetaData;
@@ -22,8 +22,9 @@ interface Props {
  */
 export default function FilterSubbar({ meta, caught, total, tab }: Props) {
   const searchRef = useRef<HTMLDivElement>(null);
-  const showDailyPanel = useSettingsStore((s) => s.showDailyPanel);
-  const setShowDailyPanel = useSettingsStore((s) => s.setShowDailyPanel);
+  const viewMode = useSettingsStore((s) => s.viewMode);
+  const setViewMode = useSettingsStore((s) => s.setViewMode);
+  const toggleDaily = () => setViewMode(viewMode === "daily" ? "box" : "daily");
 
   if (tab === "routes") {
     return (
@@ -54,10 +55,10 @@ export default function FilterSubbar({ meta, caught, total, tab }: Props) {
           <>
             <div className="w-px h-5 bg-gray-700 flex-shrink-0" />
             <button
-              onClick={() => setShowDailyPanel(!showDailyPanel)}
+              onClick={toggleDaily}
               title="Daily events checklist"
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium border transition-all flex-shrink-0 ${
-                showDailyPanel
+                viewMode === "daily"
                   ? "bg-indigo-600/20 text-indigo-400 border-indigo-500/50"
                   : "bg-gray-800 text-gray-400 border-gray-700 hover:text-gray-200 hover:bg-gray-700"
               }`}
@@ -100,10 +101,10 @@ export default function FilterSubbar({ meta, caught, total, tab }: Props) {
             <ViewToggle />
             {tab === "tracker" && (
               <button
-                onClick={() => setShowDailyPanel(!showDailyPanel)}
+                onClick={toggleDaily}
                 title="Daily events checklist"
                 className={`p-1.5 rounded-md border text-xs transition-all ${
-                  showDailyPanel
+                  viewMode === "daily"
                     ? "bg-indigo-600/20 text-indigo-400 border-indigo-500/50"
                     : "bg-gray-800 text-gray-400 border-gray-700 hover:text-gray-200"
                 }`}
