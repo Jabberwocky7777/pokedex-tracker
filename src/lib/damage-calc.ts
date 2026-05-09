@@ -118,6 +118,69 @@ export function getAbilityModifiers(ability: string): AbilityModifiers {
   };
 }
 
+// ─── Item effects ─────────────────────────────────────────────────────────────
+
+export interface ItemEffect {
+  /** Short description shown in the UI, e.g. "Choice Band (+50% Atk)" */
+  label: string;
+  /** Multiplier applied to raw Atk before the formula (physical moves) */
+  atkStatMult?: number;
+  /** Multiplier applied to raw SpA before the formula (special moves) */
+  spaStatMult?: number;
+  /** Multiplier applied to final damage for physical moves */
+  physDamageMult?: number;
+  /** Multiplier applied to final damage for special moves */
+  specDamageMult?: number;
+  /** Multiplier applied to final damage for any damaging move */
+  allDamageMult?: number;
+  /** Multiplier applied after type effectiveness when hit is super-effective */
+  superEffMult?: number;
+  /** Type that this item boosts by ×1.2 (type-boosting hold items) */
+  boostType?: string;
+}
+
+/** Items that boost one specific type by ×1.2 */
+const TYPE_BOOST_ITEMS: Record<string, string> = {
+  "silk scarf":     "normal",
+  "charcoal":       "fire",
+  "mystic water":   "water",
+  "magnet":         "electric",
+  "miracle seed":   "grass",
+  "never-melt ice": "ice",
+  "black belt":     "fighting",
+  "poison barb":    "poison",
+  "soft sand":      "ground",
+  "sharp beak":     "flying",
+  "twisted spoon":  "psychic",
+  "silver powder":  "bug",
+  "hard stone":     "rock",
+  "spell tag":      "ghost",
+  "dragon fang":    "dragon",
+  "black glasses":  "dark",
+  "metal coat":     "steel",
+};
+
+/** Returns the damage/stat effect for a held item. Returns an empty-label object if no effect. */
+export function getItemEffect(item: string): ItemEffect {
+  const i = item.toLowerCase().trim();
+  if (i === "choice band")    return { label: "Choice Band (+50% Atk)",  atkStatMult: 1.5 };
+  if (i === "choice specs")   return { label: "Choice Specs (+50% SpA)", spaStatMult: 1.5 };
+  if (i === "choice scarf")   return { label: "Choice Scarf (+50% Spe)" }; // no damage effect
+  if (i === "life orb")       return { label: "Life Orb (+30% dmg)",     allDamageMult: 1.3 };
+  if (i === "expert belt")    return { label: "Expert Belt (+20% SE)",    superEffMult: 1.2 };
+  if (i === "muscle band")    return { label: "Muscle Band (+10% phys)",  physDamageMult: 1.1 };
+  if (i === "wise glasses")   return { label: "Wise Glasses (+10% spec)", specDamageMult: 1.1 };
+  if (i === "thick club")     return { label: "Thick Club (×2 Atk)",      atkStatMult: 2.0 };
+  if (i === "light ball")     return { label: "Light Ball (×2 Atk/SpA)",  atkStatMult: 2.0, spaStatMult: 2.0 };
+  if (i === "soul dew")       return { label: "Soul Dew (+50% SpA)",      spaStatMult: 1.5 };
+  const boostType = TYPE_BOOST_ITEMS[i];
+  if (boostType) {
+    const typeName = boostType.charAt(0).toUpperCase() + boostType.slice(1);
+    return { label: `${item} (+20% ${typeName})`, boostType };
+  }
+  return { label: "" };
+}
+
 // ─── Main damage calculation ──────────────────────────────────────────────────
 
 interface CalcInput {
@@ -160,6 +223,11 @@ export function calcDamageRolls(input: CalcInput): number[] {
   // Base stat selection
   let rawAtk = isPhysical ? attacker.stats.atk : attacker.stats.spa;
   let rawDef = isPhysical ? defender.stats.def : defender.stats.spd;
+
+  // Item: Choice Band / Choice Specs / Thick Club / Light Ball — multiply stat before formula
+  const itemEff = getItemEffect(attacker.item);
+  if (isPhysical && itemEff.atkStatMult) rawAtk = Math.floor(rawAtk * itemEff.atkStatMult);
+  if (!isPhysical && itemEff.spaStatMult) rawAtk = Math.floor(rawAtk * itemEff.spaStatMult);
 
   // Burn halves physical Atk
   if (isPhysical && attacker.status === "burn") rawAtk = floorDiv(rawAtk, 2);
@@ -212,8 +280,18 @@ export function calcDamageRolls(input: CalcInput): number[] {
   // Ability defense modifier (Thick Fat etc.)
   const step7 = Math.floor(step6 * defenderAbility.defenseMult(move.type));
 
+  // "Other" modifier: item damage multipliers (Gen 4 formula position — after type/ability, before screen)
+  const isSuper = typeEff > 1;
+  let itemDmgMult = 1.0;
+  if (isSuper && itemEff.superEffMult)                                itemDmgMult *= itemEff.superEffMult;
+  if (itemEff.boostType && itemEff.boostType === move.type.toLowerCase()) itemDmgMult *= 1.2;
+  if (itemEff.allDamageMult)                                          itemDmgMult *= itemEff.allDamageMult;
+  if (isPhysical && itemEff.physDamageMult)                           itemDmgMult *= itemEff.physDamageMult;
+  if (!isPhysical && itemEff.specDamageMult)                          itemDmgMult *= itemEff.specDamageMult;
+  const step7b = itemDmgMult !== 1.0 ? Math.floor(step7 * itemDmgMult) : step7;
+
   // Screen
-  const step8 = Math.floor(step7 * screenMult);
+  const step8 = Math.floor(step7b * screenMult);
 
   // Roll: 16 values from 85 to 100
   return Array.from({ length: 16 }, (_, i) => {

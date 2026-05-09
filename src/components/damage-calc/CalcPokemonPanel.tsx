@@ -1,10 +1,16 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { useBattleCalcStore } from "../../store/useBattleCalcStore";
 import { useDesignerStore } from "../../store/useDesignerStore";
 import { designerSlotToCalcPokemon } from "../../lib/calc-from-designer";
+import { enrichCalcMoves } from "../../lib/move-lookup";
+import { getItemEffect } from "../../lib/damage-calc";
+import rawTowerSets from "../../data/battle-tower-sets.json";
 import type { Pokemon } from "../../types";
-import type { CalcPokemon, DamageResult, StatusCondition } from "../../types/battleTower";
+import type { CalcPokemon, DamageResult, StatusCondition, BattleTowerSet } from "../../types/battleTower";
 import { TYPE_BG_COLORS } from "../../lib/type-colors";
+
+const battleTowerSets = rawTowerSets as BattleTowerSet[];
 
 interface Props {
   slot: "slot1" | "slot2";
@@ -15,58 +21,132 @@ interface Props {
 }
 
 const STATUS_OPTIONS: { value: StatusCondition; label: string }[] = [
-  { value: "none", label: "Healthy" },
-  { value: "burn", label: "Burn" },
+  { value: "none",      label: "Healthy"   },
+  { value: "burn",      label: "Burn"      },
   { value: "paralysis", label: "Paralysis" },
-  { value: "poison", label: "Poison" },
-  { value: "freeze", label: "Freeze" },
-  { value: "sleep", label: "Sleep" },
+  { value: "poison",    label: "Poison"    },
+  { value: "freeze",    label: "Freeze"    },
+  { value: "sleep",     label: "Sleep"     },
 ];
 
 const STAT_LABELS: Record<string, string> = {
   hp: "HP", atk: "Atk", def: "Def", spa: "SpA", spd: "SpD", spe: "Spe",
 };
 
+/** Build a CalcPokemon shell from a Battle Tower set. Moves start with power=0 and are
+ *  enriched asynchronously by the auto-enrich useEffect. */
+function towerSetToCalcPokemon(set: BattleTowerSet, allPokemon: Pokemon[]): CalcPokemon {
+  const mon = allPokemon.find(
+    (p) => p.displayName.toLowerCase() === set.species.toLowerCase()
+  );
+  const types = (mon?.types ?? ["normal"]) as [string] | [string, string];
+  return {
+    source: "tower-set",
+    species: set.species,
+    types,
+    level: 50,
+    nature: set.nature,
+    ability: "",
+    item: set.item,
+    status: "none",
+    stats: set.stats,
+    moves: (set.moves as [string, string, string, string]).map((name) => ({
+      name,
+      power: 0,
+      type: "normal",
+      category: "physical" as const,
+    })),
+    currentHp: set.stats.hp,
+  };
+}
+
 export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defenderHp, label }: Props) {
   const store = useBattleCalcStore();
   const { slots: designerSlots } = useDesignerStore();
   const pokemon: CalcPokemon | null = store[slot];
-
+  const opponent = slot === "slot1" ? store.slot2 : store.slot1;
   const setter = slot === "slot1" ? store.setSlot1 : store.setSlot2;
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showSearch, setShowSearch] = useState(false);
+  const [customQuery, setCustomQuery]   = useState("");
+  const [showCustom, setShowCustom]     = useState(false);
+  const [btQuery, setBtQuery]           = useState("");
+  const [btOpen, setBtOpen]             = useState(false);
+  const [enrichingMoves, setEnrichingMoves] = useState(false);
 
-  // Filled designer slots for the dropdown
+  // ── Designer options ───────────────────────────────────────────────────────
   const designerOptions = useMemo(
     () => designerSlots.filter((s) => s.pokemonId != null),
     [designerSlots]
   );
 
+  // ── Battle Tower search ────────────────────────────────────────────────────
+  const btResults = useMemo(() => {
+    if (!btQuery.trim()) return battleTowerSets;
+    const q = btQuery.toLowerCase().trim();
+    return battleTowerSets.filter((s) => s.species.toLowerCase().includes(q));
+  }, [btQuery]);
+
+  // ── Custom species search ──────────────────────────────────────────────────
+  const customResults = useMemo(() => {
+    if (customQuery.length < 2) return [];
+    const q = customQuery.toLowerCase();
+    return allPokemon.filter((p) => p.displayName.toLowerCase().includes(q)).slice(0, 10);
+  }, [customQuery, allPokemon]);
+
+  // ── Auto-enrich: fetch move data when a pokemon is loaded with power=0 moves ──
+  const moveNamesKey = pokemon?.moves.map((m) => m.name).join("|") ?? "";
+  useEffect(() => {
+    if (!pokemon) return;
+    const needsEnrichment = pokemon.moves.some(
+      (m) => m.name.trim() !== "" && m.power === 0
+    );
+    if (!needsEnrichment) return;
+
+    let cancelled = false;
+    setEnrichingMoves(true);
+
+    enrichCalcMoves([...pokemon.moves]).then((enrichedMoves) => {
+      if (cancelled) return;
+      // Read freshest store state so other edits made during the fetch aren't lost
+      const fresh = useBattleCalcStore.getState()[slot as "slot1" | "slot2"];
+      if (fresh) setter({ ...fresh, moves: enrichedMoves });
+      setEnrichingMoves(false);
+    });
+
+    return () => {
+      cancelled = true;
+      setEnrichingMoves(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moveNamesKey]);
+
+  // ── Item effect (for stat display) ────────────────────────────────────────
+  const itemEff = useMemo(() => getItemEffect(pokemon?.item ?? ""), [pokemon?.item]);
+
+  // ── Loaders ───────────────────────────────────────────────────────────────
   function loadFromDesigner(slotIndex: number) {
-    const slot = designerSlots[slotIndex];
-    if (!slot) return;
-    const calc = designerSlotToCalcPokemon(slot, allPokemon);
+    const ds = designerSlots[slotIndex];
+    if (!ds) return;
+    const calc = designerSlotToCalcPokemon(ds, allPokemon);
     if (calc) setter(calc);
   }
 
-  // Search for custom Pokémon
-  const searchResults = useMemo(() => {
-    if (searchQuery.length < 2) return [];
-    const q = searchQuery.toLowerCase();
-    return allPokemon.filter((p) => p.displayName.toLowerCase().includes(q)).slice(0, 10);
-  }, [searchQuery, allPokemon]);
+  function loadFromTowerSet(set: BattleTowerSet) {
+    setter(towerSetToCalcPokemon(set, allPokemon));
+    setBtOpen(false);
+    setBtQuery("");
+  }
 
   function loadCustomPokemon(p: Pokemon) {
-    const baseStats = p.baseStats;
-    if (!baseStats) return;
+    const bs = p.baseStats;
+    if (!bs) return;
     const stats = {
-      hp: baseStats.hp + 10 + 50 + 31,     // rough Lv50 with 31 IVs, 0 EVs
-      atk: Math.floor(((2 * baseStats.atk + 31) * 50) / 100) + 5,
-      def: Math.floor(((2 * baseStats.def + 31) * 50) / 100) + 5,
-      spa: Math.floor(((2 * (baseStats.spAtk ?? 0) + 31) * 50) / 100) + 5,
-      spd: Math.floor(((2 * (baseStats.spDef ?? 0) + 31) * 50) / 100) + 5,
-      spe: Math.floor(((2 * baseStats.spe + 31) * 50) / 100) + 5,
+      hp:  Math.floor(((2 * bs.hp + 31) * 50) / 100) + 60,
+      atk: Math.floor(((2 * bs.atk + 31) * 50) / 100) + 5,
+      def: Math.floor(((2 * bs.def + 31) * 50) / 100) + 5,
+      spa: Math.floor(((2 * (bs.spAtk ?? 0) + 31) * 50) / 100) + 5,
+      spd: Math.floor(((2 * (bs.spDef ?? 0) + 31) * 50) / 100) + 5,
+      spe: Math.floor(((2 * bs.spe + 31) * 50) / 100) + 5,
     };
     const calc: CalcPokemon = {
       source: "custom",
@@ -87,8 +167,8 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
       currentHp: stats.hp,
     };
     setter(calc);
-    setShowSearch(false);
-    setSearchQuery("");
+    setShowCustom(false);
+    setCustomQuery("");
   }
 
   function updateField(patch: Partial<CalcPokemon>) {
@@ -96,10 +176,10 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
     setter({ ...pokemon, ...patch });
   }
 
-  function updateMove(moveIdx: number, patch: Partial<CalcPokemon["moves"][0]>) {
+  function updateMove(i: number, patch: Partial<CalcPokemon["moves"][0]>) {
     if (!pokemon) return;
     const moves = [...pokemon.moves];
-    moves[moveIdx] = { ...moves[moveIdx], ...patch };
+    moves[i] = { ...moves[i], ...patch };
     setter({ ...pokemon, moves });
   }
 
@@ -110,64 +190,161 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
     ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${spriteId}.png`
     : null;
 
+  // ── KO badge colour ───────────────────────────────────────────────────────
+  function koColor(koChance: string) {
+    if (koChance.includes("Guaranteed OHKO")) return "bg-red-900/60 text-red-300";
+    if (koChance.includes("OHKO"))            return "bg-orange-900/60 text-orange-300";
+    if (koChance.includes("Guaranteed 2HKO")) return "bg-amber-900/60 text-amber-300";
+    if (koChance.includes("2HKO"))            return "bg-yellow-900/60 text-yellow-300";
+    return "bg-gray-800 text-gray-500";
+  }
+
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-3">
+      {/* Section label */}
       <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide">{label}</div>
 
-      {/* Load from dropdown */}
-      <div className="flex flex-col gap-1.5">
+      {/* ── Damage summary strip ── shown at the very top when we have results ─ */}
+      {pokemon && opponent && moveResults.some((r) => r && r.max > 0) && (
+        <div className="rounded-lg overflow-hidden border border-gray-700">
+          <div className="bg-gray-800 px-3 py-1.5 text-xs text-gray-400 font-semibold flex items-center justify-between">
+            <span>vs {opponent.species}</span>
+            {enrichingMoves && (
+              <span className="flex items-center gap-1 text-indigo-400">
+                <Loader2 size={10} className="animate-spin" />
+                Looking up moves…
+              </span>
+            )}
+          </div>
+          <div className="divide-y divide-gray-800/60">
+            {pokemon.moves.map((move, i) => {
+              const r = moveResults[i];
+              if (!r || r.max === 0 || !move.name.trim()) return null;
+              return (
+                <div key={i} className="flex items-center gap-2 px-3 py-1.5 text-xs">
+                  <span className="flex-1 text-gray-200 truncate min-w-0">{move.name}</span>
+                  <span className="text-green-400 font-mono whitespace-nowrap">
+                    {r.minPercent.toFixed(1)}–{r.maxPercent.toFixed(1)}%
+                  </span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium whitespace-nowrap ${koColor(r.koChance)}`}>
+                    {r.koChance}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Load controls ─────────────────────────────────────────────────── */}
+      <div className="space-y-1.5">
         <div className="flex gap-1.5">
-          {/* Designer slots dropdown */}
+          {/* Designer slots */}
           <select
             className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-2 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-indigo-500"
             value=""
-            onChange={(e) => {
-              if (e.target.value !== "") loadFromDesigner(parseInt(e.target.value));
-            }}
+            onChange={(e) => { if (e.target.value !== "") loadFromDesigner(parseInt(e.target.value)); }}
           >
             <option value="">Load from Designer…</option>
             {designerOptions.map((s) => {
               const p = allPokemon.find((ap) => ap.id === s.pokemonId);
-              const label = s.nickname || p?.displayName || `Slot ${s.slotIndex + 1}`;
+              const lbl = s.nickname || p?.displayName || `Slot ${s.slotIndex + 1}`;
               return (
                 <option key={s.slotIndex} value={s.slotIndex}>
-                  {label} (slot {s.slotIndex + 1})
+                  {lbl} (slot {s.slotIndex + 1})
                 </option>
               );
             })}
           </select>
           <button
-            onClick={() => setShowSearch((v) => !v)}
+            onClick={() => { setShowCustom((v) => !v); setBtOpen(false); }}
             className="px-2 py-1.5 text-xs bg-gray-800 border border-gray-700 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-gray-700 transition-colors"
           >
             Custom
           </button>
         </div>
 
+        {/* Battle Tower search */}
+        <div className="relative">
+          <button
+            onClick={() => { setBtOpen((v) => !v); setShowCustom(false); }}
+            className={`w-full text-left px-3 py-1.5 text-xs rounded-lg border transition-colors ${
+              btOpen
+                ? "bg-indigo-900/30 border-indigo-600 text-indigo-300"
+                : "bg-gray-800 border-gray-700 text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+            }`}
+          >
+            {btOpen ? "▴ Battle Tower Sets" : "▾ Battle Tower Sets"}
+          </button>
+
+          {btOpen && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setBtOpen(false)} />
+              <div className="absolute top-full left-0 right-0 z-40 mt-0.5 bg-gray-850 border border-gray-700 rounded-lg shadow-2xl overflow-hidden"
+                style={{ background: "#111827" }}>
+                <input
+                  type="text"
+                  placeholder="Search species… (e.g. Rampardos)"
+                  value={btQuery}
+                  onChange={(e) => setBtQuery(e.target.value)}
+                  className="w-full bg-gray-800 border-b border-gray-700 px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-indigo-500"
+                  autoFocus
+                />
+                <div className="max-h-72 overflow-y-auto divide-y divide-gray-800/50">
+                  {btResults.slice(0, 60).map((set) => (
+                    <button
+                      key={set.id}
+                      onClick={() => loadFromTowerSet(set)}
+                      className="w-full text-left px-3 py-2 hover:bg-gray-700/60 transition-colors"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-semibold text-gray-100">
+                          {set.species}
+                          <span className="ml-1.5 text-[10px] bg-gray-700 text-gray-400 px-1.5 py-0.5 rounded-full font-normal">
+                            #{set.setNumber}
+                          </span>
+                        </span>
+                        <span className="text-[10px] text-gray-400 whitespace-nowrap shrink-0">
+                          {set.nature} · {set.item}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-gray-500 mt-0.5 truncate">
+                        {set.moves.join(" / ")}
+                      </div>
+                      <div className="text-[10px] text-gray-600 mt-0.5">
+                        HP {set.stats.hp} · Atk {set.stats.atk} · Def {set.stats.def} · SpA {set.stats.spa} · SpD {set.stats.spd} · Spe {set.stats.spe}
+                      </div>
+                    </button>
+                  ))}
+                  {btResults.length === 0 && (
+                    <div className="px-3 py-4 text-xs text-gray-500 text-center">No sets found</div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
         {/* Custom species search */}
-        {showSearch && (
+        {showCustom && (
           <div className="relative">
             <input
               type="text"
               placeholder="Search Pokémon…"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={customQuery}
+              onChange={(e) => setCustomQuery(e.target.value)}
               className="w-full bg-gray-800 border border-indigo-700 rounded-lg px-2 py-1.5 text-xs text-gray-200 focus:outline-none"
               autoFocus
             />
-            {searchResults.length > 0 && (
+            {customResults.length > 0 && (
               <div className="absolute top-full left-0 right-0 z-20 mt-0.5 bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                {searchResults.map((p) => (
+                {customResults.map((p) => (
                   <button
                     key={p.id}
                     onClick={() => loadCustomPokemon(p)}
                     className="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-700 flex items-center gap-2"
                   >
-                    <img
-                      src={p.spriteUrl}
-                      alt=""
-                      className="w-6 h-6 object-contain pixelated"
-                    />
+                    <img src={p.spriteUrl} alt="" className="w-6 h-6 object-contain pixelated" />
                     {p.displayName}
                   </button>
                 ))}
@@ -177,7 +354,7 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
         )}
       </div>
 
-      {/* Pokémon info */}
+      {/* ── Pokémon info ───────────────────────────────────────────────────── */}
       {pokemon ? (
         <>
           {/* Species header */}
@@ -187,9 +364,12 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
             )}
             <div>
               <div className="text-white font-semibold">{pokemon.species}</div>
-              <div className="flex gap-1 mt-0.5">
+              <div className="flex gap-1 mt-0.5 flex-wrap">
                 {pokemon.types.map((t) => (
-                  <span key={t} className={`text-xs px-1.5 py-0.5 rounded font-medium ${TYPE_BG_COLORS[t] ?? "bg-gray-700 text-gray-200"}`}>
+                  <span
+                    key={t}
+                    className={`text-xs px-1.5 py-0.5 rounded font-medium ${TYPE_BG_COLORS[t] ?? "bg-gray-700 text-gray-200"}`}
+                  >
                     {t.charAt(0).toUpperCase() + t.slice(1)}
                   </span>
                 ))}
@@ -197,7 +377,7 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
             </div>
           </div>
 
-          {/* Nature / Ability / Item / Status — compact grid */}
+          {/* Nature / Ability / Item / Status — 2×2 grid */}
           <div className="grid grid-cols-2 gap-1.5 text-xs">
             <div>
               <div className="text-gray-500 mb-0.5">Nature</div>
@@ -227,6 +407,9 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
                 className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-200 focus:outline-none focus:border-indigo-500"
                 placeholder="(none)"
               />
+              {itemEff.label && (
+                <div className="text-[10px] text-amber-400 mt-0.5">{itemEff.label}</div>
+              )}
             </div>
             <div>
               <div className="text-gray-500 mb-0.5">Status</div>
@@ -235,26 +418,42 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
                 onChange={(e) => updateField({ status: e.target.value as StatusCondition })}
                 className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1 text-gray-200 focus:outline-none focus:border-indigo-500"
               >
-                {STATUS_OPTIONS.map(({ value, label }) => (
-                  <option key={value} value={value}>{label}</option>
+                {STATUS_OPTIONS.map(({ value, label: lbl }) => (
+                  <option key={value} value={value}>{lbl}</option>
                 ))}
               </select>
             </div>
           </div>
 
-          {/* Stats table */}
+          {/* Stats table — shows effective stat when item boosts it */}
           <div>
             <div className="text-xs text-gray-500 mb-1">Stats (Lv {pokemon.level})</div>
             <div className="grid grid-cols-3 gap-x-2 gap-y-0.5 text-xs font-mono">
-              {(Object.keys(STAT_LABELS) as Array<keyof typeof pokemon.stats>).map((key) => (
-                <div key={key} className="flex justify-between">
-                  <span className="text-gray-500">{STAT_LABELS[key]}</span>
-                  <span className="text-gray-200">{pokemon.stats[key]}</span>
-                </div>
-              ))}
+              {(Object.keys(STAT_LABELS) as Array<keyof typeof pokemon.stats>).map((key) => {
+                const base = pokemon.stats[key];
+                const isAtk = key === "atk" && !!itemEff.atkStatMult;
+                const isSpa = key === "spa" && !!itemEff.spaStatMult;
+                const mult = isAtk ? itemEff.atkStatMult! : isSpa ? itemEff.spaStatMult! : null;
+                const effective = mult ? Math.floor(base * mult) : null;
+                return (
+                  <div key={key} className="flex justify-between items-center">
+                    <span className="text-gray-500">{STAT_LABELS[key]}</span>
+                    <span className="text-gray-200 flex items-center gap-1">
+                      {effective ? (
+                        <>
+                          <span className="line-through text-gray-600">{base}</span>
+                          <span className="text-amber-400">{effective}</span>
+                        </>
+                      ) : (
+                        base
+                      )}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
-            {/* HP slider */}
+            {/* Current HP slider */}
             <div className="mt-2">
               <div className="flex justify-between text-xs text-gray-500 mb-0.5">
                 <span>Current HP</span>
@@ -268,35 +467,52 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
                 onChange={(e) => updateField({ currentHp: parseInt(e.target.value) })}
                 className="w-full accent-indigo-500"
               />
-              <div className="h-2 rounded-full bg-gray-700 overflow-hidden mt-0.5">
+              <div className="h-1.5 rounded-full bg-gray-700 overflow-hidden mt-0.5">
                 <div
-                  className="h-full bg-green-500 rounded-full transition-all"
+                  className={`h-full rounded-full transition-all ${
+                    pokemon.currentHp / pokemon.stats.hp > 0.5
+                      ? "bg-green-500"
+                      : pokemon.currentHp / pokemon.stats.hp > 0.25
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                  }`}
                   style={{ width: `${(pokemon.currentHp / pokemon.stats.hp) * 100}%` }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Moves + damage output */}
+          {/* ── Moves section ──────────────────────────────────────────────── */}
           <div className="space-y-1.5">
-            <div className="text-xs text-gray-500">Moves</div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Moves</span>
+              {enrichingMoves && (
+                <span className="flex items-center gap-1 text-[10px] text-indigo-400">
+                  <Loader2 size={9} className="animate-spin" />
+                  Looking up move data…
+                </span>
+              )}
+            </div>
+
             {pokemon.moves.map((move, i) => {
               const result = moveResults[i];
-              const hasResult = result && (result.max > 0);
+              const hasResult = result && result.max > 0;
               return (
                 <div key={i} className="bg-gray-800/50 rounded-lg p-2 space-y-1">
-                  {/* Move name + category + type */}
+                  {/* Row 1: move name + category */}
                   <div className="flex gap-1">
                     <input
                       type="text"
                       value={move.name}
-                      onChange={(e) => updateMove(i, { name: e.target.value })}
+                      onChange={(e) => updateMove(i, { name: e.target.value, power: 0 })}
                       placeholder={`Move ${i + 1}`}
                       className="flex-1 bg-gray-700 rounded px-2 py-1 text-xs text-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                     />
                     <select
                       value={move.category}
-                      onChange={(e) => updateMove(i, { category: e.target.value as "physical" | "special" | "status" })}
+                      onChange={(e) =>
+                        updateMove(i, { category: e.target.value as "physical" | "special" | "status" })
+                      }
                       className="bg-gray-700 rounded px-1 py-1 text-xs text-gray-200 focus:outline-none"
                     >
                       <option value="physical">Phys</option>
@@ -305,7 +521,7 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
                     </select>
                   </div>
 
-                  {/* Power + Type */}
+                  {/* Row 2: power + type + damage range */}
                   <div className="flex gap-1 items-center">
                     <input
                       type="number"
@@ -313,7 +529,7 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
                       max={250}
                       value={move.power}
                       onChange={(e) => updateMove(i, { power: parseInt(e.target.value) || 0 })}
-                      className="w-16 bg-gray-700 rounded px-2 py-0.5 text-xs text-gray-200 focus:outline-none"
+                      className="w-14 bg-gray-700 rounded px-2 py-0.5 text-xs text-gray-200 focus:outline-none"
                       placeholder="BP"
                     />
                     <input
@@ -335,9 +551,11 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
                     )}
                   </div>
 
-                  {/* KO chance */}
+                  {/* Row 3: KO chance */}
                   {defenderHp > 0 && hasResult && (
-                    <div className="text-xs text-indigo-300">{result.koChance}</div>
+                    <div className={`text-[10px] px-1.5 py-0.5 rounded inline-block font-medium ${koColor(result.koChance)}`}>
+                      {result.koChance}
+                    </div>
                   )}
                 </div>
               );
@@ -348,7 +566,9 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
         <div className="flex flex-col items-center justify-center py-12 text-gray-600 gap-2">
           <span className="text-4xl">?</span>
           <span className="text-sm">No Pokémon loaded</span>
-          <span className="text-xs text-gray-700">Load from Designer or use Custom search</span>
+          <span className="text-xs text-gray-700">
+            Load from Designer, Battle Tower, or search Custom
+          </span>
         </div>
       )}
     </div>
