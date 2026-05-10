@@ -28,6 +28,7 @@ function getPokedexId(species: string, allPokemon: Pokemon[]): number | null {
 }
 
 function expandPool(pool: PoolEntry[], allSets: BattleTowerSet[]): BattleTowerSet[] {
+  const seen = new Set<number>();
   const result: BattleTowerSet[] = [];
   for (const entry of pool) {
     for (const setNum of entry.sets) {
@@ -36,7 +37,10 @@ function expandPool(pool: PoolEntry[], allSets: BattleTowerSet[]): BattleTowerSe
           s.species.toLowerCase() === entry.species.toLowerCase() &&
           s.setNumber === setNum
       );
-      if (found) result.push(found);
+      if (found && !seen.has(found.id)) {
+        seen.add(found.id);
+        result.push(found);
+      }
     }
   }
   return result;
@@ -76,17 +80,21 @@ export default function TrainerLookupTab({ allPokemon, meta }: Props) {
 
   const [game, setGame] = useState<"platinum" | "hgss">("platinum");
   const [round, setRound] = useState<"open" | "super">("open");
+  const [hgssTier, setHgssTier] = useState<number>(1);
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedTrainerName, setSelectedTrainerName] = useState<string>("");
 
-  // Filter categories by game + round
+  // Filter categories by game + round (Platinum) or tier (HGSS)
   const filteredCategories = useMemo(() => {
     return categories.filter((cat) => {
       const gameMatch = cat.game === "both" || cat.game === game;
-      const roundMatch = cat.round === "both" || cat.round === round;
-      return gameMatch && roundMatch;
+      if (!gameMatch) return false;
+      if (game === "hgss") {
+        return !cat.hgssTier || cat.hgssTier.includes(hgssTier);
+      }
+      return cat.round === "both" || cat.round === round;
     });
-  }, [game, round]);
+  }, [game, round, hgssTier]);
 
   // Collect all trainers from matching categories, deduplicate by name
   const allTrainers = useMemo(() => {
@@ -182,7 +190,7 @@ export default function TrainerLookupTab({ allPokemon, meta }: Props) {
                 {(["platinum", "hgss"] as const).map((g) => (
                   <button
                     key={g}
-                    onClick={() => { setGame(g); setSelectedClass(""); setSelectedTrainerName(""); }}
+                    onClick={() => { setGame(g); setHgssTier(1); setRound("open"); setSelectedClass(""); setSelectedTrainerName(""); }}
                     className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
                       game === g ? "bg-white text-gray-900" : "text-gray-400 hover:text-gray-200"
                     }`}
@@ -192,20 +200,39 @@ export default function TrainerLookupTab({ allPokemon, meta }: Props) {
                 ))}
               </div>
 
-              {/* Round toggle */}
-              <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
-                {(["open", "super"] as const).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => { setRound(r); setSelectedClass(""); setSelectedTrainerName(""); }}
-                    className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
-                      round === r ? "bg-white text-gray-900" : "text-gray-400 hover:text-gray-200"
-                    }`}
-                  >
-                    {r === "open" ? "Open (1–49)" : "Super (50+)"}
-                  </button>
-                ))}
-              </div>
+              {/* Round toggle (Platinum) / Tier picker (HGSS) */}
+              {game === "hgss" ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-400">Tier</span>
+                  <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+                    {[1,2,3,4,5,6,7,8].map((tier) => (
+                      <button
+                        key={tier}
+                        onClick={() => { setHgssTier(tier); setSelectedClass(""); setSelectedTrainerName(""); }}
+                        className={`w-7 h-7 rounded-md text-sm font-medium transition-all ${
+                          hgssTier === tier ? "bg-white text-gray-900" : "text-gray-400 hover:text-gray-200"
+                        }`}
+                      >
+                        {tier}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+                  {(["open", "super"] as const).map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => { setRound(r); setSelectedClass(""); setSelectedTrainerName(""); }}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                        round === r ? "bg-white text-gray-900" : "text-gray-400 hover:text-gray-200"
+                      }`}
+                    >
+                      {r === "open" ? "Open (1–49)" : "Super (50+)"}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* ── Trainer selectors ────────────────────────────────────────── */}
@@ -269,7 +296,7 @@ export default function TrainerLookupTab({ allPokemon, meta }: Props) {
                 <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {pokemonPool.map((set) => (
                     <PokemonSetCard
-                      key={`${set.species}-${set.setNumber}`}
+                      key={set.id}
                       set={set}
                       allPokemon={allPokemon}
                       onLoad={() => handleLoadIntoCalc(set)}

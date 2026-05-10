@@ -8,6 +8,14 @@ export const TRAINER_SPRITE_SLUGS: Record<string, string> = {
   "Ace Trainer F": "acetrainerf",
   "Ace Trainer": "acetrainerm",
 
+  // Aroma Lady
+  "Aroma Lady": "aromalady",
+  "Aroma Lady F": "aromalady",
+
+  // Battle Girl
+  "Battle Girl": "battlegirl",
+  "Battle Girl F": "battlegirl",
+
   // Beauty
   "Beauty": "beauty",
   "Beauty F": "beauty",
@@ -15,6 +23,15 @@ export const TRAINER_SPRITE_SLUGS: Record<string, string> = {
   // Bird Keeper
   "Bird Keeper": "birdkeeper",
   "Bird Keeper M": "birdkeeper",
+  "Bird Keeper F": "birdkeeperf",
+
+  // Youngster
+  "Youngster": "youngster",
+  "Youngster M": "youngster",
+
+  // Poké Kid
+  "Poké Kid": "pokekid",
+  "Pokekid": "pokekid",
 
   // Black Belt
   "Black Belt": "blackbelt",
@@ -33,6 +50,11 @@ export const TRAINER_SPRITE_SLUGS: Record<string, string> = {
 
   // Clown
   "Clown": "clown",
+  "Clown M": "clown",
+
+  // Scientist
+  "Scientist": "scientist",
+  "Scientist M": "scientist",
 
   // Collector
   "Collector": "collector",
@@ -45,6 +67,15 @@ export const TRAINER_SPRITE_SLUGS: Record<string, string> = {
   "Dragon Tamer": "dragontamer",
   "Dragon Tamer M": "dragontamer",
 
+  // Cameraman
+  "Cameraman": "cameraman",
+  "Cameraman M": "cameraman",
+
+  // Cyclist
+  "Cyclist": "cyclist",
+  "Cyclist M": "cyclist",
+  "Cyclist F": "cyclistf",
+
   // Engineer
   "Engineer": "pokemonbreederf", // placeholder
 
@@ -52,6 +83,10 @@ export const TRAINER_SPRITE_SLUGS: Record<string, string> = {
   "Expert M": "expertm",
   "Expert F": "expertf",
   "Expert": "expertm",
+
+  // Fisherman
+  "Fisherman": "fisherman",
+  "Fisherman M": "fisherman",
 
   // Fisher
   "Fisher": "fisher",
@@ -116,11 +151,30 @@ export const TRAINER_SPRITE_SLUGS: Record<string, string> = {
   // Rich Boy
   "Rich Boy": "richboy",
 
+  // PI
+  "PI": "pi",
+  "PI M": "pi",
+
+  // Policeman
+  "Policeman": "policeman",
+  "Policeman M": "policeman",
+
+  // Psychic
+  "Psychic": "psychicm",
+  "Psychic M": "psychicm",
+  "Psychic F": "psychicf",
+
+  // Reporter
+  "Reporter": "reporterf",
+  "Reporter F": "reporterf",
+
   // Roughneck
   "Roughneck": "roughneck",
 
-  // Ruin Maniac
+  // Ruin Maniac / Rune Maniac
   "Ruin Maniac": "ruinmaniac",
+  "Rune Maniac": "ruinmaniac",
+  "Rune Maniac M": "ruinmaniac",
 
   // Sailor
   "Sailor": "sailor",

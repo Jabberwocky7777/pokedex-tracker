@@ -32,9 +32,11 @@ export interface PoolEntry {
 export interface TrainerCategory {
   id: string;
   description: string;
-  ivTier: 21 | 31;
+  ivTier: number;
   game: "platinum" | "hgss" | "both";
   round: "open" | "super" | "both";
+  /** HGSS only: which tiers (1–8) this trainer group appears in. */
+  hgssTier?: number[];
   pokemonPool: PoolEntry[];
   trainers: TrainerEntry[];
 }

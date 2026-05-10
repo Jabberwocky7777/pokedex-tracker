@@ -23,20 +23,29 @@ interface Props {
 }
 
 export default function AttackdexTab({ allPokemon, meta }: Props) {
-  const { activeGeneration, setActiveTab, setActivePokedexId, activeAttackdexSlug, setActiveAttackdexSlug } = useSettingsStore();
+  const {
+    activeGeneration, setActiveTab, setActivePokedexId,
+    activeAttackdexSlug, setActiveAttackdexSlug,
+    lastAttackdexQuery, lastAttackdexSlug, lastAttackdexMode, lastAttackdexVersionGroup,
+    setLastAttackdexState,
+  } = useSettingsStore();
 
-  const [mode, setMode] = useState<Mode>("single");
+  const [mode, setMode] = useState<Mode>(lastAttackdexMode);
 
   const activeVersionGroups = activeGeneration === 4 ? GEN4_VERSION_GROUPS : GEN3_VERSION_GROUPS;
-  const [versionGroup, setVersionGroup] = useState<VersionGroup>(activeVersionGroups[0].id);
+  const defaultVg = activeVersionGroups[0].id;
+  const restoredVg = (lastAttackdexVersionGroup && activeVersionGroups.some((g) => g.id === lastAttackdexVersionGroup))
+    ? lastAttackdexVersionGroup as VersionGroup
+    : defaultVg;
+  const [versionGroup, setVersionGroup] = useState<VersionGroup>(restoredVg);
 
   useEffect(() => {
     const groups = activeGeneration === 4 ? GEN4_VERSION_GROUPS : GEN3_VERSION_GROUPS;
     setVersionGroup(groups[0].id);
   }, [activeGeneration]);
 
-  const [selectedMoveSlug, setSelectedMoveSlug] = useState<string | null>(null);
-  const [moveQuery, setMoveQuery] = useState("");
+  const [selectedMoveSlug, setSelectedMoveSlug] = useState<string | null>(lastAttackdexSlug);
+  const [moveQuery, setMoveQuery] = useState(lastAttackdexQuery);
 
   // When navigated here from another tab with a pre-selected move, apply it once.
   useEffect(() => {
@@ -47,6 +56,12 @@ export default function AttackdexTab({ allPokemon, meta }: Props) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeAttackdexSlug]);
+
+  // Sync current state back to store so it survives tab switches.
+  useEffect(() => {
+    setLastAttackdexState({ query: moveQuery, slug: selectedMoveSlug, mode, versionGroup });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moveQuery, selectedMoveSlug, mode, versionGroup]);
   const [showMoveDropdown, setShowMoveDropdown] = useState(false);
   const [moveSuggestions, setMoveSuggestions] = useState<MoveSummary[]>([]);
   const [moveList, setMoveList] = useState<MoveSummary[]>([]);

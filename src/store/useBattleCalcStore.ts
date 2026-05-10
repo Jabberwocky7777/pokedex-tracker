@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import type { CalcPokemon, WeatherCondition } from "../types/battleTower";
 
 interface BattleCalcStore {
@@ -29,7 +30,7 @@ interface BattleCalcStore {
   setLightScreen2: (v: boolean) => void;
 }
 
-export const useBattleCalcStore = create<BattleCalcStore>()((set) => ({
+export const useBattleCalcStore = create<BattleCalcStore>()(persist((set) => ({
   slot1: null,
   slot2: null,
   weather: "none",
@@ -55,4 +56,4 @@ export const useBattleCalcStore = create<BattleCalcStore>()((set) => ({
   setReflect2: (v) => set({ reflect2: v }),
   setLightScreen1: (v) => set({ lightScreen1: v }),
   setLightScreen2: (v) => set({ lightScreen2: v }),
-}));
+}), { name: "battle-calc-v1" }));

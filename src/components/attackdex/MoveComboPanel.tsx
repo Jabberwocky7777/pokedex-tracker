@@ -5,6 +5,7 @@ import {
   GEN4_VERSION_GROUPS,
   type VersionGroup,
   slugToDisplayName,
+  fetchLearnset,
 } from "../../lib/move-fetch";
 import { fetchMoveList, type MoveSummary } from "../../lib/move-list-fetch";
 import { fetchAttackdexDetail } from "../../lib/attackdex-fetch";
@@ -44,7 +45,13 @@ export default function MoveComboPanel({ allPokemon, activeGeneration, onSelectP
 
   const genMax = activeGeneration === 4 ? 493 : 386;
 
-  // Recompute intersection whenever the slot selection or generation changes
+  // Recompute intersection whenever slots, generation, or version group changes.
+  // Uses a two-pass approach:
+  //   1. Fast pass: intersect PokéAPI's global learned_by_pokemon lists to get candidates.
+  //   2. Validation pass: fetch each candidate's per-game learnset and confirm they can
+  //      learn every move in the selected versionGroup. This catches cases where PokéAPI
+  //      lists a Pokémon globally (across all games) but it can't actually learn the move
+  //      in the chosen version group (e.g. Gligar + Rock Climb in Gen IV).
   useEffect(() => {
     const filledSlugs = slots.map((s) => s.slug).filter((s): s is string => s !== null);
 
@@ -57,9 +64,10 @@ export default function MoveComboPanel({ allPokemon, activeGeneration, onSelectP
     setLoading(true);
 
     Promise.all(filledSlugs.map((s) => fetchAttackdexDetail(s)))
-      .then((details) => {
+      .then(async (details) => {
         if (cancelled) return;
 
+        // Pass 1: raw intersection from global learned_by_pokemon lists.
         const idSets = details.map((d) => {
           const ids = new Set<number>();
           for (const p of d.learnedByPokemon) {
@@ -70,14 +78,23 @@ export default function MoveComboPanel({ allPokemon, activeGeneration, onSelectP
         });
 
         const [first, ...rest] = idSets;
-        const intersection = new Set([...first].filter((id) => rest.every((s) => s.has(id))));
-        setResultIds([...intersection].sort((a, b) => a - b));
+        const candidates = [...first].filter((id) => rest.every((s) => s.has(id)));
+
+        // Pass 2: validate each candidate against the selected version group learnset.
+        const learnsets = await Promise.all(candidates.map((id) => fetchLearnset(id)));
+        const verified = candidates.filter((_, i) => {
+          const learnset = learnsets[i][versionGroup] ?? [];
+          const learnedSlugs = new Set(learnset.map((m) => m.move));
+          return filledSlugs.every((slug) => learnedSlugs.has(slug));
+        });
+
+        if (!cancelled) setResultIds(verified.sort((a, b) => a - b));
       })
       .catch(() => { if (!cancelled) setResultIds([]); })
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };
-  }, [slots, genMax]);
+  }, [slots, genMax, versionGroup]);
 
   function addSlot() {
     if (slots.length >= MAX_SLOTS) return;

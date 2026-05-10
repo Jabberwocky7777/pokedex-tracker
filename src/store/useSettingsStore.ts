@@ -55,6 +55,13 @@ interface SettingsStore {
   activeAttackdexSlug: string | null;
   setActiveAttackdexSlug: (slug: string | null) => void;
 
+  // Attackdex tab — last search state (persisted)
+  lastAttackdexQuery: string;
+  lastAttackdexSlug: string | null;
+  lastAttackdexMode: "single" | "combo" | "hm-planner";
+  lastAttackdexVersionGroup: string;
+  setLastAttackdexState: (s: { query: string; slug: string | null; mode: "single" | "combo" | "hm-planner"; versionGroup: string }) => void;
+
   // Designer tab — second slot for split-screen compare (not persisted)
   compareSlotIndex: number | null;
   setCompareSlotIndex: (idx: number | null) => void;
@@ -124,6 +131,17 @@ export const useSettingsStore = create<SettingsStore>()(
       activeAttackdexSlug: null,
       setActiveAttackdexSlug: (slug) => set({ activeAttackdexSlug: slug }),
 
+      lastAttackdexQuery: "",
+      lastAttackdexSlug: null,
+      lastAttackdexMode: "single",
+      lastAttackdexVersionGroup: "",
+      setLastAttackdexState: (s) => set({
+        lastAttackdexQuery: s.query,
+        lastAttackdexSlug: s.slug,
+        lastAttackdexMode: s.mode,
+        lastAttackdexVersionGroup: s.versionGroup,
+      }),
+
       compareSlotIndex: null,
       setCompareSlotIndex: (idx) => set({ compareSlotIndex: idx }),
     }),
@@ -133,7 +151,7 @@ export const useSettingsStore = create<SettingsStore>()(
       // so adding a new setting to SettingsStore will persist automatically.
       partialize: (state) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { selectedPokemonId: _a, searchQuery: _b, activeRoute: _c, activePokedexId: _d, compareSlotIndex: _e, activeAttackdexSlug: _f, ...persistent } = state;
+        const { selectedPokemonId: _a, searchQuery: _b, activeRoute: _c, compareSlotIndex: _e, activeAttackdexSlug: _f, ...persistent } = state;
         return persistent;
       },
       // Migration: rename iv-checker tab → designer, coerce unknown viewModes to "box"
