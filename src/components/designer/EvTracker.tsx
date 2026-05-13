@@ -28,6 +28,15 @@ const MAX_VITAMIN_EVS = 100;
 const EV_TOTAL_CAP = 510;
 const EV_STAT_CAP = 252;
 
+const POWER_ITEM_LABELS: Record<StatKey, string> = {
+  hp: "Power Weight",
+  atk: "Power Bracer",
+  def: "Power Belt",
+  spAtk: "Power Lens",
+  spDef: "Power Band",
+  spe: "Power Anklet",
+};
+
 export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate }: Props) {
   const [koQuery, setKoQuery] = useState("");
   const [showKoSearch, setShowKoSearch] = useState(false);
@@ -36,7 +45,9 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
   const [showKoOverlay, setShowKoOverlay] = useState(false);
 
   const totalEVs = STAT_KEYS.reduce((sum, k) => sum + (slot.evAllocation[k] ?? 0), 0);
-  const multiplier = (slot.machobraceActive ? 2 : 1) * (slot.pokerusActive ? 2 : 1);
+  const itemMult = slot.machobraceActive ? 2 : 1;
+  const pokerusMult = slot.pokerusActive ? 2 : 1;
+  const multiplier = itemMult * pokerusMult;
 
   const pokemonMap = useMemo(() => new Map(allPokemon.map((p) => [p.id, p])), [allPokemon]);
 
@@ -90,8 +101,9 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
     if (pokemon?.evYield) {
       const newEvs = { ...slot.evAllocation };
       for (const stat of STAT_KEYS) {
-        const yieldVal = pokemon.evYield![stat] ?? 0;
-        newEvs[stat] = Math.max(0, (newEvs[stat] ?? 0) - yieldVal * entry.count * multiplier);
+        const base = pokemon.evYield![stat] ?? 0;
+        const powerBonus = slot.powerItemStat === stat ? 4 : 0;
+        newEvs[stat] = Math.max(0, (newEvs[stat] ?? 0) - (base + powerBonus) * entry.count * itemMult * pokerusMult);
       }
       onUpdate({ knockOutLog: log, evAllocation: newEvs });
     } else {
@@ -104,8 +116,9 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
     if (!pokemon?.evYield) { onUpdate({ knockOutLog: log }); return; }
     const newEvs = { ...slot.evAllocation };
     for (const stat of STAT_KEYS) {
-      const yieldVal = pokemon.evYield[stat] ?? 0;
-      const gained = yieldVal * delta * multiplier;
+      const base = pokemon.evYield[stat] ?? 0;
+      const powerBonus = slot.powerItemStat === stat ? 4 : 0;
+      const gained = (base + powerBonus) * delta * itemMult * pokerusMult;
       newEvs[stat] = Math.min(EV_STAT_CAP, Math.max(0, (newEvs[stat] ?? 0) + gained));
     }
     // Enforce total EV cap — clamp the stat that was just modified if we've gone over
@@ -113,7 +126,9 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
     if (total > EV_TOTAL_CAP) {
       const excess = total - EV_TOTAL_CAP;
       for (const stat of STAT_KEYS) {
-        const gained = (pokemon.evYield[stat] ?? 0) * delta * multiplier;
+        const base = pokemon.evYield[stat] ?? 0;
+        const powerBonus = slot.powerItemStat === stat ? 4 : 0;
+        const gained = (base + powerBonus) * delta * itemMult * pokerusMult;
         if (gained > 0) {
           newEvs[stat] = Math.max(0, (newEvs[stat] ?? 0) - excess);
           break;
@@ -245,29 +260,50 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
         </div>
       </div>
 
-      {/* ── Macho Brace / Pokérus toggles ── */}
-      <div className="flex gap-3 flex-wrap">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={slot.machobraceActive}
-            onChange={(e) => onUpdate({ machobraceActive: e.target.checked })}
-            className="rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-0"
-          />
-          <span className="text-sm text-gray-300">Macho Brace (2× yield)</span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={slot.pokerusActive}
-            onChange={(e) => onUpdate({ pokerusActive: e.target.checked })}
-            className="rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-0"
-          />
-          <span className="text-sm text-gray-300">Pokérus (2× yield)</span>
-        </label>
-        {multiplier > 1 && (
-          <span className="text-xs text-indigo-400 self-center">{multiplier}× multiplier active</span>
-        )}
+      {/* ── Held Item + Pokérus toggles ── */}
+      <div className="flex flex-col gap-2">
+        <div className="text-xs font-semibold text-gray-400">Held Item</div>
+        <div className="flex gap-3 flex-wrap">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={slot.machobraceActive}
+              onChange={(e) => onUpdate(e.target.checked ? { machobraceActive: true, powerItemStat: null } : { machobraceActive: false })}
+              className="rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-0"
+            />
+            <span className="text-sm text-gray-300">Macho Brace (2×)</span>
+          </label>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5">
+          {STAT_KEYS.map((stat) => (
+            <label key={stat} className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={slot.powerItemStat === stat}
+                onChange={(e) => onUpdate({
+                  powerItemStat: e.target.checked ? stat : null,
+                  machobraceActive: e.target.checked ? false : slot.machobraceActive,
+                })}
+                className="rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-0"
+              />
+              <span className="text-sm text-gray-300">{POWER_ITEM_LABELS[stat]} <span className="text-gray-500 text-xs">(+4 {STAT_LABELS[stat]})</span></span>
+            </label>
+          ))}
+        </div>
+        <div className="flex items-center gap-3 pt-1">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={slot.pokerusActive}
+              onChange={(e) => onUpdate({ pokerusActive: e.target.checked })}
+              className="rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-0"
+            />
+            <span className="text-sm text-gray-300">Pokérus (2× yield)</span>
+          </label>
+          {multiplier > 1 && (
+            <span className="text-xs text-indigo-400">{multiplier}× multiplier active</span>
+          )}
+        </div>
       </div>
 
       {/* ── Vitamins ── */}

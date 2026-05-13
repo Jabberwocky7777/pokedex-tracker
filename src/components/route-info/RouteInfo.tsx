@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useRef, Fragment } from "react";
 import { useSettingsStore } from "../../store/useSettingsStore";
+import { useDexStore } from "../../store/useDexStore";
 import { useRouteIndex, METHOD_ORDER, METHOD_LABELS, METHOD_ICONS } from "../../hooks/useRouteIndex";
 import type { RouteData, RouteEntry } from "../../hooks/useRouteIndex";
 import { GAME_LABELS, GAME_COLORS, GEN3_GAME_ORDER, GEN4_GAME_ORDER } from "../../types";
@@ -10,6 +11,7 @@ import Header from "../layout/Header";
 import FilterSubbar from "../layout/FilterSubbar";
 import GreatMarshBanner from "./GreatMarshBanner";
 import { isGreatMarshSlug } from "../../data/great-marsh";
+import SinnohMap from "./SinnohMap";
 
 interface Props {
   allPokemon: Pokemon[];
@@ -23,6 +25,9 @@ const ALL_GAME_ORDER: GameVersion[] = [...GEN3_GAME_ORDER, ...GEN4_GAME_ORDER];
 export default function RouteInfo({ allPokemon, meta }: Props) {
   const { activeGames, activeGeneration, activeRoute, setActiveRoute } = useSettingsStore();
   const [search, setSearch] = useState("");
+  const [viewMode, setViewMode] = useState<"map" | "list">("map");
+  const routeDetailRef = useRef<HTMLDivElement>(null);
+  const mainScrollRef = useRef<HTMLElement | null>(null);
 
   // Clear selected route when activeGeneration actually changes (not on initial mount).
   // Tracks the previous generation so we only clear when it genuinely flips,
@@ -35,6 +40,19 @@ export default function RouteInfo({ allPokemon, meta }: Props) {
     prevGenRef.current = activeGeneration;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeGeneration]);
+
+  const handleMapRouteClick = (slug: string) => {
+    setActiveRoute(slug);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (routeDetailRef.current && mainScrollRef.current) {
+        const mainEl = mainScrollRef.current;
+        const mainRect = mainEl.getBoundingClientRect();
+        const detailRect = routeDetailRef.current.getBoundingClientRect();
+        const targetScrollTop = mainEl.scrollTop + (detailRect.top - mainRect.top) - 12;
+        mainEl.scrollTo({ top: targetScrollTop, behavior: "smooth" });
+      }
+    }));
+  };
 
   const routeIndex = useRouteIndex(allPokemon, activeGames);
 
@@ -57,89 +75,139 @@ export default function RouteInfo({ allPokemon, meta }: Props) {
       <Header meta={meta} />
       <FilterSubbar meta={meta} caught={0} total={0} tab="routes" />
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-4 py-8 flex flex-col gap-6">
+      <main className="flex-1 overflow-y-auto" ref={(el) => { mainScrollRef.current = el; }}>
+        <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-4">
 
-          {/* ── Search bar ── */}
+          {/* ── Search bar + view toggle ── */}
           <div className="flex flex-col gap-2">
-            <div className="relative">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  // Clear selection when the user starts a new search
-                  if (activeRoute) setActiveRoute(null);
-                }}
-                placeholder="Search routes and areas…"
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
-              />
-              {(search || activeRoute) && (
-                <button
-                  onClick={() => { setSearch(""); setActiveRoute(null); }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
-                  aria-label="Clear"
+            <div className="flex gap-2 items-center">
+              <div className="relative flex-1">
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    if (activeRoute && viewMode === "list") setActiveRoute(null);
+                  }}
+                  placeholder="Search routes and areas…"
+                  className="w-full pl-10 pr-4 py-2.5 bg-gray-900 border border-gray-700 rounded-xl text-sm text-gray-200 placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                />
+                {(search || (activeRoute && viewMode === "list")) && (
+                  <button
+                    onClick={() => { setSearch(""); setActiveRoute(null); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    aria-label="Clear"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              {activeGeneration === 4 && (
+                <div className="flex rounded-lg border border-gray-700 overflow-hidden flex-shrink-0">
+                  <button
+                    onClick={() => setViewMode("map")}
+                    className={`px-3 py-2 text-xs font-medium transition-colors ${viewMode === "map" ? "bg-indigo-600 text-white" : "bg-gray-900 text-gray-400 hover:text-gray-200"}`}
+                  >
+                    Map
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`px-3 py-2 text-xs font-medium transition-colors border-l border-gray-700 ${viewMode === "list" ? "bg-indigo-600 text-white" : "bg-gray-900 text-gray-400 hover:text-gray-200"}`}
+                  >
+                    List
+                  </button>
+                </div>
               )}
             </div>
-            <div className="text-xs text-gray-600 px-1">
-              {routeList.length} area{routeList.length !== 1 ? "s" : ""}
-              {activeGames.length > 0 ? ` · ${activeGames.map((g) => GAME_LABELS[g] ?? g).join(", ")}` : ""}
-            </div>
+            {viewMode === "list" && (
+              <div className="text-xs text-gray-600 px-1">
+                {routeList.length} area{routeList.length !== 1 ? "s" : ""}
+                {activeGames.length > 0 ? ` · ${activeGames.map((g) => GAME_LABELS[g] ?? g).join(", ")}` : ""}
+              </div>
+            )}
           </div>
 
-          {/* ── Route selected: show encounter table ── */}
-          {selectedRoute ? (
-            <div className="flex flex-col gap-6">
-              {isGreatMarshSlug(selectedRoute.slug) && (
-                <GreatMarshBanner
-                  allPokemon={allPokemon}
+          {/* ── Map view (Gen 4 only) ── */}
+          {activeGeneration === 4 && viewMode === "map" ? (
+            <div className="flex flex-col gap-4">
+              <div className="rounded-xl overflow-hidden border border-gray-700/60" style={{ height: 520 }}>
+                <SinnohMap
+                  routeIndex={routeIndex}
+                  activeRoute={activeRoute}
+                  onRouteClick={handleMapRouteClick}
+                  searchQuery={search}
                   activeGeneration={activeGeneration}
                 />
+              </div>
+              {selectedRoute && (
+                <div ref={routeDetailRef} className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">Click a region on the map to change location</span>
+                    <button
+                      onClick={() => setActiveRoute(null)}
+                      className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+                    >
+                      ✕ Close
+                    </button>
+                  </div>
+                  {isGreatMarshSlug(selectedRoute.slug) && (
+                    <GreatMarshBanner allPokemon={allPokemon} activeGeneration={activeGeneration} />
+                  )}
+                  <RouteDetail route={selectedRoute} orderedGames={orderedGames} activeGeneration={activeGeneration} />
+                </div>
               )}
-              <RouteDetail route={selectedRoute} orderedGames={orderedGames} />
+              {!selectedRoute && (
+                <div className="text-center py-6 text-gray-600 text-sm italic">Click a region on the map to view Pokémon</div>
+              )}
             </div>
           ) : (
-            /* ── Route grid: all routes when no search, filtered when searching ── */
-            routeList.length === 0 ? (
-              <div className="text-center py-16 text-gray-500 text-sm italic">No routes found.</div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {routeList.map((route) => (
-                  <button
-                    key={route.slug}
-                    onClick={() => setActiveRoute(route.slug)}
-                    className="flex items-center justify-between px-4 py-3 rounded-lg bg-gray-900 border border-gray-800 hover:border-indigo-600 hover:bg-gray-800/60 transition-all text-left group"
-                  >
-                    <span className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
-                      {route.displayName}
-                    </span>
-                    <div className="flex gap-1 ml-2 flex-shrink-0">
-                      {route.versions
-                        .filter((v) => ALL_GAME_ORDER.includes(v as GameVersion))
-                        .sort((a, b) => ALL_GAME_ORDER.indexOf(a as GameVersion) - ALL_GAME_ORDER.indexOf(b as GameVersion))
-                        .map((v) => (
-                          <span
-                            key={v}
-                            className="w-2 h-2 rounded-full inline-block"
-                            style={{ backgroundColor: GAME_COLORS[v as GameVersion] ?? "#6b7280" }}
-                            title={GAME_LABELS[v as GameVersion] ?? v}
-                          />
-                        ))}
-                    </div>
-                  </button>
-                ))}
+            /* ── List view ── */
+            selectedRoute ? (
+              <div className="flex flex-col gap-6">
+                {isGreatMarshSlug(selectedRoute.slug) && (
+                  <GreatMarshBanner allPokemon={allPokemon} activeGeneration={activeGeneration} />
+                )}
+                <RouteDetail route={selectedRoute} orderedGames={orderedGames} activeGeneration={activeGeneration} />
               </div>
+            ) : (
+              routeList.length === 0 ? (
+                <div className="text-center py-16 text-gray-500 text-sm italic">No routes found.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {routeList.map((route) => (
+                    <button
+                      key={route.slug}
+                      onClick={() => setActiveRoute(route.slug)}
+                      className="flex items-center justify-between px-4 py-3 rounded-lg bg-gray-900 border border-gray-800 hover:border-indigo-600 hover:bg-gray-800/60 transition-all text-left group"
+                    >
+                      <span className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
+                        {route.displayName}
+                      </span>
+                      <div className="flex gap-1 ml-2 flex-shrink-0">
+                        {route.versions
+                          .filter((v) => ALL_GAME_ORDER.includes(v as GameVersion))
+                          .sort((a, b) => ALL_GAME_ORDER.indexOf(a as GameVersion) - ALL_GAME_ORDER.indexOf(b as GameVersion))
+                          .map((v) => (
+                            <span
+                              key={v}
+                              className="w-2 h-2 rounded-full inline-block"
+                              style={{ backgroundColor: GAME_COLORS[v as GameVersion] ?? "#6b7280" }}
+                              title={GAME_LABELS[v as GameVersion] ?? v}
+                            />
+                          ))}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )
             )
           )}
         </div>
@@ -166,11 +234,14 @@ const SLOT2_METHOD_SET = new Set<EncounterMethod>([
 function RouteDetail({
   route,
   orderedGames,
+  activeGeneration,
 }: {
   route: RouteData;
   orderedGames: GameVersion[];
+  activeGeneration: number;
 }) {
   const { setActiveTab, setActivePokedexId } = useSettingsStore();
+  const { isCaught, setCaught } = useDexStore();
 
   const methodsPresent = useMemo(() => {
     const seen = new Set<EncounterMethod>();
@@ -302,11 +373,30 @@ function RouteDetail({
     return true;
   }
 
+  // Compute unique Pokémon across all encounter methods for the completion badge
+  const uniqueIds = useMemo(() => {
+    const ids = new Set<number>();
+    for (const methodMap of route.games.values()) {
+      for (const entries of methodMap.values()) {
+        for (const e of entries) ids.add(e.pokemonId);
+      }
+    }
+    return ids;
+  }, [route]);
+  const caughtCount = useMemo(() => [...uniqueIds].filter((id) => isCaught(id, activeGeneration)).length, [uniqueIds, isCaught, activeGeneration]);
+
   return (
     <div className="flex flex-col gap-6">
       {/* Route header */}
       <div className="pb-4 border-b border-gray-800">
-        <h2 className="text-2xl font-bold text-white">{route.displayName}</h2>
+        <div className="flex items-baseline justify-between gap-4 flex-wrap">
+          <h2 className="text-2xl font-bold text-white">{route.displayName}</h2>
+          {uniqueIds.size > 0 && (
+            <span className={`text-sm font-medium tabular-nums ${caughtCount === uniqueIds.size ? "text-green-400" : "text-indigo-400"}`}>
+              {caughtCount}/{uniqueIds.size} caught
+            </span>
+          )}
+        </div>
         <div className="flex gap-2 mt-2 flex-wrap">
           {route.versions
             .filter((v) => ALL_GAME_ORDER.includes(v as GameVersion))
@@ -344,7 +434,8 @@ function RouteDetail({
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-gray-800/80 text-xs text-gray-400">
-                      <th className="text-left py-2 pl-3 pr-2 w-8">{/* sprite */}</th>
+                      <th className="text-left py-2 pl-3 pr-1 w-6">{/* caught */}</th>
+                      <th className="text-left py-2 pl-1 pr-2 w-8">{/* sprite */}</th>
                       <th className="text-left py-2 px-2 min-w-[120px]">Pokémon</th>
                       <th className="text-left py-2 px-2 hidden sm:table-cell">Type</th>
                       {showPerGame
@@ -371,7 +462,7 @@ function RouteDetail({
                     </tr>
                     {showPerGame && (
                       <tr className="bg-gray-800/50 text-xs text-gray-500">
-                        <th colSpan={3} />
+                        <th colSpan={4} />
                         {orderedGames.map((g) => (
                           <Fragment key={g}>
                             <th className="text-right py-1 px-2 border-l border-gray-700/40 font-normal">Levels</th>
@@ -384,13 +475,25 @@ function RouteDetail({
                   <tbody>
                     {rows.map((row, i) => {
                       const anyEntry = orderedGames.map((g) => row.byGame.get(g)).find(Boolean);
+                      const caught = isCaught(row.pokemonId, activeGeneration);
                       return (
                         <tr
-                          key={row.pokemonId}
-                          onClick={() => { setActiveTab("pokedex"); setActivePokedexId(row.pokemonId); }}
-                          className={`border-t border-gray-700/30 hover:bg-indigo-900/20 cursor-pointer transition-colors ${i % 2 === 0 ? "" : "bg-gray-900/30"}`}
+                          key={`${row.pokemonId}:${row.timeOfDay ?? ""}`}
+                          className={`border-t border-gray-700/30 transition-colors ${i % 2 === 0 ? "" : "bg-gray-900/30"} ${caught ? "opacity-60" : ""}`}
                         >
-                          <td className="py-1.5 pl-3 pr-1">
+                          <td className="py-1.5 pl-3 pr-1" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={caught}
+                              onChange={() => setCaught(row.pokemonId, !caught, activeGeneration)}
+                              className="rounded border-gray-600 bg-gray-800 text-indigo-500 focus:ring-0 cursor-pointer"
+                              aria-label={`Mark ${row.displayName} as caught`}
+                            />
+                          </td>
+                          <td
+                            className="py-1.5 pl-1 pr-1 cursor-pointer hover:bg-indigo-900/20"
+                            onClick={() => { setActiveTab("pokedex"); setActivePokedexId(row.pokemonId); }}
+                          >
                             <img
                               src={row.sprite}
                               alt={row.displayName}
@@ -399,9 +502,12 @@ function RouteDetail({
                               style={{ imageRendering: "pixelated" }}
                             />
                           </td>
-                          <td className="py-1.5 px-2">
+                          <td
+                            className="py-1.5 px-2 cursor-pointer hover:bg-indigo-900/20"
+                            onClick={() => { setActiveTab("pokedex"); setActivePokedexId(row.pokemonId); }}
+                          >
                             <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="font-medium text-gray-100 text-sm">{row.displayName}</span>
+                              <span className={`font-medium text-sm ${caught ? "line-through text-gray-500" : "text-gray-100"}`}>{row.displayName}</span>
                               <span className="text-xs text-gray-600 font-mono">#{formatDexNumber(row.pokemonId)}</span>
                               {row.timeOfDay && (
                                 <span className="text-[10px] font-medium px-1 py-0.5 rounded bg-gray-700 text-gray-300 whitespace-nowrap">
@@ -411,7 +517,10 @@ function RouteDetail({
                               )}
                             </div>
                           </td>
-                          <td className="py-1.5 px-2 hidden sm:table-cell">
+                          <td
+                            className="py-1.5 px-2 hidden sm:table-cell cursor-pointer hover:bg-indigo-900/20"
+                            onClick={() => { setActiveTab("pokedex"); setActivePokedexId(row.pokemonId); }}
+                          >
                             <div className="flex gap-1 flex-wrap">
                               {row.types.map((t) => <TypeBadge key={t} type={t} size="sm" />)}
                             </div>

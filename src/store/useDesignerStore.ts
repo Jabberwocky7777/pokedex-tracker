@@ -25,6 +25,7 @@ export interface DesignerSlot {
   evAllocation: Record<StatKey, number>;
   vitaminEVs: Record<StatKey, number>;
   machobraceActive: boolean;
+  powerItemStat: StatKey | null;
   pokerusActive: boolean;
   knockOutLog: { speciesId: number; count: number }[];
   routePresets: { name: string; species: number[] }[];
@@ -49,6 +50,7 @@ function emptySlot(slotIndex: number): DesignerSlot {
     evAllocation: zeroStats(),
     vitaminEVs: zeroStats(),
     machobraceActive: false,
+    powerItemStat: null,
     pokerusActive: false,
     knockOutLog: [],
     routePresets: [],
