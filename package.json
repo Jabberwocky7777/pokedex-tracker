@@ -11,9 +11,13 @@
     "generate-data": "tsx --tsconfig tsconfig.scripts.json scripts/fetch-data.ts",
     "merge-stats": "tsx --tsconfig tsconfig.scripts.json scripts/merge-stats.ts",
     "patch-slot2": "tsx --tsconfig tsconfig.scripts.json scripts/patch-slot2.ts",
-    "fetch-battle-tower": "tsx --tsconfig tsconfig.scripts.json scripts/fetch-battle-tower.ts"
+    "fetch-battle-tower": "tsx --tsconfig tsconfig.scripts.json scripts/fetch-battle-tower.ts",
+    "ios:sync": "npx cap sync ios",
+    "ios:icons": "npx capacitor-assets generate --ios"
   },
   "dependencies": {
+    "@capacitor/core": "^8.3.4",
+    "@capacitor/ios": "^8.3.4",
     "@types/leaflet": "^1.9.21",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.8.0",
@@ -21,6 +25,8 @@
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.3.4",
     "@eslint/js": "^9.39.4",
     "@tailwindcss/vite": "^4.2.2",
     "@types/node": "^24.12.2",

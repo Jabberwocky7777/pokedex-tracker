@@ -9,10 +9,12 @@ import AttackdexTab from "./components/attackdex/AttackdexTab";
 import TrainerLookupTab from "./components/trainer-lookup/TrainerLookupTab";
 import DamageCalcTab from "./components/damage-calc/DamageCalcTab";
 import LoginScreen from "./components/auth/LoginScreen";
+import ServerSetupScreen from "./components/auth/ServerSetupScreen";
 import MobileBottomNav from "./components/layout/MobileBottomNav";
 import SyncToast from "./components/layout/SyncToast";
 import { useSyncEngine } from "./hooks/useSyncEngine";
-import { hasToken, clearToken } from "./lib/sync";
+import { hasToken, clearToken, hasServerUrl } from "./lib/sync";
+import { Capacitor } from "@capacitor/core";
 import metaData from "./data/meta.json";
 import type { Pokemon, MetaData } from "./types";
 
@@ -30,6 +32,8 @@ function App() {
   const [loadError, setLoadError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
 
+  // Server setup state — only relevant on native (Capacitor); web uses relative URLs
+  const [hasServer, setHasServer] = useState(() => !Capacitor.isNativePlatform() || hasServerUrl());
   // Auth state — initialize from localStorage so we don't flash the login screen on reload
   const [isAuthed, setIsAuthed] = useState(() => hasToken());
 
@@ -48,6 +52,11 @@ function App() {
   function handleLogout() {
     clearToken();
     setIsAuthed(false);
+  }
+
+  // On native app (Capacitor): show server setup screen until a URL is configured
+  if (!hasServer) {
+    return <ServerSetupScreen onSuccess={() => setHasServer(true)} />;
   }
 
   // Show login screen until the user has entered (or bypassed) their sync token

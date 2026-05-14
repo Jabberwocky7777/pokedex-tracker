@@ -39,3 +39,7 @@ sync-server/node_modules/
 
 # Docker env file (contains secrets)
 .env
+
+# Capacitor build output (built in CI — do not commit)
+ios/build/
+assets/

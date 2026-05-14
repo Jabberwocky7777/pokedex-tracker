@@ -12,6 +12,21 @@ import { useDesignerStore } from "../store/useDesignerStore";
 import type { BackupData } from "./backup";
 
 const STORAGE_KEY = "pokedex_sync_token";
+const SERVER_URL_KEY = "pokedex_server_url";
+
+// ── Server URL (configured during onboarding on native app) ──────────────────
+
+export function getServerUrl(): string {
+  return localStorage.getItem(SERVER_URL_KEY) ?? "";
+}
+
+export function setServerUrl(url: string): void {
+  localStorage.setItem(SERVER_URL_KEY, url.replace(/\/$/, ""));
+}
+
+export function hasServerUrl(): boolean {
+  return Boolean(localStorage.getItem(SERVER_URL_KEY));
+}
 
 // ── Token management (called by LoginScreen / logout) ─────────────────────────
 
@@ -43,14 +58,14 @@ function handleUnauthorized() {
 }
 
 export async function pullData(): Promise<{ ok: boolean; data?: BackupData; savedAt?: string }> {
-  const res = await fetch("/api/pull", { headers: authHeaders() });
+  const res = await fetch(`${getServerUrl()}/api/pull`, { headers: authHeaders() });
   if (res.status === 401) { handleUnauthorized(); return { ok: false }; }
   if (!res.ok) return { ok: false };
   return res.json();
 }
 
 export async function pushData(payload: BackupData): Promise<{ ok: boolean; savedAt?: string }> {
-  const res = await fetch("/api/push", {
+  const res = await fetch(`${getServerUrl()}/api/push`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({ data: payload }),

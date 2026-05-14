@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { setToken } from "../../lib/sync";
+import { setToken, getServerUrl } from "../../lib/sync";
 
 interface Props {
   onSuccess: () => void;
@@ -24,7 +24,7 @@ export default function LoginScreen({ onSuccess }: Props) {
   const usernameRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    fetch("/health")
+    fetch(`${getServerUrl()}/health`)
       .then((r) => r.json() as Promise<HealthResponse>)
       .then((body) => {
         setServerState(body);
@@ -41,7 +41,7 @@ export default function LoginScreen({ onSuccess }: Props) {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/login", {
+      const res = await fetch(`${getServerUrl()}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username.trim(), password }),
