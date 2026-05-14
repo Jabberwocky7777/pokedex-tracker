@@ -38,7 +38,7 @@ jobs:
             -project App.xcodeproj \
             -scheme App
 
-      - name: Build unsigned archive
+      - name: Build ad-hoc signed archive
         working-directory: ios
         run: |
           xcodebuild archive \
@@ -46,17 +46,18 @@ jobs:
             -scheme App \
             -archivePath build/App.xcarchive \
             -configuration Release \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=YES \
+            CODE_SIGNING_ALLOWED=YES \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
             -allowProvisioningUpdates
 
       - name: Package as IPA
         working-directory: ios
         run: |
           mkdir -p Payload
-          cp -r build/App.xcarchive/Products/Applications/App.app Payload/
-          zip -r PokedexTracker.ipa Payload/
+          ditto "build/App.xcarchive/Products/Applications/App.app" "Payload/App.app"
+          ditto -c -k --sequesterRsrc --keepParent Payload PokedexTracker.ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
