@@ -28,7 +28,7 @@ export default function FilterSubbar({ meta, caught, total, tab }: Props) {
 
   if (tab === "routes") {
     return (
-      <div className="sticky top-[56px] md:top-[64px] z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800">
+      <div className="sticky top-[calc(44px+env(safe-area-inset-top,0px))] md:top-[64px] z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800">
         <div className="max-w-screen-2xl mx-auto overflow-x-auto [&::-webkit-scrollbar]:hidden -mx-0 px-4 py-2">
           <GameSelector meta={meta} />
         </div>
@@ -38,7 +38,7 @@ export default function FilterSubbar({ meta, caught, total, tab }: Props) {
 
   // Tracker tab
   return (
-    <div className="sticky top-[56px] md:top-[64px] z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800">
+    <div className="sticky top-[calc(44px+env(safe-area-inset-top,0px))] md:top-[64px] z-30 bg-gray-900/95 backdrop-blur border-b border-gray-800">
 
       {/* ── Desktop: single row ───────────────────────────────────────── */}
       <div className="hidden md:flex max-w-screen-2xl mx-auto px-4 py-2 items-center gap-2 flex-wrap">
@@ -73,31 +73,13 @@ export default function FilterSubbar({ meta, caught, total, tab }: Props) {
         </span>
       </div>
 
-      {/* ── Mobile: 3 rows ────────────────────────────────────────────── */}
+      {/* ── Mobile: 2 rows ────────────────────────────────────────────── */}
       <div className="flex flex-col md:hidden divide-y divide-gray-800/60">
 
-        {/* Row 1: Dex mode */}
-        <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden px-3 py-1.5">
-          <DexModeSelector meta={meta} />
-        </div>
-
-        {/* Row 2: Game filter with right-fade affordance */}
-        <div className="relative">
-          <div
-            ref={searchRef}
-            className="overflow-x-auto [&::-webkit-scrollbar]:hidden px-3 py-1.5 scroll-snap-type-x-mandatory"
-          >
-            <GameSelector meta={meta} />
-          </div>
-          {/* Right-edge fade indicating more content */}
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-900 to-transparent" />
-        </div>
-
-        {/* Row 3: Availability + search icon + view toggle */}
-        <div className="overflow-x-auto [&::-webkit-scrollbar]:hidden px-3 py-1.5 flex items-center gap-2">
-          <AvailabilityFilter />
-          <div className="ml-auto flex items-center gap-2 flex-shrink-0">
-            <SearchBar compact />
+        {/* Row 1: Search bar — full width, most-used control */}
+        <div className="px-3 py-1.5 flex items-center gap-2">
+          <SearchBar compact />
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <ViewToggle />
             {tab === "tracker" && (
               <button
@@ -113,6 +95,18 @@ export default function FilterSubbar({ meta, caught, total, tab }: Props) {
               </button>
             )}
           </div>
+        </div>
+
+        {/* Row 2: All filter chips in one swipeable strip */}
+        <div
+          ref={searchRef}
+          className="flex items-center gap-2 px-3 py-1.5 overflow-x-auto scrollbar-none"
+        >
+          <DexModeSelector meta={meta} />
+          <div className="w-px h-4 bg-gray-700 flex-shrink-0" />
+          <GameSelector meta={meta} />
+          <div className="w-px h-4 bg-gray-700 flex-shrink-0" />
+          <AvailabilityFilter />
         </div>
       </div>
 

@@ -69,3 +69,23 @@ body {
 button, img, a {
   -webkit-touch-callout: none;
 }
+
+/* Utility: hide scrollbar while keeping scroll behaviour */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbars on touch devices (Capacitor / mobile Safari) */
+@media (pointer: coarse) {
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+  }
+}

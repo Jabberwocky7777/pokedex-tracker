@@ -2,8 +2,6 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import Header from "./Header";
 import FilterSubbar from "./FilterSubbar";
 import ViewportProgressBar from "./ViewportProgressBar";
-import MobileBottomNav from "./MobileBottomNav";
-import SyncToast from "./SyncToast";
 import BoxView from "../box-view/BoxView";
 import ListView from "../list-view/ListView";
 import PcBoxLayout from "../pc-box/PcBoxLayout";
@@ -240,11 +238,6 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
           </>
         )}
 
-        {/* Mobile bottom nav */}
-        <MobileBottomNav />
-
-        {/* Sync state toast */}
-        <SyncToast />
       </div>
 
       {shortcutsOpen && <ShortcutModal onClose={() => setShortcutsOpen(false)} />}

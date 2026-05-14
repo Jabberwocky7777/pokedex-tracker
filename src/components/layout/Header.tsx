@@ -96,7 +96,7 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
     >
 
       {/* ── Mobile top bar (hidden on md+) ───────────────────────────── */}
-      <div className="flex md:hidden items-center gap-2 px-3 min-h-[56px]">
+      <div className="flex md:hidden items-center gap-2 px-3 min-h-[44px]">
         {/* Left: sync dot */}
         <SyncDot className="ml-0.5" />
 

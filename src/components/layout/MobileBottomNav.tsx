@@ -1,4 +1,4 @@
-import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords, Search, Zap, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutGrid, BookOpen, Map, Calculator, Wand2, Swords, Search, Zap, MoreHorizontal } from "lucide-react";
 import { useSettingsStore } from "../../store/useSettingsStore";
 import type { AppTab } from "../../types";
 
@@ -19,60 +19,72 @@ const FRONTIER_TABS: TabDef[] = [
 ];
 
 export default function MobileBottomNav() {
-  const activeTab = useSettingsStore((s) => s.activeTab);
+  const activeTab    = useSettingsStore((s) => s.activeTab);
   const setActiveTab = useSettingsStore((s) => s.setActiveTab);
-  const tabGroup = useSettingsStore((s) => s.tabGroup);
-  const setTabGroup = useSettingsStore((s) => s.setTabGroup);
-  const activeTabs = tabGroup === "tracker" ? TRACKER_TABS : FRONTIER_TABS;
+  const tabGroup     = useSettingsStore((s) => s.tabGroup);
+  const setTabGroup  = useSettingsStore((s) => s.setTabGroup);
+
+  const activeTabs   = tabGroup === "tracker" ? TRACKER_TABS : FRONTIER_TABS;
+  const isFrontier   = tabGroup === "frontier";
+
+  // The "more" button cycles between groups
+  function toggleGroup() {
+    setTabGroup(isFrontier ? "tracker" : "frontier");
+  }
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 flex md:hidden bg-gray-900/95 backdrop-blur border-t border-gray-800"
+      className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-gray-950/95 backdrop-blur-md border-t border-gray-800/60"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       aria-label="Main navigation"
     >
-      {/* ← group toggle */}
-      <button
-        onClick={() => setTabGroup("tracker")}
-        disabled={tabGroup === "tracker"}
-        className={`flex flex-col items-center justify-center px-2 py-2 gap-0.5 text-xs transition-colors ${
-          tabGroup === "tracker" ? "text-gray-700" : "text-gray-500 hover:text-gray-300"
-        }`}
-        aria-label="Switch to Tracker tabs"
-      >
-        <ChevronLeft size={18} />
-      </button>
+      <div className="flex items-stretch">
 
-      {activeTabs.map(({ id, label, Icon }) => {
-        const isActive = activeTab === id;
-        return (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`flex flex-col items-center justify-center flex-1 py-2 gap-0.5 text-xs font-medium transition-colors
-              ${isActive
-                ? "text-white border-t-2 border-indigo-500 -mt-[2px]"
-                : "text-gray-500 hover:text-gray-300 border-t-2 border-transparent -mt-[2px]"
-              }`}
-            aria-current={isActive ? "page" : undefined}
-          >
-            <Icon size={20} />
-            <span>{label}</span>
-          </button>
-        );
-      })}
+        {activeTabs.map(({ id, label, Icon }) => {
+          const isActive = activeTab === id;
+          return (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className="flex flex-col items-center justify-center flex-1 pt-2 pb-1.5 gap-0.5 min-h-[52px] relative"
+              aria-current={isActive ? "page" : undefined}
+            >
+              {/* Active indicator bar */}
+              {isActive && (
+                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] rounded-full bg-indigo-500" />
+              )}
+              <Icon
+                size={22}
+                className={isActive ? "text-indigo-400" : "text-gray-500"}
+              />
+              <span className={`text-[10px] font-medium leading-none ${
+                isActive ? "text-indigo-400" : "text-gray-500"
+              }`}>
+                {label}
+              </span>
+            </button>
+          );
+        })}
 
-      {/* → group toggle */}
-      <button
-        onClick={() => setTabGroup("frontier")}
-        disabled={tabGroup === "frontier"}
-        className={`flex flex-col items-center justify-center px-2 py-2 gap-0.5 text-xs transition-colors ${
-          tabGroup === "frontier" ? "text-gray-700" : "text-gray-500 hover:text-gray-300"
-        }`}
-        aria-label="Switch to Battle Frontier tabs"
-      >
-        <ChevronRight size={18} />
-      </button>
+        {/* Group switcher — small, at the far right */}
+        <button
+          onClick={toggleGroup}
+          className="flex flex-col items-center justify-center px-3 pt-2 pb-1.5 gap-0.5 min-h-[52px] relative"
+          aria-label={isFrontier ? "Switch to main tabs" : "Switch to Frontier tabs"}
+          title={isFrontier ? "Main tabs" : "Frontier tabs"}
+        >
+          {/* Dot indicator for active group */}
+          <span className="absolute top-0 left-1/2 -translate-x-1/2 flex gap-0.5">
+            <span className={`w-1 h-1 rounded-full ${!isFrontier ? "bg-indigo-500" : "bg-gray-700"}`} />
+            <span className={`w-1 h-1 rounded-full ${isFrontier  ? "bg-indigo-500" : "bg-gray-700"}`} />
+          </span>
+          <MoreHorizontal size={20} className="text-gray-500 mt-1" />
+          <span className="text-[10px] font-medium leading-none text-gray-500">
+            {isFrontier ? "Main" : "More"}
+          </span>
+        </button>
+
+      </div>
     </nav>
   );
 }
