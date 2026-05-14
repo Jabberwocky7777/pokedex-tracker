@@ -39,7 +39,9 @@ function writeData(payload) {
 function requireAuth(req, res, next) {
   if (!TOKEN) return res.status(503).json({ error: "Sync not configured on this server" });
   const auth = (req.headers["authorization"] || "").trim();
-  if (auth !== `Bearer ${TOKEN}`) return res.status(401).json({ error: "Unauthorized" });
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  // Constant-time comparison to prevent timing-based token enumeration.
+  if (!safeCompare(token, TOKEN)) return res.status(401).json({ error: "Unauthorized" });
   next();
 }
 

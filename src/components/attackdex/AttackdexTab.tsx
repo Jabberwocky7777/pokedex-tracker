@@ -23,12 +23,16 @@ interface Props {
 }
 
 export default function AttackdexTab({ allPokemon, meta }: Props) {
-  const {
-    activeGeneration, setActiveTab, setActivePokedexId,
-    activeAttackdexSlug, setActiveAttackdexSlug,
-    lastAttackdexQuery, lastAttackdexSlug, lastAttackdexMode, lastAttackdexVersionGroup,
-    setLastAttackdexState,
-  } = useSettingsStore();
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
+  const setActiveTab = useSettingsStore((s) => s.setActiveTab);
+  const setActivePokedexId = useSettingsStore((s) => s.setActivePokedexId);
+  const activeAttackdexSlug = useSettingsStore((s) => s.activeAttackdexSlug);
+  const setActiveAttackdexSlug = useSettingsStore((s) => s.setActiveAttackdexSlug);
+  const lastAttackdexQuery = useSettingsStore((s) => s.lastAttackdexQuery);
+  const lastAttackdexSlug = useSettingsStore((s) => s.lastAttackdexSlug);
+  const lastAttackdexMode = useSettingsStore((s) => s.lastAttackdexMode);
+  const lastAttackdexVersionGroup = useSettingsStore((s) => s.lastAttackdexVersionGroup);
+  const setLastAttackdexState = useSettingsStore((s) => s.setLastAttackdexState);
 
   const [mode, setMode] = useState<Mode>(lastAttackdexMode);
 

@@ -31,7 +31,7 @@ interface Props {
 }
 
 export default function DetailPanel({ pokemon, allPokemonMap, isCaught, isPending, onToggleCaught, onTogglePending, onClose, exclusiveGames = [], onRouteClick, onPokedexClick }: Props) {
-  const { activeGeneration } = useSettingsStore();
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
   const {
     id, displayName, types,
     isLegendary, isMythical, isBaby, hasStaticEncounter,

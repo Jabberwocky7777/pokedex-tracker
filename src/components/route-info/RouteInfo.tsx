@@ -23,7 +23,10 @@ interface Props {
 const ALL_GAME_ORDER: GameVersion[] = [...GEN3_GAME_ORDER, ...GEN4_GAME_ORDER];
 
 export default function RouteInfo({ allPokemon, meta }: Props) {
-  const { activeGames, activeGeneration, activeRoute, setActiveRoute } = useSettingsStore();
+  const activeGames = useSettingsStore((s) => s.activeGames);
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
+  const activeRoute = useSettingsStore((s) => s.activeRoute);
+  const setActiveRoute = useSettingsStore((s) => s.setActiveRoute);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"map" | "list">("map");
   const routeDetailRef = useRef<HTMLDivElement>(null);
@@ -240,8 +243,10 @@ function RouteDetail({
   orderedGames: GameVersion[];
   activeGeneration: number;
 }) {
-  const { setActiveTab, setActivePokedexId } = useSettingsStore();
-  const { isCaught, setCaught } = useDexStore();
+  const setActiveTab = useSettingsStore((s) => s.setActiveTab);
+  const setActivePokedexId = useSettingsStore((s) => s.setActivePokedexId);
+  const isCaught = useDexStore((s) => s.isCaught);
+  const setCaught = useDexStore((s) => s.setCaught);
 
   const methodsPresent = useMemo(() => {
     const seen = new Set<EncounterMethod>();

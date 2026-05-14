@@ -149,7 +149,7 @@ export default function GreatMarshBanner({ allPokemon, activeGeneration }: Props
                     >
                       <td className="py-1.5 pl-3 pr-1">
                         {sprite && (
-                          <img src={sprite} alt="" className="w-8 h-8 object-contain" style={{ imageRendering: "pixelated" }} />
+                          <img src={sprite} alt={entry.pokemon.displayName} className="w-8 h-8 object-contain" style={{ imageRendering: "pixelated" }} />
                         )}
                       </td>
                       <td className="py-1.5 px-2">

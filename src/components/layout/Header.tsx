@@ -81,7 +81,10 @@ function PokeBall() {
 }
 
 export default function Header({ meta, onLogout, onExport, onExportJSON, onExportCSV, onImport }: Props) {
-  const { activeTab, setActiveTab, tabGroup, setTabGroup } = useSettingsStore();
+  const activeTab = useSettingsStore((s) => s.activeTab);
+  const setActiveTab = useSettingsStore((s) => s.setActiveTab);
+  const tabGroup = useSettingsStore((s) => s.tabGroup);
+  const setTabGroup = useSettingsStore((s) => s.setTabGroup);
   const allTabs = [...TRACKER_TABS, ...FRONTIER_TABS];
   const currentLabel = allTabs.find((t) => t.id === activeTab)?.label ?? "Pokédex Tracker";
   const activeTabs = tabGroup === "tracker" ? TRACKER_TABS : FRONTIER_TABS;

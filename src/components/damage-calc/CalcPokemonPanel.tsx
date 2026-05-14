@@ -61,11 +61,10 @@ function towerSetToCalcPokemon(set: BattleTowerSet, allPokemon: Pokemon[]): Calc
 }
 
 export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defenderHp, label }: Props) {
-  const store = useBattleCalcStore();
-  const { slots: designerSlots } = useDesignerStore();
-  const pokemon: CalcPokemon | null = store[slot];
-  const opponent = slot === "slot1" ? store.slot2 : store.slot1;
-  const setter = slot === "slot1" ? store.setSlot1 : store.setSlot2;
+  const pokemon = useBattleCalcStore((s) => s[slot as "slot1" | "slot2"]);
+  const opponent = useBattleCalcStore((s) => slot === "slot1" ? s.slot2 : s.slot1);
+  const setter = useBattleCalcStore((s) => slot === "slot1" ? s.setSlot1 : s.setSlot2);
+  const designerSlots = useDesignerStore((s) => s.slots);
 
   const [customQuery, setCustomQuery]   = useState("");
   const [showCustom, setShowCustom]     = useState(false);
@@ -221,7 +220,7 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
               const r = moveResults[i];
               if (!r || r.max === 0 || !move.name.trim()) return null;
               return (
-                <div key={i} className="flex items-center gap-2 px-3 py-1.5 text-xs">
+                <div key={`move-${i}`} className="flex items-center gap-2 px-3 py-1.5 text-xs">
                   <span className="flex-1 text-gray-200 truncate min-w-0">{move.name}</span>
                   <span className="text-green-400 font-mono whitespace-nowrap">
                     {r.minPercent.toFixed(1)}–{r.maxPercent.toFixed(1)}%
@@ -344,7 +343,7 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
                     onClick={() => loadCustomPokemon(p)}
                     className="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-700 flex items-center gap-2"
                   >
-                    <img src={p.spriteUrl} alt="" className="w-6 h-6 object-contain pixelated" />
+                    <img src={p.spriteUrl} alt={p.displayName} className="w-6 h-6 object-contain pixelated" />
                     {p.displayName}
                   </button>
                 ))}
@@ -498,7 +497,7 @@ export default function CalcPokemonPanel({ slot, allPokemon, moveResults, defend
               const result = moveResults[i];
               const hasResult = result && result.max > 0;
               return (
-                <div key={i} className="bg-gray-800/50 rounded-lg p-2 space-y-1">
+                <div key={`move-${i}`} className="bg-gray-800/50 rounded-lg p-2 space-y-1">
                   {/* Row 1: move name + category */}
                   <div className="flex gap-1">
                     <input

@@ -6,7 +6,8 @@ interface Props {
 }
 
 export default function GenerationSelector({ meta }: Props) {
-  const { activeGeneration, setActiveGeneration } = useSettingsStore();
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
+  const setActiveGeneration = useSettingsStore((s) => s.setActiveGeneration);
 
   if (meta.activeGenerations.length <= 1) return null;
 

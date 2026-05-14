@@ -222,7 +222,7 @@ export function calcDamageRolls(input: CalcInput): number[] {
 
   // Base stat selection
   let rawAtk = isPhysical ? attacker.stats.atk : attacker.stats.spa;
-  let rawDef = isPhysical ? defender.stats.def : defender.stats.spd;
+  const rawDef = isPhysical ? defender.stats.def : defender.stats.spd;
 
   // Item: Choice Band / Choice Specs / Thick Club / Light Ball — multiply stat before formula
   const itemEff = getItemEffect(attacker.item);
@@ -337,8 +337,7 @@ export function calcDamage(input: CalcInput): DamageResult {
 
 // ─── Stat computation helpers ─────────────────────────────────────────────────
 
-const STAT_KEYS = ["hp", "atk", "def", "spa", "spd", "spe"] as const;
-type StatKey4 = typeof STAT_KEYS[number];
+type StatKey4 = "hp" | "atk" | "def" | "spa" | "spd" | "spe";
 
 /** Compute final stat from base stat + IV + EV + nature (Gen 4 formula) */
 export function computeStat(

@@ -38,7 +38,7 @@ export default function PokemonSearchBar({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setHighlightedIndex(-1); }, [suggestions]);
+  useEffect(() => { setHighlightedIndex(-1); }, [suggestions]); // eslint-disable-line react-hooks/set-state-in-effect -- reset keyboard cursor when suggestion list changes
 
   useEffect(() => {
     if (highlightedIndex >= 0 && dropdownRef.current) {

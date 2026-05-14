@@ -23,7 +23,7 @@ export default function DesignerPokemonPicker({ allPokemon, activeGeneration, on
 
   // Reset highlight when query changes
   useEffect(() => {
-    setHighlightedIndex(-1);
+    setHighlightedIndex(-1); // eslint-disable-line react-hooks/set-state-in-effect -- reset keyboard cursor when query changes
   }, [query]);
 
   // Scroll highlighted item into view
@@ -97,7 +97,7 @@ export default function DesignerPokemonPicker({ allPokemon, activeGeneration, on
                 className={`w-full flex items-center gap-3 px-3 py-2 transition-colors text-left ${highlightedIndex === index ? "bg-gray-700" : "hover:bg-gray-800"}`}
               >
                 {sprite && (
-                  <img src={sprite} alt="" className="w-8 h-8 object-contain pixelated flex-shrink-0" />
+                  <img src={sprite} alt={p.displayName} className="w-8 h-8 object-contain pixelated flex-shrink-0" />
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="text-sm text-gray-200">{p.displayName}</div>

@@ -63,7 +63,10 @@ export default function DesignerPanel({
   copiedSlotIndex = null,
   onCopySlot,
 }: Props) {
-  const { slots, activeSlotIndex, updateSlot, evolveSlot } = useDesignerStore();
+  const slots = useDesignerStore((s) => s.slots);
+  const activeSlotIndex = useDesignerStore((s) => s.activeSlotIndex);
+  const updateSlot = useDesignerStore((s) => s.updateSlot);
+  const evolveSlot = useDesignerStore((s) => s.evolveSlot);
   const effectiveIndex = slotIndex ?? activeSlotIndex;
   const slot: DesignerSlot | null = effectiveIndex != null ? slots[effectiveIndex] : null;
 
@@ -205,7 +208,7 @@ export default function DesignerPanel({
                         onClick={() => handleEvolve(evo.speciesId)}
                         className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-700 text-left text-xs text-gray-200 transition-colors"
                       >
-                        {sprite && <img src={sprite} alt="" className="w-8 h-8 object-contain pixelated flex-shrink-0" />}
+                        {sprite && <img src={sprite} alt={evo.displayName} className="w-8 h-8 object-contain pixelated flex-shrink-0" />}
                         <div>
                           <div className="font-medium">{evo.displayName}</div>
                           <div className="text-gray-500">{evo.details}</div>

@@ -19,7 +19,10 @@ const FRONTIER_TABS: TabDef[] = [
 ];
 
 export default function MobileBottomNav() {
-  const { activeTab, setActiveTab, tabGroup, setTabGroup } = useSettingsStore();
+  const activeTab = useSettingsStore((s) => s.activeTab);
+  const setActiveTab = useSettingsStore((s) => s.setActiveTab);
+  const tabGroup = useSettingsStore((s) => s.tabGroup);
+  const setTabGroup = useSettingsStore((s) => s.setTabGroup);
   const activeTabs = tabGroup === "tracker" ? TRACKER_TABS : FRONTIER_TABS;
 
   return (

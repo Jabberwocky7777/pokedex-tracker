@@ -12,8 +12,14 @@ interface Props {
 }
 
 export default function DamageCalcTab({ allPokemon, meta }: Props) {
-  const store = useBattleCalcStore();
-  const { slot1, slot2, weather, reflect1, reflect2, lightScreen1, lightScreen2 } = store;
+  const slot1 = useBattleCalcStore((s) => s.slot1);
+  const slot2 = useBattleCalcStore((s) => s.slot2);
+  const weather = useBattleCalcStore((s) => s.weather);
+  const isSingles = useBattleCalcStore((s) => s.isSingles);
+  const reflect1 = useBattleCalcStore((s) => s.reflect1);
+  const reflect2 = useBattleCalcStore((s) => s.reflect2);
+  const lightScreen1 = useBattleCalcStore((s) => s.lightScreen1);
+  const lightScreen2 = useBattleCalcStore((s) => s.lightScreen2);
 
   // Determine if attacker is intimidated by defender's ability
   const slot1Intimidated = !!slot2 && getAbilityModifiers(slot2.ability).intimidatesOpponent;
@@ -37,7 +43,7 @@ export default function DamageCalcTab({ allPokemon, meta }: Props) {
         attackerIntimidated,
         reflect,
         lightScreen,
-        isSingles: store.isSingles,
+        isSingles,
       })
     );
   };

@@ -12,14 +12,20 @@ interface Props {
 }
 
 export default function PcBoxLayout({ allPokemon, meta }: Props) {
-  const { activeGeneration, selectedPokemonId, setSelectedPokemonId } = useSettingsStore();
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
+  const selectedPokemonId = useSettingsStore((s) => s.selectedPokemonId);
+  const setSelectedPokemonId = useSettingsStore((s) => s.setSelectedPokemonId);
 
   const genMeta = meta.generations.find((g) => g.id === activeGeneration);
   const games = useMemo(() => (genMeta?.versions ?? []) as GameVersion[], [genMeta]);
   const [selectedGame, setSelectedGame] = useState<GameVersion>(games[0]);
 
-  const { slotsByGen, assignSlot, clearSlot, moveSlot } = useBoxSlotStore();
-  const { caughtByGen, pendingByGen } = useDexStore();
+  const slotsByGen = useBoxSlotStore((s) => s.slotsByGen);
+  const assignSlot = useBoxSlotStore((s) => s.assignSlot);
+  const clearSlot = useBoxSlotStore((s) => s.clearSlot);
+  const moveSlot = useBoxSlotStore((s) => s.moveSlot);
+  const caughtByGen = useDexStore((s) => s.caughtByGen);
+  const pendingByGen = useDexStore((s) => s.pendingByGen);
 
   const caught = caughtByGen[activeGeneration] ?? [];
   const pending = pendingByGen[activeGeneration] ?? [];

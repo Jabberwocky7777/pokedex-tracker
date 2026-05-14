@@ -345,9 +345,9 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
         <div>
           <div className="text-xs font-semibold text-gray-400 mb-2">Route Presets</div>
           <div className="flex gap-1.5 flex-wrap">
-            {slot.routePresets.map((preset, i) => (
+            {slot.routePresets.map((preset) => (
               <button
-                key={i}
+                key={preset.name}
                 onClick={() => loadPreset(preset.species)}
                 className="px-2.5 py-1 rounded-full text-xs bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 hover:text-white"
               >
@@ -377,7 +377,7 @@ export default function EvTracker({ slot, allPokemon, activeGeneration, onUpdate
               const sprite = pokemon ? getGenSprite(pokemon, activeGeneration) : null;
               return (
                 <div key={entry.speciesId} className="flex items-center gap-2 bg-gray-800/50 rounded p-2">
-                  {sprite && <img src={sprite} alt="" className="w-7 h-7 object-contain pixelated flex-shrink-0" />}
+                  {sprite && <img src={sprite} alt={pokemon?.displayName ?? ""} className="w-7 h-7 object-contain pixelated flex-shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-gray-200">{pokemon?.displayName ?? `#${entry.speciesId}`}</div>
                   </div>
@@ -490,7 +490,7 @@ function SuggestionList({
                 onClick={() => { onAdd(p.id); onClose(); }}
                 className={`w-full flex items-center gap-3 px-3 ${py} hover:bg-gray-700 text-sm text-left border-b border-gray-700/30 last:border-0`}
               >
-                <img src={getGenSprite(p, activeGeneration)} alt="" className={`${imgSize} object-contain pixelated flex-shrink-0`} />
+                <img src={getGenSprite(p, activeGeneration)} alt={p.displayName} className={`${imgSize} object-contain pixelated flex-shrink-0`} />
                 <span className="text-gray-200 flex-1 truncate">{p.displayName}</span>
                 {detectedStat && yieldAmt > 0 && (
                   <span className="text-indigo-300 text-xs font-mono flex-shrink-0">+{yieldAmt} {STAT_LABELS[detectedStat]}</span>
@@ -516,7 +516,7 @@ function SuggestionList({
                 onClick={() => { onAdd(p.id); onClose(); }}
                 className={`w-full flex items-center gap-3 px-3 ${py} hover:bg-gray-700 text-sm text-left border-b border-gray-700/30 last:border-0`}
               >
-                <img src={getGenSprite(p, activeGeneration)} alt="" className={`${imgSize} object-contain pixelated flex-shrink-0`} />
+                <img src={getGenSprite(p, activeGeneration)} alt={p.displayName} className={`${imgSize} object-contain pixelated flex-shrink-0`} />
                 <span className="text-gray-200 flex-1 truncate">{p.displayName}</span>
                 {detectedStat && yieldAmt > 0 && (
                   <span className="text-gray-400 text-xs font-mono flex-shrink-0">+{yieldAmt} {STAT_LABELS[detectedStat]}</span>
@@ -659,7 +659,7 @@ function KoOverlay({
                   className="flex items-center gap-3 bg-gray-900 border border-gray-800 rounded-xl p-3"
                 >
                   {sprite && (
-                    <img src={sprite} alt="" className="w-10 h-10 object-contain pixelated flex-shrink-0" />
+                    <img src={sprite} alt={pokemon?.displayName ?? ""} className="w-10 h-10 object-contain pixelated flex-shrink-0" />
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-gray-200 truncate">

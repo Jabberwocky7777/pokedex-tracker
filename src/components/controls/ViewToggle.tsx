@@ -9,7 +9,8 @@ const OPTIONS: { id: ViewMode; label: string; Icon: React.ComponentType<{ size?:
 ];
 
 export default function ViewToggle() {
-  const { viewMode, setViewMode } = useSettingsStore();
+  const viewMode = useSettingsStore((s) => s.viewMode);
+  const setViewMode = useSettingsStore((s) => s.setViewMode);
 
   return (
     <div className="flex items-center rounded-md overflow-hidden border border-gray-700">

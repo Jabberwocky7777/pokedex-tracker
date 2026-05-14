@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function CatchCalculator({ allPokemon, meta }: Props) {
-  const { activeGeneration } = useSettingsStore();
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -46,7 +46,7 @@ export default function CatchCalculator({ allPokemon, meta }: Props) {
       .slice(0, 8);
   }, [query, allPokemon]);
 
-  useEffect(() => { setHighlightedIndex(-1); }, [suggestions]);
+  useEffect(() => { setHighlightedIndex(-1); }, [suggestions]); // eslint-disable-line react-hooks/set-state-in-effect -- reset keyboard cursor when suggestion list changes
 
   useEffect(() => {
     if (highlightedIndex >= 0 && dropdownRef.current) {

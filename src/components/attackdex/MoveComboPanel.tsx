@@ -36,7 +36,7 @@ export default function MoveComboPanel({ allPokemon, activeGeneration, onSelectP
 
   useEffect(() => {
     const groups = activeGeneration === 4 ? GEN4_VERSION_GROUPS : GEN3_VERSION_GROUPS;
-    setVersionGroup(groups[0].id);
+    setVersionGroup(groups[0].id); // eslint-disable-line react-hooks/set-state-in-effect -- reset version group when generation changes
   }, [activeGeneration]);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function MoveComboPanel({ allPokemon, activeGeneration, onSelectP
     const filledSlugs = slots.map((s) => s.slug).filter((s): s is string => s !== null);
 
     if (filledSlugs.length < 2) {
-      setResultIds(null);
+      setResultIds(null); // eslint-disable-line react-hooks/set-state-in-effect -- clear results when move slots are empty
       return;
     }
 
@@ -240,7 +240,7 @@ function ComboSlot({ moveList, onSelect, onClear }: ComboSlotProps) {
 
   useEffect(() => {
     const q = query.trim().toLowerCase();
-    if (!q) { setSuggestions([]); return; }
+    if (!q) { setSuggestions([]); return; } // eslint-disable-line react-hooks/set-state-in-effect -- clear suggestions when query is empty
     setSuggestions(
       moveList
         .filter((m) => m.displayName.toLowerCase().includes(q) || m.slug.includes(q))

@@ -29,7 +29,12 @@ export default function DesignerPcBox({
   onPasteToSlot,
   fullScreen = false,
 }: Props) {
-  const { slots, activeSlotIndex, activeBoxIndex, setActiveSlot, setActiveBox, clearSlot } = useDesignerStore();
+  const slots = useDesignerStore((s) => s.slots);
+  const activeSlotIndex = useDesignerStore((s) => s.activeSlotIndex);
+  const activeBoxIndex = useDesignerStore((s) => s.activeBoxIndex);
+  const setActiveSlot = useDesignerStore((s) => s.setActiveSlot);
+  const setActiveBox = useDesignerStore((s) => s.setActiveBox);
+  const clearSlot = useDesignerStore((s) => s.clearSlot);
   const [menuSlot, setMenuSlot] = useState<number | null>(null);
   const [accordionOpen, setAccordionOpen] = useState(false);
 
@@ -53,7 +58,7 @@ export default function DesignerPcBox({
       <div className="flex gap-1 mb-3">
         {BOX_LABELS.map((label, i) => (
           <button
-            key={i}
+            key={label}
             onClick={() => setActiveBox(i as 0 | 1 | 2)}
             className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
               activeBoxIndex === i
@@ -138,7 +143,7 @@ export default function DesignerPcBox({
                 title={isPasteTarget ? `Paste onto ${slot.nickname || pokemon.displayName}` : (slot.nickname || pokemon.displayName)}
               >
                 {sprite && (
-                  <img src={sprite} alt="" className="w-8 h-8 object-contain pixelated" draggable={false} />
+                  <img src={sprite} alt={slot.nickname || pokemon.displayName} className="w-8 h-8 object-contain pixelated" draggable={false} />
                 )}
                 {!isNeutral && !isPasteTarget && (
                   <span

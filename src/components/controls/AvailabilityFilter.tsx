@@ -2,7 +2,8 @@ import { useSettingsStore } from "../../store/useSettingsStore";
 import type { AvailabilityMode } from "../../types";
 
 export default function AvailabilityFilter() {
-  const { availabilityMode, setAvailabilityMode } = useSettingsStore();
+  const availabilityMode = useSettingsStore((s) => s.availabilityMode);
+  const setAvailabilityMode = useSettingsStore((s) => s.setAvailabilityMode);
 
   const options: { id: AvailabilityMode; label: string; title: string }[] = [
     {

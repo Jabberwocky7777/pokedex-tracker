@@ -28,19 +28,17 @@ interface Props {
 const boxes = boxesData as DexBox[];
 
 export default function Layout({ allPokemon, meta, onLogout }: Props) {
-  const {
-    viewMode,
-    activeGames,
-    activeGeneration,
-    dexMode,
-    selectedPokemonId,
-    setSelectedPokemonId,
-    availabilityMode,
-    searchQuery,
-    setActiveTab,
-    setActiveRoute,
-    setActivePokedexId,
-  } = useSettingsStore();
+  const viewMode = useSettingsStore((s) => s.viewMode);
+  const activeGames = useSettingsStore((s) => s.activeGames);
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
+  const dexMode = useSettingsStore((s) => s.dexMode);
+  const selectedPokemonId = useSettingsStore((s) => s.selectedPokemonId);
+  const setSelectedPokemonId = useSettingsStore((s) => s.setSelectedPokemonId);
+  const availabilityMode = useSettingsStore((s) => s.availabilityMode);
+  const searchQuery = useSettingsStore((s) => s.searchQuery);
+  const setActiveTab = useSettingsStore((s) => s.setActiveTab);
+  const setActiveRoute = useSettingsStore((s) => s.setActiveRoute);
+  const setActivePokedexId = useSettingsStore((s) => s.setActivePokedexId);
 
   const caughtByGen = useDexStore((s) => s.caughtByGen);
   const pendingByGen = useDexStore((s) => s.pendingByGen);

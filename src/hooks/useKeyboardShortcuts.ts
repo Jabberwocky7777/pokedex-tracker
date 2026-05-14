@@ -13,7 +13,8 @@ export function useKeyboardShortcuts(
   activeGeneration: number,
   onOpenShortcuts: () => void
 ) {
-  const { selectedPokemonId, setSelectedPokemonId } = useSettingsStore();
+  const selectedPokemonId = useSettingsStore((s) => s.selectedPokemonId);
+  const setSelectedPokemonId = useSettingsStore((s) => s.setSelectedPokemonId);
   const toggleCaughtRaw = useDexStore((s) => s.toggleCaught);
 
   useEffect(() => {

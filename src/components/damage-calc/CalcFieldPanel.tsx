@@ -1,4 +1,5 @@
 import { useBattleCalcStore } from "../../store/useBattleCalcStore";
+import { useShallow } from "zustand/react/shallow";
 import type { WeatherCondition } from "../../types/battleTower";
 
 const WEATHER_OPTIONS: { value: WeatherCondition; label: string }[] = [
@@ -56,7 +57,7 @@ function SpikesBtn({
 }
 
 export default function CalcFieldPanel() {
-  const store = useBattleCalcStore();
+  const store = useBattleCalcStore(useShallow((s) => s));
 
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-xl p-4 space-y-4">

@@ -6,7 +6,9 @@ interface Props {
 }
 
 export default function DexModeSelector({ meta }: Props) {
-  const { dexMode, setDexMode, activeGeneration } = useSettingsStore();
+  const dexMode = useSettingsStore((s) => s.dexMode);
+  const setDexMode = useSettingsStore((s) => s.setDexMode);
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
 
   const availableRegionalDexes = meta.regionalDexes.filter((rd) => {
     const genMeta = meta.generations.find((g) => g.id === activeGeneration);

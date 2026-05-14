@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import L from "leaflet";
+import L, { type Layer } from "leaflet";
+import type { Feature } from "geojson";
 import "leaflet/dist/leaflet.css";
 import { SINNOH_OVERWORLD_GEOJSON } from "../../data/sinnoh-map-regions";
 import { useDexStore } from "../../store/useDexStore";
@@ -82,7 +83,7 @@ export default function SinnohMap({ routeIndex, activeRoute, onRouteClick, searc
   const containerRef = useRef<HTMLDivElement>(null);
   const geoLayerRef = useRef<L.GeoJSON | null>(null);
 
-  const { caughtByGen } = useDexStore();
+  const caughtByGen = useDexStore((s) => s.caughtByGen);
   const caughtSet = new Set<number>(caughtByGen[activeGeneration] ?? []);
 
   // Initialize map once
@@ -117,7 +118,6 @@ export default function SinnohMap({ routeIndex, activeRoute, onRouteClick, searc
       map.remove();
       mapRef.current = null;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update GeoJSON layer when deps change
@@ -129,12 +129,12 @@ export default function SinnohMap({ routeIndex, activeRoute, onRouteClick, searc
       map.removeLayer(geoLayerRef.current);
     }
 
-    const layer = L.geoJSON(SINNOH_OVERWORLD_GEOJSON as GeoJSON.FeatureCollection, {
-      style: (feature) => {
+    const layer = L.geoJSON(SINNOH_OVERWORLD_GEOJSON, {
+      style: (feature: Feature | undefined) => {
         const slug = (feature?.properties?.slug as string | null) ?? null;
         return regionStyle(slug, routeIndex, caughtSet, activeRoute, searchQuery);
       },
-      onEachFeature: (feature, featureLayer) => {
+      onEachFeature: (feature: Feature, featureLayer: Layer) => {
         const slug = feature.properties?.slug as string | null;
         const name = feature.properties?.name as string;
         const routeData = slug ? routeIndex.get(slug) : null;

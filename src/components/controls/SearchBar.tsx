@@ -7,7 +7,8 @@ interface Props {
 }
 
 export default function SearchBar({ compact = false }: Props) {
-  const { searchQuery, setSearchQuery } = useSettingsStore();
+  const searchQuery = useSettingsStore((s) => s.searchQuery);
+  const setSearchQuery = useSettingsStore((s) => s.setSearchQuery);
   const [expanded, setExpanded] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 

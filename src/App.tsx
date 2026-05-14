@@ -25,7 +25,7 @@ function SyncEngine() {
 }
 
 function App() {
-  const { activeTab } = useSettingsStore();
+  const activeTab = useSettingsStore((s) => s.activeTab);
   const [allPokemon, setAllPokemon] = useState<Pokemon[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
@@ -34,7 +34,7 @@ function App() {
   const [isAuthed, setIsAuthed] = useState(() => hasToken());
 
   useEffect(() => {
-    setAllPokemon(null);
+    setAllPokemon(null); // eslint-disable-line react-hooks/set-state-in-effect -- reset before re-fetch when retryKey changes
     setLoadError(false);
     fetch("/data/pokemon.json")
       .then((r) => {

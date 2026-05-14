@@ -59,7 +59,12 @@ function buildEvSuggestions(
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function PokedexTab({ allPokemon, meta }: Props) {
-  const { activePokedexId, setActivePokedexId, activeGeneration, setActiveTab, setActiveRoute, setActiveAttackdexSlug } = useSettingsStore();
+  const activePokedexId = useSettingsStore((s) => s.activePokedexId);
+  const setActivePokedexId = useSettingsStore((s) => s.setActivePokedexId);
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
+  const setActiveTab = useSettingsStore((s) => s.setActiveTab);
+  const setActiveRoute = useSettingsStore((s) => s.setActiveRoute);
+  const setActiveAttackdexSlug = useSettingsStore((s) => s.setActiveAttackdexSlug);
 
   // Slot A (primary — synced with store so "More Detail" from tracker still works)
   const [queryA, setQueryA] = useState("");

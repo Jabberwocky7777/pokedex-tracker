@@ -75,8 +75,8 @@ function towerSetToCalcPokemon(set: BattleTowerSet, allPokemon: Pokemon[]): Calc
 }
 
 export default function TrainerLookupTab({ allPokemon, meta }: Props) {
-  const { setActiveTab } = useSettingsStore();
-  const { setSlot2 } = useBattleCalcStore();
+  const setActiveTab = useSettingsStore((s) => s.setActiveTab);
+  const setSlot2 = useBattleCalcStore((s) => s.setSlot2);
 
   const [game, setGame] = useState<"platinum" | "hgss">("platinum");
   const [round, setRound] = useState<"open" | "super">("open");
@@ -409,7 +409,7 @@ function PokemonSetCard({
       {/* Moves */}
       <div className="grid grid-cols-2 gap-1">
         {set.moves.map((move, i) => (
-          <div key={i} className="text-xs bg-gray-800 rounded px-2 py-1 text-gray-300 truncate">
+          <div key={`${i}-${move}`} className="text-xs bg-gray-800 rounded px-2 py-1 text-gray-300 truncate">
             {move || "—"}
           </div>
         ))}

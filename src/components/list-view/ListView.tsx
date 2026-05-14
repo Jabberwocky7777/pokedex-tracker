@@ -23,7 +23,8 @@ export default function ListView({
 }: Props) {
   const caughtSet = new Set(caughtIds);
   const pendingSet = new Set(pendingIds);
-  const { showUncaughtOnly, toggleShowUncaughtOnly } = useSettingsStore();
+  const showUncaughtOnly = useSettingsStore((s) => s.showUncaughtOnly);
+  const toggleShowUncaughtOnly = useSettingsStore((s) => s.toggleShowUncaughtOnly);
 
   const displayPokemon = showUncaughtOnly
     ? filteredPokemon.filter((p) => !caughtSet.has(p.id))

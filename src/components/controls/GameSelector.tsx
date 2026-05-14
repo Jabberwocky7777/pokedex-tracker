@@ -7,7 +7,10 @@ interface Props {
 }
 
 export default function GameSelector({ meta }: Props) {
-  const { activeGames, toggleActiveGame, clearActiveGames, activeGeneration } = useSettingsStore();
+  const activeGames = useSettingsStore((s) => s.activeGames);
+  const toggleActiveGame = useSettingsStore((s) => s.toggleActiveGame);
+  const clearActiveGames = useSettingsStore((s) => s.clearActiveGames);
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
 
   const genMeta = meta.generations.find((g) => g.id === activeGeneration);
   if (!genMeta) return null;

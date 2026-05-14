@@ -65,7 +65,7 @@ export default function HmPlannerPanel({ allPokemon, activeGeneration, onClose, 
   // Drop selections that no longer exist after a version group switch (defog ↔ whirlpool)
   useEffect(() => {
     const validSlugs = new Set(hmList.map((h) => h.slug));
-    setSelectedSlugs((prev) => {
+    setSelectedSlugs((prev) => { // eslint-disable-line react-hooks/set-state-in-effect -- drop selections that no longer exist after version group switch
       const next = new Set([...prev].filter((s) => validSlugs.has(s)));
       return next.size === prev.size ? prev : next;
     });
@@ -76,7 +76,7 @@ export default function HmPlannerPanel({ allPokemon, activeGeneration, onClose, 
   useEffect(() => {
     const slugs = [...selectedSlugs];
     if (slugs.length === 0) {
-      setResultIds(null);
+      setResultIds(null); // eslint-disable-line react-hooks/set-state-in-effect -- clear results when no HMs are selected
       return;
     }
 

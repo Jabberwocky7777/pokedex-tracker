@@ -14,8 +14,14 @@ interface Props {
 }
 
 export default function DesignerTab({ allPokemon, meta }: Props) {
-  const { activeGeneration, compareSlotIndex, setCompareSlotIndex } = useSettingsStore();
-  const { slots, activeSlotIndex, updateSlot, setActiveSlot, copySlotTo } = useDesignerStore();
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
+  const compareSlotIndex = useSettingsStore((s) => s.compareSlotIndex);
+  const setCompareSlotIndex = useSettingsStore((s) => s.setCompareSlotIndex);
+  const slots = useDesignerStore((s) => s.slots);
+  const activeSlotIndex = useDesignerStore((s) => s.activeSlotIndex);
+  const updateSlot = useDesignerStore((s) => s.updateSlot);
+  const setActiveSlot = useDesignerStore((s) => s.setActiveSlot);
+  const copySlotTo = useDesignerStore((s) => s.copySlotTo);
   const [pickerSlot, setPickerSlot] = useState<number | null>(null);
   const [showComparePicker, setShowComparePicker] = useState(false);
   const [copiedSlotIndex, setCopiedSlotIndex] = useState<number | null>(null);
@@ -137,15 +143,15 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
                 <>
                   <div className="fixed inset-0 z-40" onClick={() => setShowComparePicker(false)} />
                   <div className="absolute top-full left-3 mt-1 z-50 bg-gray-800 border border-gray-700 rounded-xl shadow-xl p-2 flex flex-wrap gap-1.5 max-w-xs">
-                    {slots.map((s, i) => {
-                      if (i === activeSlotIndex || s.pokemonId === null) return null;
+                    {slots.map((s) => {
+                      if (s.slotIndex === activeSlotIndex || s.pokemonId === null) return null;
                       const mon = pokemonMap.get(s.pokemonId!);
                       if (!mon) return null;
                       const sprite = activeGeneration === 4 ? mon.gen4Sprite : mon.gen3Sprite;
                       return (
                         <button
-                          key={i}
-                          onClick={() => openCompare(i)}
+                          key={s.slotIndex}
+                          onClick={() => openCompare(s.slotIndex)}
                           className="flex flex-col items-center gap-0.5 p-1.5 rounded-lg hover:bg-gray-700 transition-colors"
                           title={s.nickname || mon.displayName}
                         >

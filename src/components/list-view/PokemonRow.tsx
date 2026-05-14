@@ -25,7 +25,7 @@ export default function PokemonRow({
 }: Props) {
   const { displayNumber, displayName, types, spriteUrl, genSprite, isHighlighted, isVersionExclusive } = pokemon;
   const sprite = genSprite || spriteUrl;
-  const { activeGeneration } = useSettingsStore();
+  const activeGeneration = useSettingsStore((s) => s.activeGeneration);
   const genVersions: GameVersion[] = activeGeneration === 4 ? GEN4_VERSIONS : GEN3_VERSIONS;
 
   return (

@@ -94,7 +94,7 @@ export default function MoveGrid({ slot, pokemonId, activeGeneration, onUpdate }
 
           return (
             <div
-              key={i}
+              key={`move-slot-${i}`}
               className={`rounded border p-2 min-h-[70px] flex flex-col gap-1 ${
                 moveSlug
                   ? "border-gray-700 bg-gray-800/50"
