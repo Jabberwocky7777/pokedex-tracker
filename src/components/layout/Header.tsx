@@ -90,7 +90,10 @@ export default function Header({ meta, onLogout, onExport, onExportJSON, onExpor
   const activeTabs = tabGroup === "tracker" ? TRACKER_TABS : FRONTIER_TABS;
 
   return (
-    <header className="sticky top-[3px] z-40 bg-gray-900/95 backdrop-blur border-b border-gray-800">
+    <header
+      className="sticky top-0 z-40 bg-gray-900/95 backdrop-blur border-b border-gray-800"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
+    >
 
       {/* ── Mobile top bar (hidden on md+) ───────────────────────────── */}
       <div className="flex md:hidden items-center gap-2 px-3 min-h-[56px]">

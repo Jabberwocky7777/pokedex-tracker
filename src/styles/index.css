@@ -45,3 +45,27 @@ img {
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.25);
 }
+
+/* ── iOS / Capacitor native fixes ───────────────────────────────── */
+
+/* Remove blue tap-highlight flash on every interactive element */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent iOS from inflating font sizes when rotating to landscape */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Kill bouncy overscroll on the document root — individual scrollable
+   panels keep their own overflow-y: auto and scroll normally */
+body {
+  overscroll-behavior: none;
+}
+
+/* Suppress long-press context menu on buttons, images, and links */
+button, img, a {
+  -webkit-touch-callout: none;
+}

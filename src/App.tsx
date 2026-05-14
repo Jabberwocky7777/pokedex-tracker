@@ -9,7 +9,7 @@ import AttackdexTab from "./components/attackdex/AttackdexTab";
 import TrainerLookupTab from "./components/trainer-lookup/TrainerLookupTab";
 import DamageCalcTab from "./components/damage-calc/DamageCalcTab";
 import LoginScreen from "./components/auth/LoginScreen";
-import ServerSetupScreen from "./components/auth/ServerSetupScreen";
+import NativeOnboardingScreen from "./components/auth/NativeOnboardingScreen";
 import MobileBottomNav from "./components/layout/MobileBottomNav";
 import SyncToast from "./components/layout/SyncToast";
 import { useSyncEngine } from "./hooks/useSyncEngine";
@@ -32,8 +32,10 @@ function App() {
   const [loadError, setLoadError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
 
-  // Server setup state — only relevant on native (Capacitor); web uses relative URLs
-  const [hasServer, setHasServer] = useState(() => !Capacitor.isNativePlatform() || hasServerUrl());
+  // On native: track whether both a server URL and an auth token are already stored.
+  // If either is missing, show the combined onboarding screen.
+  const isNative = Capacitor.isNativePlatform();
+  const [hasServer, setHasServer] = useState(() => !isNative || hasServerUrl());
   // Auth state — initialize from localStorage so we don't flash the login screen on reload
   const [isAuthed, setIsAuthed] = useState(() => hasToken());
 
@@ -54,12 +56,16 @@ function App() {
     setIsAuthed(false);
   }
 
-  // On native app (Capacitor): show server setup screen until a URL is configured
-  if (!hasServer) {
-    return <ServerSetupScreen onSuccess={() => setHasServer(true)} />;
+  // Native app: single combined onboarding when server URL or auth token is missing
+  if (isNative && (!hasServer || !isAuthed)) {
+    return (
+      <NativeOnboardingScreen
+        onSuccess={() => { setHasServer(true); setIsAuthed(true); }}
+      />
+    );
   }
 
-  // Show login screen until the user has entered (or bypassed) their sync token
+  // Web: show login screen until the user has a sync token
   if (!isAuthed) {
     return <LoginScreen onSuccess={() => setIsAuthed(true)} />;
   }

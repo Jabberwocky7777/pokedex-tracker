@@ -187,7 +187,7 @@ export default function Layout({ allPokemon, meta, onLogout }: Props) {
           pb-[76px] on mobile leaves room for the bottom nav (60px + safe area).
         */}
         <div className="flex flex-1 overflow-hidden max-w-screen-2xl mx-auto w-full">
-          <main className="flex-1 min-w-0 overflow-y-auto pb-[76px] md:pb-0 flex flex-col">
+          <main className="flex-1 min-w-0 overflow-y-auto pb-[calc(76px+env(safe-area-inset-bottom,0px))] md:pb-0 flex flex-col">
             {viewMode === "daily" ? (
               <DailyChecklist allPokemon={allPokemon} />
             ) : viewMode === "box" ? (

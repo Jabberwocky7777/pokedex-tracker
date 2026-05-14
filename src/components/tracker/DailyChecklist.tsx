@@ -102,7 +102,7 @@ export default function DailyChecklist({ allPokemon }: Props) {
       )}
 
       {/* Pokémon list */}
-      <div className="overflow-y-auto flex-1 pb-[76px] md:pb-0">
+      <div className="overflow-y-auto flex-1 pb-[calc(76px+env(safe-area-inset-bottom,0px))] md:pb-0">
         {items.length === 0 ? (
           <div className="px-4 py-10 text-center text-sm text-gray-500">
             All caught! ✓

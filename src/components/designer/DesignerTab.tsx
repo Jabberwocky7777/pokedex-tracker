@@ -80,7 +80,7 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
 
       {!hasActiveSlot ? (
         // ── No slot selected: PC box fills the whole screen ──────────────────
-        <div className="flex-1 overflow-y-auto pb-[76px] md:pb-0">
+        <div className="flex-1 overflow-y-auto pb-[calc(76px+env(safe-area-inset-bottom,0px))] md:pb-0">
           <DesignerPcBox {...pcBoxProps} fullScreen />
         </div>
       ) : inCompareMode ? (
@@ -96,7 +96,7 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
               Close compare
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto pb-[76px] md:pb-0">
+          <div className="flex-1 overflow-y-auto pb-[calc(76px+env(safe-area-inset-bottom,0px))] md:pb-0">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 p-3">
               <DesignerPanel
                 key={`cmp-${activeSlotIndex}`}
@@ -172,7 +172,7 @@ export default function DesignerTab({ allPokemon, meta }: Props) {
             </div>
           )}
 
-          <div className="flex-1 overflow-y-auto pb-[76px] md:pb-0">
+          <div className="flex-1 overflow-y-auto pb-[calc(76px+env(safe-area-inset-bottom,0px))] md:pb-0">
             <DesignerPanel
               key={activeSlotIndex ?? -1}
               allPokemon={allPokemon}
