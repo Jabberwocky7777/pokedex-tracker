@@ -57,9 +57,22 @@ function safeCompare(a, b) {
   return timingSafeEqual(bufA, bufB);
 }
 
-app.use((_req, res, next) => {
-  // If CORS_ORIGIN is set, restrict to that origin; otherwise default to localhost dev server.
-  res.header("Access-Control-Allow-Origin", CORS_ORIGIN || "http://localhost:5173");
+// Build the set of allowed CORS origins.
+// CORS_ORIGIN can be a comma-separated list or a single value.
+// capacitor://localhost is always included so the iOS app can connect.
+const _configuredOrigins = CORS_ORIGIN
+  ? CORS_ORIGIN.split(",").map((s) => s.trim()).filter(Boolean)
+  : ["http://localhost:5173"];
+const _allowedOrigins = new Set([..._configuredOrigins, "capacitor://localhost"]);
+
+app.use((req, res, next) => {
+  const requestOrigin = req.headers["origin"] || "";
+  // Echo back the matched origin; fall back to the first configured origin.
+  const originHeader = _allowedOrigins.has(requestOrigin)
+    ? requestOrigin
+    : _configuredOrigins[0];
+  res.header("Access-Control-Allow-Origin", originHeader);
+  res.header("Vary", "Origin");
   res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   next();
