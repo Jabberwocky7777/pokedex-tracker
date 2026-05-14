@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <!-- Background: dark charcoal, slightly lighter in centre -->
+    <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </radialGradient>
+    <!-- Indigo aura behind the ball -->
+    <radialGradient id="aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#4f46e5" stop-opacity="0.35"/>
+      <stop offset="70%"  stop-color="#3730a3" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#030712" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Red half: highlight upper-left → deep red lower-right -->
+    <radialGradient id="redGrad" cx="38%" cy="35%" r="65%">
+      <stop offset="0%"   stop-color="#f87171"/>
+      <stop offset="50%"  stop-color="#dc2626"/>
+      <stop offset="100%" stop-color="#7f1d1d"/>
+    </radialGradient>
+    <!-- White half: bright upper-left → cool gray lower-right -->
+    <radialGradient id="whiteGrad" cx="38%" cy="65%" r="65%">
+      <stop offset="0%"   stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </radialGradient>
+    <!-- Clip: upper half of ball -->
+    <clipPath id="top">
+      <rect x="122" y="122" width="780" height="390"/>
+    </clipPath>
+    <!-- Clip: lower half of ball -->
+    <clipPath id="bot">
+      <rect x="122" y="512" width="780" height="390"/>
+    </clipPath>
+    <!-- Clip: ball circle (for centre band) -->
+    <clipPath id="ball">
+      <circle cx="512" cy="512" r="370"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── Background ──────────────────────────────────────────────── -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+
+  <!-- Indigo aura -->
+  <circle cx="512" cy="512" r="480" fill="url(#aura)"/>
+
+  <!-- ── Pokéball ────────────────────────────────────────────────── -->
+
+  <!-- Soft drop shadow -->
+  <ellipse cx="512" cy="548" rx="370" ry="28" fill="#000" opacity="0.45"/>
+
+  <!-- Outer ring (dark navy border) -->
+  <circle cx="512" cy="512" r="390" fill="#0f172a"/>
+
+  <!-- Red top half -->
+  <circle cx="512" cy="512" r="370" fill="url(#redGrad)" clip-path="url(#top)"/>
+
+  <!-- White bottom half -->
+  <circle cx="512" cy="512" r="370" fill="url(#whiteGrad)" clip-path="url(#bot)"/>
+
+  <!-- Centre band clipped to ball circle -->
+  <rect x="122" y="493" width="780" height="38" fill="#0f172a" clip-path="url(#ball)"/>
+
+  <!-- Gloss highlight on red half -->
+  <ellipse cx="420" cy="368" rx="115" ry="68"
+           fill="white" opacity="0.18"
+           transform="rotate(-25 420 368)"
+           clip-path="url(#top)"/>
+
+  <!-- ── Centre button ───────────────────────────────────────────── -->
+  <!-- Shadow ring -->
+  <circle cx="512" cy="512" r="95"  fill="#020617"/>
+  <!-- White face -->
+  <circle cx="512" cy="512" r="78"  fill="#f1f5f9"/>
+  <!-- Inner groove ring -->
+  <circle cx="512" cy="512" r="55"  fill="#e2e8f0"/>
+  <!-- Inner dot -->
+  <circle cx="512" cy="512" r="32"  fill="#cbd5e1"/>
+  <!-- Button gloss -->
+  <circle cx="500" cy="500" r="14"  fill="white" opacity="0.55"/>
+</svg>
